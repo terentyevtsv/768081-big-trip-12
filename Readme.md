@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Сергей Терентьев](https://up.htmlacademy.ru/ecmascript/12/user/768081).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Тимоновский](https://up.htmlacademy.ru/ecmascript/12/user/768125).
 
 ---
 
