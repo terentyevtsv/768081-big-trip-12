@@ -1,5 +1,14 @@
 'use strict';
 
+const ROUTE_POINT_COUNT = 3;
+
+const AddedComponentPosition = {
+  BEFORE_BEGIN: `beforebegin`,
+  AFTER_BEGIN: `afterbegin`,
+  BEFORE_END: `beforeend`,
+  AFTER_END: `afterend`
+};
+
 const createSiteMenuTemplate = () =>
   `<nav class="trip-controls__trip-tabs  trip-tabs">
     <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
@@ -490,3 +499,47 @@ const createTripPriceTemplate = () =>
   </p>`;
 
 const render = (container, template, place) => container.insertAdjacentHTML(place, template);
+
+// Отрисовка меню и фильтров
+const mainTripComponents = [
+  createSiteMenuTemplate,
+  createSiteFilterTemplate
+];
+
+const pageBodyElement = document.querySelector(`.page-body`);
+
+// Шапка
+const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
+
+// Маршрут
+render(tripMainElement, createTripInformationTemplate(), AddedComponentPosition.AFTER_BEGIN);
+
+// и стоимость
+const priceAndRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
+render(priceAndRouteElement, createTripPriceTemplate(), AddedComponentPosition.BEFORE_END);
+
+// Меню и фильтры
+const tripMainControlElements = tripMainElement
+  .querySelectorAll(`.trip-main__trip-controls .visually-hidden`);
+for (let i = 0; i < tripMainControlElements.length; ++i) {
+  render(tripMainControlElements[i], mainTripComponents[i](), AddedComponentPosition.AFTER_END);
+}
+
+// Сортировка
+const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
+render(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFORE_END);
+
+// Форма добавление/редактирования
+render(sortEditContentElement, createEventTemplate(), AddedComponentPosition.BEFORE_END);
+
+// Оферы и места
+const eventDetailsElement = sortEditContentElement.querySelector(`.event__details`);
+render(eventDetailsElement, createOffersTemplate(), AddedComponentPosition.BEFORE_END);
+render(eventDetailsElement, createDistinationTemplate(), AddedComponentPosition.BEFORE_END);
+
+// Какая-то дата путешествия
+render(sortEditContentElement, createTripDaysItemTemplate(), AddedComponentPosition.BEFORE_END);
+const tripEventsListElement = sortEditContentElement.querySelector(`.trip-events__list`);
+for (let i = 0; i < ROUTE_POINT_COUNT; ++i) {
+  render(tripEventsListElement, createTripEventsItemTemplate(), AddedComponentPosition.BEFORE_END);
+}
