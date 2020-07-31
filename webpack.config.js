@@ -8,5 +8,9 @@ module.exports = {
     filename: 'bundle.js',                  // Файл сборки
     path: path.join(__dirname, 'public'),   // Место расположения сборки (абсолютный путь до директории public)
   },
-  devtool: 'source-map'                     // Генерация source-map для быстрой навигации в файле сборки
+  devtool: 'source-map',                    // Генерация source-map для быстрой навигации в файле сборки
+  devServer: {
+    contentBase: path.join(__dirname, 'public'),
+    watchContentBase: true,
+  }
 };
