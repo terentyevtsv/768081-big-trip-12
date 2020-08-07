@@ -1,5 +1,24 @@
-import {createTripsTreeTemplate} from "./trip-days-item.js";
-import {render, AddedComponentPosition} from "../common.js";
+import {createTripEventsItemTemplate} from "./trip-events-item.js";
+import {render, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
+
+const MAX_OFFERS_COUNT = 3;
+
+const createTripDaysItemTemplate = (date, index) =>
+  `<li class="trip-days__item  day">
+    <div class="day__info">
+      <span class="day__counter">${index + 1}</span>
+      <time class="day__date" datetime="${dateToString(date)}">${monthDayToString(date)}</time>
+    </div>
+
+    <ul class="trip-events__list"></ul>
+  </li>`;
+
+const createOfferItemTemplate = (offer) =>
+  `<li class="event__offer">
+    <span class="event__offer-title">${offer.name}</span>
+    &plus;
+    &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+  </li>`;
 
 const createEventsPlanContainerTemplate = () =>
   `<ul class="trip-days"></ul>`;
@@ -37,15 +56,53 @@ export const createEventsPlanTemplate = (events) => {
       AddedComponentPosition.BEFORE_END
   );
 
-  const mapDateKeys = mapDates.keys();
   let index = 0;
-  for (const mapDateKey of mapDateKeys) {
+  const tripDaysElement = document.querySelector(`.trip-days`);
+  for (const mapDateKey of mapDates.keys()) {
     // Какая-то дата путешествия
     const date = new Date(mapDateKey);
-    const tmpEvents = mapDates.get(mapDateKey)
+
+    // Отрисовка очередной даты
+    render(
+        tripDaysElement,
+        createTripDaysItemTemplate(date, index++),
+        AddedComponentPosition.BEFORE_END
+    );
+  }
+
+  const tripDayElements = tripDaysElement.querySelectorAll(`.trip-days__item`);
+  const mapDateKeys = Array.from(mapDates.keys());
+  for (let i = 0; i < tripDayElements.length; ++i) {
+    // контейнер событий для контейнера текущей даты
+    const tripDayEventsContainerElement = tripDayElements[i].querySelector(`.trip-events__list`);
+
+    // события даты сортируем по дате начала
+    const tmpEvents = mapDates.get(mapDateKeys[i])
       .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
                       b.timeInterval.leftLimitDate.getTime());
+    for (let j = 0; j < tmpEvents.length; ++j) {
+      render(
+          tripDayEventsContainerElement,
+          createTripEventsItemTemplate(tmpEvents[j]),
+          AddedComponentPosition.BEFORE_END
+      );
+    }
 
-    createTripsTreeTemplate(date, tmpEvents, index++);
+    // Цикл по всем событиям данной даты
+    const currentDateEventElements = tripDayEventsContainerElement.querySelectorAll(`.trip-events__item`);
+    for (let j = 0; j < currentDateEventElements.length; ++j) {
+      const selectedOffersElement = currentDateEventElements[j].querySelector(`.event__selected-offers`);
+      for (let k = 0; k < tmpEvents[j].offers.length; ++k) {
+        if (k >= MAX_OFFERS_COUNT) {
+          break;
+        }
+
+        render(
+            selectedOffersElement,
+            createOfferItemTemplate(tmpEvents[j].offers[k]),
+            AddedComponentPosition.BEFORE_END
+        );
+      }
+    }
   }
 };

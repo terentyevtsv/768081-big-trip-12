@@ -171,6 +171,7 @@ const getRandomDestinationsDescription = () => {
 
 const getRandomTimeInterval = () => {
   const nowDate = new Date();
+
   const firstDate = new Date();
   const lastDate = new Date();
 
