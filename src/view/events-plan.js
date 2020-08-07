@@ -92,16 +92,20 @@ export const createEventsPlanTemplate = (events) => {
     const currentDateEventElements = tripDayEventsContainerElement.querySelectorAll(`.trip-events__item`);
     for (let j = 0; j < currentDateEventElements.length; ++j) {
       const selectedOffersElement = currentDateEventElements[j].querySelector(`.event__selected-offers`);
+      let cnt = 0;
       for (let k = 0; k < tmpEvents[j].offers.length; ++k) {
-        if (k >= MAX_OFFERS_COUNT) {
-          break;
-        }
+        if (tmpEvents[j].offers[k].isAccepted) {
+          ++cnt;
+          if (cnt > MAX_OFFERS_COUNT) {
+            break;
+          }
 
-        render(
-            selectedOffersElement,
-            createOfferItemTemplate(tmpEvents[j].offers[k]),
-            AddedComponentPosition.BEFORE_END
-        );
+          render(
+              selectedOffersElement,
+              createOfferItemTemplate(tmpEvents[j].offers[k]),
+              AddedComponentPosition.BEFORE_END
+          );
+        }
       }
     }
   }

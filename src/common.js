@@ -54,6 +54,17 @@ export const fullDateToString = (date) => {
   return `${date.getFullYear()}-${zeroBasedFormat(month)}-${zeroBasedFormat(date.getDate())}T${timeToString(date)}`;
 };
 
+export const shortYearDateToString = (date) => {
+  // для формы редактирования
+  const day = zeroBasedFormat(date.getDate());
+  const month = zeroBasedFormat(date.getMonth() + 1);
+  const year = zeroBasedFormat(date.getFullYear() % 100);
+  const hours = zeroBasedFormat(date.getHours());
+  const minutes = zeroBasedFormat(date.getMinutes());
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
+
 export const getDatesDelta = (date1, date2) => {
   let dateDelta = date2 - date1;
 

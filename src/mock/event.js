@@ -1,7 +1,7 @@
 import {getRandomInteger, getRandomDate} from "../common.js";
+import {CITIES, EventGroup} from "../const.js";
 
 const MAX_SENTENCE_COUNT = 5;
-const CITIES = [`Amsterdam`, `Geneva`, `Chamonix`, `Saint Petersburg`];
 const destinationDescriptions = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
   `Cras aliquet varius magna, non porta ligula feugiat eget.`,
@@ -20,17 +20,13 @@ const MIN_PRICE = 20;
 const MAX_PRICE = 200;
 const DAYS_BEFORE_AFTER = 5;
 
-const EventGroup = {
-  MOVEMENT: `to`,
-  PLACE: `in`
-};
-
 const typeOffers = new Map([
   [
     {
       name: `Taxi`,
       image: `img/icons/taxi.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `taxi`
     }, [
       {name: `Order Uber`, price: 30},
       {name: `Order Yandex`, price: 25},
@@ -41,14 +37,16 @@ const typeOffers = new Map([
     {
       name: `Bus`,
       image: `img/icons/bus.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `bus`
     }, []
   ],
   [
     {
       name: `Train`,
       image: `img/icons/train.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `train`
     }, [
       {name: `Econom`, price: 60},
       {name: `Stateroom`, price: 80},
@@ -59,7 +57,8 @@ const typeOffers = new Map([
     {
       name: `Ship`,
       image: `img/icons/ship.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `ship`
     }, [
       {name: `Entertainments on board`, price: 20},
       {name: `Alcohol`, price: 80},
@@ -69,14 +68,16 @@ const typeOffers = new Map([
     {
       name: `Transport`,
       image: `img/icons/transport.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `transport`
     }, []
   ],
   [
     {
       name: `Drive`,
       image: `img/icons/drive.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `drive`
     }, [
       {name: `Navigation`, price: 5},
       {name: `Full tank of fuel`, price: 40},
@@ -87,7 +88,8 @@ const typeOffers = new Map([
     {
       name: `Flight`,
       image: `img/icons/flight.png`,
-      eventGroup: EventGroup.MOVEMENT
+      eventGroup: EventGroup.MOVEMENT,
+      value: `flight`
     }, [
       {name: `Add luggage`, price: 30},
       {name: `Switch to comfort class`, price: 100},
@@ -100,7 +102,8 @@ const typeOffers = new Map([
     {
       name: `Check`,
       image: `img/icons/check-in.png`,
-      eventGroup: EventGroup.PLACE
+      eventGroup: EventGroup.PLACE,
+      value: `check-in`
     }, [
       {name: `Sea view`, price: 100},
       {name: `All inclusive`, price: 100},
@@ -112,8 +115,9 @@ const typeOffers = new Map([
   [
     {
       name: `Sightseeing`,
-      image: `img/icons/check-in.png`,
-      eventGroup: EventGroup.PLACE
+      image: `img/icons/sightseeing.png`,
+      eventGroup: EventGroup.PLACE,
+      value: `sightseeing`
     }, [
       {name: `Book tickets`, price: 40},
       {name: `Lunch in city`, price: 30},
@@ -124,7 +128,8 @@ const typeOffers = new Map([
     {
       name: `Restaurant`,
       image: `img/icons/restaurant.png`,
-      eventGroup: EventGroup.PLACE
+      eventGroup: EventGroup.PLACE,
+      value: `restaurant`
     }, [
       {name: `Desert`, price: 3},
       {name: `Beverage`, price: 2},
@@ -132,18 +137,6 @@ const typeOffers = new Map([
     ]
   ]
 ]);
-
-const eventTypes = Array.from(typeOffers.keys());
-
-const getOffers = (eventType) => {
-  return typeOffers.has(eventType)
-    ? typeOffers.get(eventType)
-    : null;
-};
-
-const getRandomEventType = () => {
-  return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
-};
 
 const getRandomDestinationsDescription = () => {
   // Случайное количество предложений
@@ -201,6 +194,18 @@ const getRandomTimeInterval = () => {
   };
 };
 
+export const eventTypes = Array.from(typeOffers.keys());
+
+const getRandomEventType = () => {
+  return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
+};
+
+export const getOffers = (eventType) => {
+  return typeOffers.has(eventType)
+    ? typeOffers.get(eventType)
+    : null;
+};
+
 export const generateEvent = () => {
   const evt = {
     eventType: getRandomEventType(),
@@ -213,9 +218,13 @@ export const generateEvent = () => {
   };
 
   const offers = getOffers(evt.eventType);
-  const offersCount = getRandomInteger(0, offers.length - 1);
-  for (let i = 0; i < offersCount; i++) {
-    evt.offers[i] = offers[i];
+
+  for (let i = 0; i < offers.length; i++) {
+    evt.offers[i] = {
+      name: offers[i].name,
+      price: offers[i].price,
+      isAccepted: Boolean(getRandomInteger())
+    };
   }
 
   return evt;

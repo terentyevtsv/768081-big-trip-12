@@ -34,7 +34,7 @@ const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
 render(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFORE_END);
 
 // Форма добавления и редактирования события
-createEventTemplate();
+createEventTemplate(null);
 
 // Какая-то дата путешествия
 createEventsPlanTemplate(events);
