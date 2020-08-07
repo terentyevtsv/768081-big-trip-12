@@ -25,6 +25,7 @@ export const createTripsTreeTemplate = (date, events, index) => {
   const tripDayElement = tripDayElements[tripDayElements.length - 1];
   const tripDayEventsContainerElement = tripDayElement.querySelector(`.trip-events__list`);
 
+  // Отрисовка списка точек маршрута
   for (let i = 0; i < events.length; ++i) {
     render(
         tripDayEventsContainerElement,

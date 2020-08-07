@@ -35,3 +35,13 @@ export const monthDayToString = (date) => {
 
   return `${monthNames[date.getMonth()]} ${day >= 10 ? day : `0${day}`}`;
 };
+
+export const timeToString = (date) => {
+  let hours = date.getHours();
+  hours = hours >= 10 ? hours : `0${hours}`;
+
+  let minutes = date.getMinutes();
+  minutes = minutes >= 10 ? minutes : `0${minutes}`;
+
+  return `${hours}:${minutes}`;
+}

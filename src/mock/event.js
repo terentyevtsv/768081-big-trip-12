@@ -20,52 +20,117 @@ const MIN_PRICE = 20;
 const MAX_PRICE = 200;
 const DAYS_BEFORE_AFTER = 5;
 
+const EventGroup = {
+  MOVEMENT: `to`,
+  PLACE: `in`
+};
+
 const typeOffers = new Map([
-  [`Taxi`, [
-    {name: `Order Uber`, price: 30},
-    {name: `Order Yandex`, price: 25},
-    {name: `Order Leader`, price: 27},
-  ]],
-  [`Bus`, []],
-  [`Train`, [
-    {name: `Econom`, price: 60},
-    {name: `Stateroom`, price: 80},
-    {name: `SV`, price: 130},
-  ]],
-  [`Ship`, [
-    {name: `Entertainments on board`, price: 20},
-    {name: `Alcohol`, price: 80},
-  ]],
-  [`Transport`, []],
-  [`Drive`, [
-    {name: `Navigation`, price: 5},
-    {name: `Full tank of fuel`, price: 40},
-    {name: `Video recorder`, price: 8},
-  ]],
-  [`Flight`, [
-    {name: `Add luggage`, price: 30},
-    {name: `Switch to comfort class`, price: 100},
-    {name: `Add meal`, price: 15},
-    {name: `Choose seats`, price: 5},
-    {name: `Travel by train`, price: 40}
-  ]],
-  [`Check`, [
-    {name: `Sea view`, price: 100},
-    {name: `All inclusive`, price: 100},
-    {name: `Meeting in arrival zone`, price: 15},
-    {name: `Lux`, price: 50},
-    {name: `Mini bar`, price: 20}
-  ]],
-  [`Sightseeing`, [
-    {name: `Book tickets`, price: 40},
-    {name: `Lunch in city`, price: 30},
-    {name: `Souvenirs`, price: 25}
-  ]],
-  [`Restaurant`, [
-    {name: `Desert`, price: 3},
-    {name: `Beverage`, price: 2},
-    {name: `Snack`, price: 1},
-  ]],
+  [
+    {
+      name: `Taxi`,
+      image: `img/icons/taxi.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, [
+      {name: `Order Uber`, price: 30},
+      {name: `Order Yandex`, price: 25},
+      {name: `Order Leader`, price: 27}
+    ]
+  ],
+  [
+    {
+      name: `Bus`,
+      image: `img/icons/bus.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, []
+  ],
+  [
+    {
+      name: `Train`,
+      image: `img/icons/train.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, [
+      {name: `Econom`, price: 60},
+      {name: `Stateroom`, price: 80},
+      {name: `SV`, price: 130},
+    ]
+  ],
+  [
+    {
+      name: `Ship`,
+      image: `img/icons/ship.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, [
+      {name: `Entertainments on board`, price: 20},
+      {name: `Alcohol`, price: 80},
+    ]
+  ],
+  [
+    {
+      name: `Transport`,
+      image: `img/icons/transport.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, []
+  ],
+  [
+    {
+      name: `Drive`,
+      image: `img/icons/drive.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, [
+      {name: `Navigation`, price: 5},
+      {name: `Full tank of fuel`, price: 40},
+      {name: `Video recorder`, price: 8},
+    ]
+  ],
+  [
+    {
+      name: `Flight`,
+      image: `img/icons/flight.png`,
+      eventGroup: EventGroup.MOVEMENT
+    }, [
+      {name: `Add luggage`, price: 30},
+      {name: `Switch to comfort class`, price: 100},
+      {name: `Add meal`, price: 15},
+      {name: `Choose seats`, price: 5},
+      {name: `Travel by train`, price: 40}
+    ]
+  ],
+  [
+    {
+      name: `Check`,
+      image: `img/icons/check-in.png`,
+      eventGroup: EventGroup.PLACE
+    }, [
+      {name: `Sea view`, price: 100},
+      {name: `All inclusive`, price: 100},
+      {name: `Meeting in arrival zone`, price: 15},
+      {name: `Lux`, price: 50},
+      {name: `Mini bar`, price: 20}
+    ]
+  ],
+  [
+    {
+      name: `Sightseeing`,
+      image: `img/icons/check-in.png`,
+      eventGroup: EventGroup.PLACE
+    }, [
+      {name: `Book tickets`, price: 40},
+      {name: `Lunch in city`, price: 30},
+      {name: `Souvenirs`, price: 25}
+    ]
+  ],
+  [
+    {
+      name: `Restaurant`,
+      image: `img/icons/restaurant.png`,
+      eventGroup: EventGroup.PLACE
+    }, [
+      {name: `Desert`, price: 3},
+      {name: `Beverage`, price: 2},
+      {name: `Snack`, price: 1},
+    ]
+  ]
 ]);
 
 const eventTypes = Array.from(typeOffers.keys());
