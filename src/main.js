@@ -5,6 +5,11 @@ import {createEventTemplate} from "./view/full-event-creator.js";
 import {render, AddedComponentPosition} from "./common.js";
 import {createEventsPlanTemplate} from "./view/events-plan.js";
 import {createTripInformationTemplate} from "./view/trip-information.js";
+import {generateEvent} from "./mock/event.js";
+
+const EVENTS_COUNT = 20;
+
+const events = new Array(EVENTS_COUNT).fill().map(generateEvent);
 
 const pageBodyElement = document.querySelector(`.page-body`);
 
@@ -32,4 +37,4 @@ render(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFO
 createEventTemplate();
 
 // Какая-то дата путешествия
-createEventsPlanTemplate();
+createEventsPlanTemplate(events);

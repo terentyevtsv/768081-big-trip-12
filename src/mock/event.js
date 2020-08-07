@@ -68,6 +68,8 @@ const typeOffers = new Map([
   ]],
 ]);
 
+const eventTypes = Array.from(typeOffers.keys());
+
 const getOffers = (eventType) => {
   return typeOffers.has(eventType)
     ? typeOffers.get(eventType)
@@ -75,7 +77,6 @@ const getOffers = (eventType) => {
 };
 
 const getRandomEventType = () => {
-  const eventTypes = typeOffers.keys;
   return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
 };
 
@@ -110,18 +111,31 @@ const getRandomTimeInterval = () => {
 
   // Определили диапазон дат
   firstDate.setDate(nowDate.getDate() - DAYS_BEFORE_AFTER);
+  firstDate.setHours(0, 0, 0);
+
   lastDate.setDate(nowDate.getDate() + DAYS_BEFORE_AFTER);
   lastDate.setHours(23, 59, 59);
 
-  let date1 = getRandomDate(firstDate, lastDate);
-  let date2 = getRandomDate(firstDate, lastDate);
+  const date1 = getRandomDate(firstDate, lastDate);
+  const date2 = getRandomDate(firstDate, lastDate);
+
+  if (date1 === date2) {
+    return {
+      leftLimitDate: date1,
+      rightLimitDate: date2
+    };
+  }
+
+  const leftLimitDate = date1 < date2 ? date1 : date2;
+  const rightLimitDate = date1 < date2 ? date2 : date1;
+
   return {
-    leftLimitDate: Math.min(date1, date2),
-    rightLimitDate: Math.max(date1, date2)
+    leftLimitDate,
+    rightLimitDate
   };
 };
 
-const generateEvent = () => {
+export const generateEvent = () => {
   const evt = {
     eventType: getRandomEventType(),
     city: CITIES[getRandomInteger(0, CITIES.length - 1)],
