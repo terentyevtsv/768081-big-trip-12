@@ -138,30 +138,6 @@ const typeOffers = new Map([
   ]
 ]);
 
-const getRandomDestinationsDescription = () => {
-  // Случайное количество предложений
-  const sentenceCount = getRandomInteger(0, MAX_SENTENCE_COUNT);
-
-  // Считаем, что если количество предложений 0, то описание отсутствует
-  if (sentenceCount === 0) {
-    return null;
-  }
-
-  // Формируем описание из заданного количества предложений и фотографий
-  let fullDescription = ``;
-  const photos = [];
-  for (let i = 0; i < sentenceCount; i++) {
-    fullDescription +=
-      ` ${destinationDescriptions[getRandomInteger(0, destinationDescriptions.length - 1)]}`;
-    photos[i] = `http://picsum.photos/248/152?r=${Math.random()}`;
-  }
-
-  return {
-    description: fullDescription,
-    photos
-  };
-};
-
 const getRandomTimeInterval = () => {
   const nowDate = new Date();
 
@@ -204,6 +180,30 @@ export const getOffers = (eventType) => {
   return typeOffers.has(eventType)
     ? typeOffers.get(eventType)
     : null;
+};
+
+export const getRandomDestinationsDescription = () => {
+  // Случайное количество предложений
+  const sentenceCount = getRandomInteger(0, MAX_SENTENCE_COUNT);
+
+  // Считаем, что если количество предложений 0, то описание отсутствует
+  if (sentenceCount === 0) {
+    return null;
+  }
+
+  // Формируем описание из заданного количества предложений и фотографий
+  let fullDescription = ``;
+  const photos = [];
+  for (let i = 0; i < sentenceCount; i++) {
+    fullDescription +=
+      ` ${destinationDescriptions[getRandomInteger(0, destinationDescriptions.length - 1)]}`;
+    photos[i] = `http://picsum.photos/248/152?r=${Math.random()}`;
+  }
+
+  return {
+    description: fullDescription,
+    photos
+  };
 };
 
 export const generateEvent = () => {

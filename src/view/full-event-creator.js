@@ -2,7 +2,7 @@ import {createOffersTemplate} from "./offers.js";
 import {createDistinationTemplate} from "./destination.js";
 import {AddedComponentPosition, render, shortYearDateToString} from "../common.js";
 import {CITIES, EventGroup} from "../const.js";
-import {eventTypes, getOffers} from "../mock/event.js";
+import {eventTypes, getOffers, getRandomDestinationsDescription} from "../mock/event.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -159,7 +159,7 @@ export const createEventTemplate = (evt = null, placeContainer) => {
       eventType: eventTypes[0],
       city: CITIES[0],
       offers: [],
-      destination: null,
+      destination: getRandomDestinationsDescription(),
       isFavorite: false,
       price: 0
     };

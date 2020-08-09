@@ -1,6 +1,7 @@
 import {createTripEventsItemTemplate} from "./trip-events-item.js";
 import {render, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
 import {createEventTemplate} from "./full-event-creator.js";
+import {getRandomDestinationsDescription} from "../mock/event.js";
 
 const MAX_OFFERS_COUNT = 3;
 const FIRST_DATE_INDEX = 0;
