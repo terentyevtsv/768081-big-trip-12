@@ -129,7 +129,13 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     ? `<button class="event__reset-btn" type="reset">Cancel</button>`
     : `<button class="event__reset-btn" type="reset">Delete</button>
 
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+      <input
+        id="event-favorite-1"
+        class="event__favorite-checkbox  visually-hidden"
+        type="checkbox"
+        name="event-favorite"
+        ${evt.isFavorite ? `checked` : ``}
+      >
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">

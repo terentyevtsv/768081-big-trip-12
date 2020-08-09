@@ -1,5 +1,6 @@
 import {createTripEventsItemTemplate} from "./trip-events-item.js";
 import {render, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
+import {createEventTemplate} from "./full-event-creator.js";
 
 const MAX_OFFERS_COUNT = 3;
 const FIRST_DATE_INDEX = 0;
@@ -84,15 +85,20 @@ export const createEventsPlanTemplate = (events) => {
       .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
                       b.timeInterval.leftLimitDate.getTime());
     for (let j = 0; j < tmpEvents.length; ++j) {
+      const isFirstEditableEvent = i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX;
       render(
           tripDayEventsContainerElement,
           createTripEventsItemTemplate(
               tmpEvents[j],
-              tripDayEventsContainerElement,
-              i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX
+              isFirstEditableEvent
           ),
           AddedComponentPosition.BEFORE_END
       );
+
+      if (isFirstEditableEvent) {
+        const editableEventContainerElement = tripDayEventsContainerElement.querySelector(`.trip-events__item`);
+        createEventTemplate(tmpEvents[j], editableEventContainerElement);
+      }
     }
 
     // Цикл по всем событиям данной даты

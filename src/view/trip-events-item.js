@@ -211,9 +211,9 @@ const createReadingTripEventsItemTemplate = (evt) =>
     </button>
   </div>`;
 
-export const createTripEventsItemTemplate = (evt, newEventContainerElement, isReadOnly) =>
+export const createTripEventsItemTemplate = (evt, isEditable) =>
   `<li class="trip-events__item">
-    ${isReadOnly
-    ? createEditableTripEventsItemTemplate(evt)
-    : createReadingTripEventsItemTemplate(evt)}
+    ${!isEditable
+    ? createReadingTripEventsItemTemplate(evt)
+    : ``}
   </li>`;
