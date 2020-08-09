@@ -1,5 +1,5 @@
 import {getRandomInteger, getRandomDate} from "../common.js";
-import {CITIES, EventGroup} from "../const.js";
+import {EventGroup} from "../const.js";
 
 const MAX_SENTENCE_COUNT = 5;
 const destinationDescriptions = [
@@ -170,19 +170,7 @@ const getRandomTimeInterval = () => {
   };
 };
 
-export const eventTypes = Array.from(typeOffers.keys());
-
-const getRandomEventType = () => {
-  return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
-};
-
-export const getOffers = (eventType) => {
-  return typeOffers.has(eventType)
-    ? typeOffers.get(eventType)
-    : null;
-};
-
-export const getRandomDestinationsDescription = () => {
+const getRandomDestinationsDescription = () => {
   // Случайное количество предложений
   const sentenceCount = getRandomInteger(0, MAX_SENTENCE_COUNT);
 
@@ -206,12 +194,31 @@ export const getRandomDestinationsDescription = () => {
   };
 };
 
+export const cities = new Map([
+  [`Amsterdam`, getRandomDestinationsDescription()],
+  [`Geneva`, getRandomDestinationsDescription()],
+  [`Chamonix`, getRandomDestinationsDescription()],
+  [`Saint Petersburg`, getRandomDestinationsDescription()]
+]);
+
+export const eventTypes = Array.from(typeOffers.keys());
+
+const getRandomEventType = () => {
+  return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
+};
+
+export const getOffers = (eventType) => {
+  return typeOffers.has(eventType)
+    ? typeOffers.get(eventType)
+    : null;
+};
+
 export const generateEvent = () => {
+  const tmpCities = Array.from(cities.keys());
   const evt = {
     eventType: getRandomEventType(),
-    city: CITIES[getRandomInteger(0, CITIES.length - 1)],
+    city: tmpCities[getRandomInteger(0, tmpCities.length - 1)],
     offers: [],
-    destination: getRandomDestinationsDescription(),
     isFavorite: Boolean(getRandomInteger()),
     price: getRandomInteger(MIN_PRICE, MAX_PRICE),
     timeInterval: getRandomTimeInterval()

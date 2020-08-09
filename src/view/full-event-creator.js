@@ -1,8 +1,10 @@
 import {createOffersTemplate} from "./offers.js";
-import {createDistinationTemplate} from "./destination.js";
+import {createDestinationTemplate} from "./destination.js";
 import {AddedComponentPosition, render, shortYearDateToString} from "../common.js";
-import {CITIES, EventGroup} from "../const.js";
-import {eventTypes, getOffers, getRandomDestinationsDescription} from "../mock/event.js";
+import {EventGroup} from "../const.js";
+import {eventTypes, getOffers, cities} from "../mock/event.js";
+
+const EMPTY_EVENT_INDEX = 0;
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -82,7 +84,7 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
           list="destination-list-1"
         >
         <datalist id="destination-list-1">
-          ${CITIES.map((city) => `<option value="${city}"></option>`).join(``)}
+          ${Array.from(cities.keys()).map((city) => `<option value="${city}"></option>`).join(``)}
         </datalist>
       </div>
 
@@ -154,12 +156,13 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
 export const createEventTemplate = (evt = null, placeContainer) => {
   let isNewEvent = false;
   if (evt === null) {
+    const tmpCities = Array.from(cities.keys());
     isNewEvent = true;
     evt = {
-      eventType: eventTypes[0],
-      city: CITIES[0],
+      eventType: eventTypes[EMPTY_EVENT_INDEX],
+      city: tmpCities[EMPTY_EVENT_INDEX],
       offers: [],
-      destination: getRandomDestinationsDescription(),
+      destination: cities.get(tmpCities[EMPTY_EVENT_INDEX]),
       isFavorite: false,
       price: 0
     };
@@ -200,10 +203,11 @@ export const createEventTemplate = (evt = null, placeContainer) => {
       );
     }
 
-    if (evt.destination !== null) {
+    const destination = cities.get(evt.city);
+    if (destination !== null) {
       render(
           eventDetailsElement,
-          createDistinationTemplate(evt.destination),
+          createDestinationTemplate(destination),
           AddedComponentPosition.BEFORE_END
       );
     }
