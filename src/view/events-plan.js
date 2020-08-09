@@ -2,6 +2,8 @@ import {createTripEventsItemTemplate} from "./trip-events-item.js";
 import {render, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
 
 const MAX_OFFERS_COUNT = 3;
+const FIRST_DATE_INDEX = 0;
+const FIRST_EVENT_INDEX = 0;
 
 const createTripDaysItemTemplate = (date, index) =>
   `<li class="trip-days__item  day">
@@ -72,6 +74,7 @@ export const createEventsPlanTemplate = (events) => {
 
   const tripDayElements = tripDaysElement.querySelectorAll(`.trip-days__item`);
   const mapDateKeys = Array.from(mapDates.keys());
+
   for (let i = 0; i < tripDayElements.length; ++i) {
     // контейнер событий для контейнера текущей даты
     const tripDayEventsContainerElement = tripDayElements[i].querySelector(`.trip-events__list`);
@@ -86,7 +89,7 @@ export const createEventsPlanTemplate = (events) => {
           createTripEventsItemTemplate(
               tmpEvents[j],
               tripDayEventsContainerElement,
-              i === 0 && j === 0
+              i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX
           ),
           AddedComponentPosition.BEFORE_END
       );
@@ -95,8 +98,11 @@ export const createEventsPlanTemplate = (events) => {
     // Цикл по всем событиям данной даты
     const currentDateEventElements = tripDayEventsContainerElement.querySelectorAll(`.trip-events__item`);
     for (let j = 0; j < currentDateEventElements.length; ++j) {
+      if (i === FIRST_DATE_INDEX && FIRST_EVENT_INDEX === 0) {
+        continue;
+      }
       const selectedOffersElement = currentDateEventElements[j].querySelector(`.event__selected-offers`);
-      let cnt = 0;
+      let cnt = 0; // счетчик предложений для короткой записи события
       for (let k = 0; k < tmpEvents[j].offers.length; ++k) {
         if (tmpEvents[j].offers[k].isAccepted) {
           ++cnt;
