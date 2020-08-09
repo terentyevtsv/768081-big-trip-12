@@ -83,7 +83,11 @@ export const createEventsPlanTemplate = (events) => {
     for (let j = 0; j < tmpEvents.length; ++j) {
       render(
           tripDayEventsContainerElement,
-          createTripEventsItemTemplate(tmpEvents[j]),
+          createTripEventsItemTemplate(
+              tmpEvents[j],
+              tripDayEventsContainerElement,
+              i === 0 && j === 0
+          ),
           AddedComponentPosition.BEFORE_END
       );
     }

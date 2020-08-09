@@ -145,7 +145,7 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     <section class="event__details"></section>
   </form>`;
 
-export const createEventTemplate = (evt = null) => {
+export const createEventTemplate = (evt = null, placeContainer) => {
   let isNewEvent = false;
   if (evt === null) {
     isNewEvent = true;
@@ -176,18 +176,15 @@ export const createEventTemplate = (evt = null) => {
     }
   }
 
-  const pageBodyElement = document.querySelector(`.page-body`);
-  const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
-
   // Форма добавление/редактирования
   render(
-      sortEditContentElement,
+      placeContainer,
       createEmptyEventTemplate(evt, isNewEvent),
       AddedComponentPosition.BEFORE_END
   );
 
   // Оферы и места
-  const eventDetailsElement = sortEditContentElement.querySelector(`.event__details`);
+  const eventDetailsElement = placeContainer.querySelector(`.event__details`);
   if (evt.offers.length > 0 || evt.destination !== null) {
     if (evt.offers.length > 0) {
       render(
