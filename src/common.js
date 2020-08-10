@@ -5,6 +5,11 @@ export const AddedComponentPosition = {
   AFTER_END: `afterend`
 };
 
+const MONTH_NAMES = [
+  `Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`,
+  `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`
+];
+
 const zeroBasedFormat = (value) => {
   return value >= 10 ? `${value}` : `0${value}`;
 };
@@ -31,13 +36,9 @@ export const dateToString = (date) => {
 };
 
 export const monthDayToString = (date) => {
-  const monthNames = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`,
-    `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`
-  ];
-
   const day = date.getDate();
 
-  return `${monthNames[date.getMonth()]} ${zeroBasedFormat(day)}`;
+  return `${MONTH_NAMES[date.getMonth()]} ${zeroBasedFormat(day)}`;
 };
 
 export const timeToString = (date) => {
@@ -103,3 +104,6 @@ export const getDatesDelta = (date1, date2) => {
 
   return delta;
 };
+
+export const getDateForInterval = (date1) =>
+  `${zeroBasedFormat(date1.getDate())} ${MONTH_NAMES[date1.getMonth()].toUpperCase()}`;

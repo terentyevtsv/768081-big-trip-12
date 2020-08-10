@@ -16,8 +16,6 @@ const pageBodyElement = document.querySelector(`.page-body`);
 // Шапка
 const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
 
-createTripInformationTemplate();
-
 // Отрисовка меню и фильтров
 const mainTripComponents = [
   createSiteMenuTemplate,
@@ -36,5 +34,7 @@ render(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFO
 // Форма добавления и редактирования события
 createEventTemplate(null, sortEditContentElement);
 
-// Какая-то дата путешествия
-createEventsPlanTemplate(events);
+// Формирование дерева плана путешествия
+const planDateEventsMap = createEventsPlanTemplate(events);
+
+createTripInformationTemplate(planDateEventsMap);

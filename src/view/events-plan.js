@@ -84,6 +84,8 @@ export const createEventsPlanTemplate = (events) => {
     const tmpEvents = mapDates.get(mapDateKeys[i])
       .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
                       b.timeInterval.leftLimitDate.getTime());
+
+    // Цикл по всем событиям данной даты
     for (let j = 0; j < tmpEvents.length; ++j) {
       const isFirstEditableEvent = i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX;
       render(
@@ -101,7 +103,6 @@ export const createEventsPlanTemplate = (events) => {
       }
     }
 
-    // Цикл по всем событиям данной даты
     const currentDateEventElements = tripDayEventsContainerElement.querySelectorAll(`.trip-events__item`);
     for (let j = 0; j < currentDateEventElements.length; ++j) {
       if (i === FIRST_DATE_INDEX && FIRST_EVENT_INDEX === 0) {
@@ -125,4 +126,6 @@ export const createEventsPlanTemplate = (events) => {
       }
     }
   }
+
+  return mapDates;
 };
