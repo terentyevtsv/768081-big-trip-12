@@ -1,8 +1,6 @@
 export const AddedComponentPosition = {
-  BEFORE_BEGIN: `beforebegin`,
   AFTER_BEGIN: `afterbegin`,
-  BEFORE_END: `beforeend`,
-  AFTER_END: `afterend`
+  BEFORE_END: `beforeend`
 };
 
 const MONTH_NAMES = [
@@ -14,7 +12,27 @@ const zeroBasedFormat = (value) => {
   return value >= 10 ? `${value}` : `0${value}`;
 };
 
-export const render = (container, template, place) => container.insertAdjacentHTML(place, template);
+export const renderElement = (container, element, place) => {
+  switch (place) {
+    case AddedComponentPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case AddedComponentPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const renderTemplate = (container, template, place) => {
+  container.insertAdjacentHTML(place, template);
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
 
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));

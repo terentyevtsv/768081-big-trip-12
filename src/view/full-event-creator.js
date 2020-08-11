@@ -1,6 +1,6 @@
 import {createOffersTemplate} from "./offers.js";
 import {createDestinationTemplate} from "./destination.js";
-import {AddedComponentPosition, render, shortYearDateToString} from "../common.js";
+import {AddedComponentPosition, renderTemplate, shortYearDateToString} from "../common.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, getOffers, cities} from "../mock/event.js";
 
@@ -186,7 +186,7 @@ export const createEventTemplate = (evt = null, placeContainer) => {
   }
 
   // Форма добавление/редактирования
-  render(
+  renderTemplate(
       placeContainer,
       createEmptyEventTemplate(evt, isNewEvent),
       AddedComponentPosition.BEFORE_END
@@ -196,7 +196,7 @@ export const createEventTemplate = (evt = null, placeContainer) => {
   const eventDetailsElement = placeContainer.querySelector(`.event__details`);
   if (evt.offers.length > 0 || evt.destination !== null) {
     if (evt.offers.length > 0) {
-      render(
+      renderTemplate(
           eventDetailsElement,
           createOffersTemplate(evt.offers),
           AddedComponentPosition.BEFORE_END
@@ -205,7 +205,7 @@ export const createEventTemplate = (evt = null, placeContainer) => {
 
     const destination = cities.get(evt.city);
     if (destination !== null) {
-      render(
+      renderTemplate(
           eventDetailsElement,
           createDestinationTemplate(destination),
           AddedComponentPosition.BEFORE_END

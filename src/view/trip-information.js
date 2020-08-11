@@ -1,4 +1,4 @@
-import {render, AddedComponentPosition} from "../common.js";
+import {renderTemplate, AddedComponentPosition} from "../common.js";
 import {createTripPriceTemplate} from "./trip-price.js";
 import {getDateForInterval} from "../common.js";
 
@@ -75,7 +75,7 @@ export const createTripInformationTemplate = (planDateEventsMap) => {
   // Маршрут
   const pageBodyElement = document.querySelector(`.page-body`);
   const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
-  render(
+  renderTemplate(
       tripMainElement,
       createTripInformationContainerTemplate(planDateEventsMap),
       AddedComponentPosition.AFTER_BEGIN
@@ -83,7 +83,7 @@ export const createTripInformationTemplate = (planDateEventsMap) => {
 
   // и стоимость
   const priceAndRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
-  render(
+  renderTemplate(
       priceAndRouteElement,
       createTripPriceTemplate(planDateEventsMap),
       AddedComponentPosition.BEFORE_END

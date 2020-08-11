@@ -1,8 +1,8 @@
-import {createSiteMenuTemplate} from "./view/site-menu.js";
-import {createSiteFilterTemplate} from "./view/filter.js";
+import {createSiteMenuTemplate, createSiteMenuHeaderTemplate} from "./view/site-menu.js";
+import {createSiteFilterTemplate, createSiteFilterHeaderTemplate} from "./view/filter.js";
 import {createSortTemplate} from "./view/sorting.js";
 import {createEventTemplate} from "./view/full-event-creator.js";
-import {render, AddedComponentPosition} from "./common.js";
+import {renderTemplate, AddedComponentPosition} from "./common.js";
 import {createEventsPlanTemplate} from "./view/events-plan.js";
 import {createTripInformationTemplate} from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
@@ -18,18 +18,24 @@ const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
 
 // Отрисовка меню и фильтров
 const mainTripComponents = [
+  createSiteMenuHeaderTemplate,
   createSiteMenuTemplate,
+  createSiteFilterHeaderTemplate,
   createSiteFilterTemplate
 ];
-const tripMainControlElements = tripMainElement
-  .querySelectorAll(`.trip-main__trip-controls .visually-hidden`);
-for (let i = 0; i < tripMainControlElements.length; ++i) {
-  render(tripMainControlElements[i], mainTripComponents[i](), AddedComponentPosition.AFTER_END);
+const tripMainTripControlElement = tripMainElement
+  .querySelector(`.trip-main__trip-controls`);
+for (let i = 0; i < mainTripComponents.length; ++i) {
+  renderTemplate(
+      tripMainTripControlElement,
+      mainTripComponents[i](),
+      AddedComponentPosition.BEFORE_END
+  );
 }
 
 // Сортировка
 const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
-render(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFORE_END);
+renderTemplate(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFORE_END);
 
 // Форма добавления и редактирования события
 createEventTemplate(null, sortEditContentElement);

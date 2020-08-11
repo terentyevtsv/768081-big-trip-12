@@ -1,5 +1,5 @@
 import {createTripEventsItemTemplate} from "./trip-events-item.js";
-import {render, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
+import {renderTemplate, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
 import {createEventTemplate} from "./full-event-creator.js";
 
 const MAX_OFFERS_COUNT = 3;
@@ -53,7 +53,7 @@ export const createEventsPlanTemplate = (events) => {
     .querySelector(`.trip-events`);
 
   // Отрисовка контейнера дат
-  render(
+  renderTemplate(
       tripEventsElement,
       createEventsPlanContainerTemplate(),
       AddedComponentPosition.BEFORE_END
@@ -66,7 +66,7 @@ export const createEventsPlanTemplate = (events) => {
     const date = new Date(mapDateKey);
 
     // Отрисовка очередной даты
-    render(
+    renderTemplate(
         tripDaysElement,
         createTripDaysItemTemplate(date, index++),
         AddedComponentPosition.BEFORE_END
@@ -88,7 +88,7 @@ export const createEventsPlanTemplate = (events) => {
     // Цикл по всем событиям данной даты
     for (let j = 0; j < tmpEvents.length; ++j) {
       const isFirstEditableEvent = i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX;
-      render(
+      renderTemplate(
           tripDayEventsContainerElement,
           createTripEventsItemTemplate(
               tmpEvents[j],
@@ -117,7 +117,7 @@ export const createEventsPlanTemplate = (events) => {
             break;
           }
 
-          render(
+          renderTemplate(
               selectedOffersElement,
               createOfferItemTemplate(tmpEvents[j].offers[k]),
               AddedComponentPosition.BEFORE_END
