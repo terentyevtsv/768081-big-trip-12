@@ -14,10 +14,10 @@ const zeroBasedFormat = (value) => {
 
 export const renderElement = (container, element, place) => {
   switch (place) {
-    case AddedComponentPosition.AFTERBEGIN:
+    case AddedComponentPosition.AFTER_BEGIN:
       container.prepend(element);
       break;
-    case AddedComponentPosition.BEFOREEND:
+    case AddedComponentPosition.BEFORE_END:
       container.append(element);
       break;
   }

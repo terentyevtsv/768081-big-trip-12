@@ -1,6 +1,7 @@
 import {timeToString, fullDateToString, getDatesDelta} from "../common.js";
+import {createElement} from "../common.js";
 
-const createReadingTripEventsItemTemplate = (evt) =>
+const createReadingEventsItemTemplate = (evt) =>
   `<div class="event">
     <div class="event__type">
       <img
@@ -37,9 +38,32 @@ const createReadingTripEventsItemTemplate = (evt) =>
     </button>
   </div>`;
 
-export const createTripEventsItemTemplate = (evt, isEditable) =>
+const createTripEventsItemTemplate = (evt, isEditable) =>
   `<li class="trip-events__item">
     ${!isEditable
-    ? createReadingTripEventsItemTemplate(evt)
+    ? createReadingEventsItemTemplate(evt)
     : ``}
   </li>`;
+
+export default class TripEventsItem {
+  constructor(evt, isEditable) {
+    this._evt = evt;
+    this._isEditable = isEditable;
+  }
+
+  getTemplate() {
+    return createTripEventsItemTemplate(this._evt, this._isEditable);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

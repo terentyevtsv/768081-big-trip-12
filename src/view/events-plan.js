@@ -1,30 +1,13 @@
-import {createTripEventsItemTemplate} from "./trip-events-item.js";
-import {renderTemplate, AddedComponentPosition, dateToString, monthDayToString} from "../common.js";
+import TripEventsItemView from "./trip-events-item.js";
+import {AddedComponentPosition, renderElement} from "../common.js";
 import {createEventTemplate} from "./full-event-creator.js";
+import TripDaysItemView from "./trip-days-item.js";
+import OfferItemView from "./offer-item.js";
+import EventsPlanContainerView from "./events-plan-container.js";
 
 const MAX_OFFERS_COUNT = 3;
 const FIRST_DATE_INDEX = 0;
 const FIRST_EVENT_INDEX = 0;
-
-const createTripDaysItemTemplate = (date, index) =>
-  `<li class="trip-days__item  day">
-    <div class="day__info">
-      <span class="day__counter">${index + 1}</span>
-      <time class="day__date" datetime="${dateToString(date)}">${monthDayToString(date)}</time>
-    </div>
-
-    <ul class="trip-events__list"></ul>
-  </li>`;
-
-const createOfferItemTemplate = (offer) =>
-  `<li class="event__offer">
-    <span class="event__offer-title">${offer.name}</span>
-    &plus;
-    &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-  </li>`;
-
-const createEventsPlanContainerTemplate = () =>
-  `<ul class="trip-days"></ul>`;
 
 export const createEventsPlanTemplate = (events) => {
   const datesSet = new Set();
@@ -53,9 +36,9 @@ export const createEventsPlanTemplate = (events) => {
     .querySelector(`.trip-events`);
 
   // Отрисовка контейнера дат
-  renderTemplate(
+  renderElement(
       tripEventsElement,
-      createEventsPlanContainerTemplate(),
+      new EventsPlanContainerView().getElement(),
       AddedComponentPosition.BEFORE_END
   );
 
@@ -66,9 +49,9 @@ export const createEventsPlanTemplate = (events) => {
     const date = new Date(mapDateKey);
 
     // Отрисовка очередной даты
-    renderTemplate(
+    renderElement(
         tripDaysElement,
-        createTripDaysItemTemplate(date, index++),
+        new TripDaysItemView(date, index++).getElement(),
         AddedComponentPosition.BEFORE_END
     );
   }
@@ -88,12 +71,9 @@ export const createEventsPlanTemplate = (events) => {
     // Цикл по всем событиям данной даты
     for (let j = 0; j < tmpEvents.length; ++j) {
       const isFirstEditableEvent = i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX;
-      renderTemplate(
+      renderElement(
           tripDayEventsContainerElement,
-          createTripEventsItemTemplate(
-              tmpEvents[j],
-              isFirstEditableEvent
-          ),
+          new TripEventsItemView(tmpEvents[j], isFirstEditableEvent).getElement(),
           AddedComponentPosition.BEFORE_END
       );
 
@@ -117,9 +97,9 @@ export const createEventsPlanTemplate = (events) => {
             break;
           }
 
-          renderTemplate(
+          renderElement(
               selectedOffersElement,
-              createOfferItemTemplate(tmpEvents[j].offers[k]),
+              new OfferItemView(tmpEvents[j].offers[k]).getElement(),
               AddedComponentPosition.BEFORE_END
           );
         }
