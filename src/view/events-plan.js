@@ -1,5 +1,5 @@
 import TripEventsItemView from "./trip-events-item.js";
-import {AddedComponentPosition, renderElement} from "../common.js";
+import {AddedComponentPosition, render} from "../common.js";
 import {createEventTemplate} from "./full-event-creator.js";
 import TripDaysItemView from "./trip-days-item.js";
 import OfferItemView from "./offer-item.js";
@@ -36,7 +36,7 @@ export const createEventsPlanTemplate = (events) => {
     .querySelector(`.trip-events`);
 
   // Отрисовка контейнера дат
-  renderElement(
+  render(
       tripEventsElement,
       new EventsPlanContainerView().getElement(),
       AddedComponentPosition.BEFORE_END
@@ -49,7 +49,7 @@ export const createEventsPlanTemplate = (events) => {
     const date = new Date(mapDateKey);
 
     // Отрисовка очередной даты
-    renderElement(
+    render(
         tripDaysElement,
         new TripDaysItemView(date, index++).getElement(),
         AddedComponentPosition.BEFORE_END
@@ -71,24 +71,27 @@ export const createEventsPlanTemplate = (events) => {
     // Цикл по всем событиям данной даты
     for (let j = 0; j < tmpEvents.length; ++j) {
       const isFirstEditableEvent = i === FIRST_DATE_INDEX && j === FIRST_EVENT_INDEX;
-      renderElement(
+      render(
           tripDayEventsContainerElement,
           new TripEventsItemView(tmpEvents[j], isFirstEditableEvent).getElement(),
           AddedComponentPosition.BEFORE_END
       );
 
       if (isFirstEditableEvent) {
-        const editableEventContainerElement = tripDayEventsContainerElement.querySelector(`.trip-events__item`);
+        const editableEventContainerElement = tripDayEventsContainerElement
+          .querySelector(`.trip-events__item`);
         createEventTemplate(tmpEvents[j], editableEventContainerElement);
       }
     }
 
-    const currentDateEventElements = tripDayEventsContainerElement.querySelectorAll(`.trip-events__item`);
+    const currentDateEventElements = tripDayEventsContainerElement
+      .querySelectorAll(`.trip-events__item`);
     for (let j = 0; j < currentDateEventElements.length; ++j) {
       if (i === FIRST_DATE_INDEX && FIRST_EVENT_INDEX === 0) {
         continue;
       }
-      const selectedOffersElement = currentDateEventElements[j].querySelector(`.event__selected-offers`);
+      const selectedOffersElement = currentDateEventElements[j]
+        .querySelector(`.event__selected-offers`);
       let cnt = 0; // счетчик предложений для короткой записи события
       for (let k = 0; k < tmpEvents[j].offers.length; ++k) {
         if (tmpEvents[j].offers[k].isAccepted) {
@@ -97,7 +100,7 @@ export const createEventsPlanTemplate = (events) => {
             break;
           }
 
-          renderElement(
+          render(
               selectedOffersElement,
               new OfferItemView(tmpEvents[j].offers[k]).getElement(),
               AddedComponentPosition.BEFORE_END

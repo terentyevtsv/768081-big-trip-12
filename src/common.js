@@ -12,7 +12,7 @@ const zeroBasedFormat = (value) => {
   return value >= 10 ? `${value}` : `0${value}`;
 };
 
-export const renderElement = (container, element, place) => {
+export const render = (container, element, place) => {
   switch (place) {
     case AddedComponentPosition.AFTER_BEGIN:
       container.prepend(element);

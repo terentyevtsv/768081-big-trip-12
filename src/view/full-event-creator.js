@@ -1,6 +1,6 @@
 import OffersContainerView from "./offers.js";
 import DestinationView from "./destination.js";
-import {AddedComponentPosition, renderElement} from "../common.js";
+import {AddedComponentPosition, render} from "../common.js";
 import {eventTypes, getOffers, cities} from "../mock/event.js";
 import EmptyEventView from "./empty-event.js";
 
@@ -42,9 +42,11 @@ export const createEventTemplate = (evt = null, placeContainer) => {
   evt = evt || getDefaultEvent();
 
   // Форма добавление/редактирования
-  renderElement(
+  const emptyEventElement = new EmptyEventView(evt, isNewEvent)
+    .getElement();
+  render(
       placeContainer,
-      new EmptyEventView(evt, isNewEvent).getElement(),
+      emptyEventElement,
       AddedComponentPosition.BEFORE_END
   );
 
@@ -52,7 +54,7 @@ export const createEventTemplate = (evt = null, placeContainer) => {
   const eventDetailsElement = placeContainer.querySelector(`.event__details`);
   if (evt.offers.length > 0 || evt.destination !== null) {
     if (evt.offers.length > 0) {
-      renderElement(
+      render(
           eventDetailsElement,
           new OffersContainerView(evt.offers).getElement(),
           AddedComponentPosition.BEFORE_END
@@ -61,7 +63,7 @@ export const createEventTemplate = (evt = null, placeContainer) => {
 
     const destination = cities.get(evt.city);
     if (destination !== null) {
-      renderElement(
+      render(
           eventDetailsElement,
           new DestinationView(destination).getElement(),
           AddedComponentPosition.BEFORE_END

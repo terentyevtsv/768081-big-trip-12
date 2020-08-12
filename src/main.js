@@ -4,7 +4,7 @@ import FilterHeaderView from "./view/filter-header.js";
 import FilterView from "./view/filter.js";
 import SortingView from "./view/sorting.js";
 import {createEventTemplate} from "./view/full-event-creator.js";
-import {AddedComponentPosition, renderElement} from "./common.js";
+import {AddedComponentPosition, render} from "./common.js";
 import {createTripInformationTemplate} from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
 import {createEventsPlanTemplate} from "./view/events-plan.js";
@@ -28,7 +28,7 @@ const mainTripComponents = [
 const tripMainTripControlElement = tripMainElement
   .querySelector(`.trip-main__trip-controls`);
 for (let i = 0; i < mainTripComponents.length; ++i) {
-  renderElement(
+  render(
       tripMainTripControlElement,
       mainTripComponents[i].getElement(),
       AddedComponentPosition.BEFORE_END
@@ -37,7 +37,7 @@ for (let i = 0; i < mainTripComponents.length; ++i) {
 
 // Сортировка
 const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
-renderElement(
+render(
     sortEditContentElement,
     new SortingView().getElement(),
     AddedComponentPosition.BEFORE_END
