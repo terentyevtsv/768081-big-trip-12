@@ -146,8 +146,6 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
         <span class="visually-hidden">Open event</span>
       </button>`}
     </header>
-
-    <section class="event__details"></section>
   </form>`;
 
 export default class EmptyEvent {

@@ -3,6 +3,7 @@ import DestinationView from "./destination.js";
 import {AddedComponentPosition, render} from "../common.js";
 import {eventTypes, getOffers, cities} from "../mock/event.js";
 import EmptyEventView from "./empty-event.js";
+import EventDetailsView from "./event-details.js";
 
 const EMPTY_EVENT_INDEX = 0;
 
@@ -37,25 +38,24 @@ const getDefaultEvent = () => {
   return evt;
 };
 
-export const createEventTemplate = (evt = null, placeContainer) => {
+export const createEventTemplate = (evt = null) => {
   const isNewEvent = evt === null;
   evt = evt || getDefaultEvent();
 
   // Форма добавление/редактирования
-  const emptyEventElement = new EmptyEventView(evt, isNewEvent)
-    .getElement();
+  const emptyEventView = new EmptyEventView(evt, isNewEvent);
+  const eventDetailsView = new EventDetailsView();
   render(
-      placeContainer,
-      emptyEventElement,
+      emptyEventView.getElement(),
+      eventDetailsView.getElement(),
       AddedComponentPosition.BEFORE_END
   );
 
   // Оферы и места
-  const eventDetailsElement = placeContainer.querySelector(`.event__details`);
   if (evt.offers.length > 0 || evt.destination !== null) {
     if (evt.offers.length > 0) {
       render(
-          eventDetailsElement,
+          eventDetailsView.getElement(),
           new OffersContainerView(evt.offers).getElement(),
           AddedComponentPosition.BEFORE_END
       );
@@ -64,12 +64,15 @@ export const createEventTemplate = (evt = null, placeContainer) => {
     const destination = cities.get(evt.city);
     if (destination !== null) {
       render(
-          eventDetailsElement,
+          eventDetailsView.getElement(),
           new DestinationView(destination).getElement(),
           AddedComponentPosition.BEFORE_END
       );
     }
   } else {
-    eventDetailsElement.remove();
+    eventDetailsView.getElement().remove();
+    eventDetailsView.removeElement();
   }
+
+  return emptyEventView;
 };

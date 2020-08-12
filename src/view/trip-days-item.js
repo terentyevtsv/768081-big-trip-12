@@ -6,8 +6,6 @@ const createTripDaysItemTemplate = (date, index) =>
       <span class="day__counter">${index + 1}</span>
       <time class="day__date" datetime="${dateToString(date)}">${monthDayToString(date)}</time>
     </div>
-
-    <ul class="trip-events__list"></ul>
   </li>`;
 
 export default class TripDaysItem {

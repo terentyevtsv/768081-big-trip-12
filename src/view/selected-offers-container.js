@@ -1,16 +1,15 @@
 import {createElement} from "../common.js";
 
-const createTripEventsItemTemplate = () =>
-  `<li class="trip-events__item">
-  </li>`;
+const createSelectedOffersContainer = () =>
+  `<ul class="event__selected-offers"></ul>`;
 
-export default class TripEventsItem {
+export default class SelectedOffersContainer {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createTripEventsItemTemplate();
+    return createSelectedOffersContainer();
   }
 
   getElement() {

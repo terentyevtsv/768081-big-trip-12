@@ -1,16 +1,17 @@
 import {createElement} from "../common.js";
 
-const createTripEventsItemTemplate = () =>
-  `<li class="trip-events__item">
-  </li>`;
+const createOpenEventButtonTemplate = () =>
+  `<button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>`;
 
-export default class TripEventsItem {
+export default class OpenEventButton {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createTripEventsItemTemplate();
+    return createOpenEventButtonTemplate();
   }
 
   getElement() {

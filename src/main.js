@@ -43,9 +43,6 @@ render(
     AddedComponentPosition.BEFORE_END
 );
 
-// Форма добавления и редактирования события
-createEventTemplate(null, sortEditContentElement);
-
 // Формирование дерева плана путешествия
 const planDateEventsMap = createEventsPlanTemplate(events);
 
