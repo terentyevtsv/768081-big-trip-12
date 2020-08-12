@@ -71,7 +71,7 @@ const createTripInformationContainerTemplate = (planDateEventsMap) => {
   );
 };
 
-class TripInformationContainer {
+export default class TripInformationContainer {
   constructor(planDateEventsMap) {
     this._planDateEventsMap = planDateEventsMap;
     this._element = null;
@@ -92,23 +92,12 @@ class TripInformationContainer {
   removeElement() {
     this._element = null;
   }
+
+  fillPrice() {
+    render(
+        this.getElement(),
+        new TripPriceView(this._planDateEventsMap).getElement(),
+        AddedComponentPosition.BEFORE_END
+    );
+  }
 }
-
-export const createTripInformationTemplate = (planDateEventsMap) => {
-  // Маршрут
-  const pageBodyElement = document.querySelector(`.page-body`);
-  const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
-  render(
-      tripMainElement,
-      new TripInformationContainer(planDateEventsMap).getElement(),
-      AddedComponentPosition.AFTER_BEGIN
-  );
-
-  // и стоимость
-  const priceAndRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
-  render(
-      priceAndRouteElement,
-      new TripPriceView(planDateEventsMap).getElement(),
-      AddedComponentPosition.BEFORE_END
-  );
-};

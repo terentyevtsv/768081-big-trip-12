@@ -4,9 +4,9 @@ import FilterHeaderView from "./view/filter-header.js";
 import FilterView from "./view/filter.js";
 import SortingView from "./view/sorting.js";
 import {AddedComponentPosition, render} from "./common.js";
-import {createTripInformationTemplate} from "./view/trip-information.js";
+import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
-import {createEventsPlanTemplate} from "./view/events-plan.js";
+import EventsPlanContainerView from "./view/events-plan-container.js";
 
 const EVENTS_COUNT = 20;
 
@@ -43,6 +43,24 @@ render(
 );
 
 // Формирование дерева плана путешествия
-const planDateEventsMap = createEventsPlanTemplate(events);
+const tripEventsElement = pageBodyElement
+    .querySelector(`.trip-events`);
 
-createTripInformationTemplate(planDateEventsMap);
+// Отрисовка контейнера дат
+const eventsPlanContainerView = new EventsPlanContainerView(events);
+const planDateEventsMap = eventsPlanContainerView.fillTree();
+render(
+    tripEventsElement,
+    eventsPlanContainerView.getElement(),
+    AddedComponentPosition.BEFORE_END
+);
+
+const tripInformationContainer =
+  new TripInformationContainerView(planDateEventsMap);
+tripInformationContainer.fillPrice();
+
+render(
+    tripMainElement,
+    tripInformationContainer.getElement(),
+    AddedComponentPosition.AFTER_BEGIN
+);

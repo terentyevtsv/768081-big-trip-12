@@ -1,7 +1,10 @@
-import {shortYearDateToString} from "../common.js";
+import {shortYearDateToString, AddedComponentPosition, render} from "../common.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities} from "../mock/event.js";
 import {createElement} from "../common.js";
+import EventDetailsView from "./event-details.js";
+import OffersContainerView from "./offers.js";
+import DestinationView from "./destination.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -148,7 +151,7 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     </header>
   </form>`;
 
-export default class EmptyEvent {
+export default class BaseEvent {
   constructor(evt, isNewEvent) {
     this._evt = evt;
     this._isNewEvent = isNewEvent;
@@ -170,5 +173,38 @@ export default class EmptyEvent {
 
   removeElement() {
     this._element = null;
+  }
+
+  fillEvent() {
+    const eventDetailsView = new EventDetailsView();
+
+    render(
+        this.getElement(),
+        eventDetailsView.getElement(),
+        AddedComponentPosition.BEFORE_END
+    );
+
+    // Оферы и места
+    if (this._evt.offers.length > 0 || this._evt.destination !== null) {
+      if (this._evt.offers.length > 0) {
+        render(
+            eventDetailsView.getElement(),
+            new OffersContainerView(this._evt.offers).getElement(),
+            AddedComponentPosition.BEFORE_END
+        );
+      }
+
+      const destination = cities.get(this._evt.city);
+      if (destination !== null) {
+        render(
+            eventDetailsView.getElement(),
+            new DestinationView(destination).getElement(),
+            AddedComponentPosition.BEFORE_END
+        );
+      }
+    } else {
+      eventDetailsView.getElement().remove();
+      eventDetailsView.removeElement();
+    }
   }
 }
