@@ -22,6 +22,8 @@ const renderEvent = (evt, tripEventsItemView) => {
         readingEventContentView.getElement()
     );
 
+    // ЗДЕСЬ КОСТЫЛЬ ПО ИДЕЕ ПОДПИСКА ДОЛЖНА БЫТЬ ВМЕСТЕ С readingEventContentView
+    // НА ОДНОМ УРОВНЕ, editingEventContentView не видит тег form
     tripEventsItemView.getElement()
       .querySelector(`form`)
       .addEventListener(`submit`, (evt1) => {
@@ -29,7 +31,6 @@ const renderEvent = (evt, tripEventsItemView) => {
         replaceFormToEvent();
       });
   };
-
   const replaceFormToEvent = () => {
     tripEventsItemView.getElement().replaceChild(
         readingEventContentView.getElement(),
@@ -75,9 +76,18 @@ const renderEvent = (evt, tripEventsItemView) => {
       AddedComponentPosition.BEFORE_END
   );
 
-  const elem = tripEventsItemView.getElement()
+  // Здесь получилось подписаться без проблем
+  const elem = readingEventContentView.getElement()
     .querySelector(`.event__rollup-btn`);
   elem.addEventListener(`click`, () => replaceEventToForm());
+
+  // ДОЛЖНО БЫТЬ ТАК
+  // editingEventContentView.getElement()
+  //     .querySelector(`form`)
+  //     .addEventListener(`submit`, (evt1) => {
+  //       evt1.preventDefault();
+  //       replaceFormToEvent();
+  //     });
 };
 
 export const createEventsPlanTemplate = (events) => {

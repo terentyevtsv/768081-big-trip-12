@@ -3,7 +3,6 @@ import SiteMenuHeaderView from "./view/site-menu-header.js";
 import FilterHeaderView from "./view/filter-header.js";
 import FilterView from "./view/filter.js";
 import SortingView from "./view/sorting.js";
-import {createEventTemplate} from "./view/full-event-creator.js";
 import {AddedComponentPosition, render} from "./common.js";
 import {createTripInformationTemplate} from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
