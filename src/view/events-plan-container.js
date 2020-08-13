@@ -123,6 +123,14 @@ export default class EventsPlanContainer {
       );
     };
 
+    const onEscKeyDown = (evt1) => {
+      if (evt1.key === `Escape` || evt1.key === `Esc`) {
+        evt1.preventDefault();
+        replaceFormToEvent();
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      }
+    };
+
     // Отрисовка события
     render(
         tripEventsItemView.getElement(),
@@ -165,13 +173,17 @@ export default class EventsPlanContainer {
     // Подписка на кнопку открытия формы
     const elem = readingEventContentView.getElement()
       .querySelector(`.event__rollup-btn`);
-    elem.addEventListener(`click`, () => replaceEventToForm());
+    elem.addEventListener(`click`, () => {
+      replaceEventToForm();
+      document.addEventListener(`keydown`, onEscKeyDown);
+    });
 
     // Подписка на отправку формы
     eventView.getElement()
         .addEventListener(`submit`, (evt1) => {
           evt1.preventDefault();
           replaceFormToEvent();
+          document.removeEventListener(`keydown`, onEscKeyDown);
         });
   }
 
