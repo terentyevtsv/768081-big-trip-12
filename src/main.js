@@ -7,6 +7,7 @@ import {AddedComponentPosition, render} from "./common.js";
 import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
 import EventsPlanContainerView from "./view/events-plan-container.js";
+import NoEventView from "./view/no-event.js";
 
 const EVENTS_COUNT = 20;
 
@@ -34,29 +35,38 @@ for (let i = 0; i < mainTripComponents.length; ++i) {
   );
 }
 
-// Сортировка
-const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
-render(
-    sortEditContentElement,
-    new SortingView().getElement(),
-    AddedComponentPosition.BEFORE_END
-);
-
 // Формирование дерева плана путешествия
 const tripEventsElement = pageBodyElement
     .querySelector(`.trip-events`);
 
-// Отрисовка контейнера дат
 const eventsPlanContainerView = new EventsPlanContainerView(events);
 const planDateEventsMap = eventsPlanContainerView.fillTree();
-render(
-    tripEventsElement,
-    eventsPlanContainerView.getElement(),
-    AddedComponentPosition.BEFORE_END
-);
+if (events.length > 0) {
+  // Сортировка
+  const sortEditContentElement = pageBodyElement
+    .querySelector(`.trip-events`);
+  render(
+      sortEditContentElement,
+      new SortingView().getElement(),
+      AddedComponentPosition.BEFORE_END
+  );
+
+  // Отрисовка контейнера дат
+  render(
+      tripEventsElement,
+      eventsPlanContainerView.getElement(),
+      AddedComponentPosition.BEFORE_END
+  );
+} else {
+  render(
+      tripEventsElement,
+      new NoEventView().getElement(),
+      AddedComponentPosition.BEFORE_END
+  );
+}
 
 const tripInformationContainer =
-  new TripInformationContainerView(planDateEventsMap);
+    new TripInformationContainerView(planDateEventsMap);
 tripInformationContainer.fillPrice();
 
 render(
