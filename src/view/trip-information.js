@@ -1,5 +1,5 @@
-import {render, AddedComponentPosition} from "../common.js";
-import {createTripPriceTemplate} from "./trip-price.js";
+import {AddedComponentPosition, createElement, render} from "../common.js";
+import TripPriceView from "./trip-price.js";
 import {getDateForInterval} from "../common.js";
 
 const MAX_CITIES_COUNT = 3;
@@ -71,21 +71,33 @@ const createTripInformationContainerTemplate = (planDateEventsMap) => {
   );
 };
 
-export const createTripInformationTemplate = (planDateEventsMap) => {
-  // Маршрут
-  const pageBodyElement = document.querySelector(`.page-body`);
-  const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
-  render(
-      tripMainElement,
-      createTripInformationContainerTemplate(planDateEventsMap),
-      AddedComponentPosition.AFTER_BEGIN
-  );
+export default class TripInformationContainer {
+  constructor(planDateEventsMap) {
+    this._planDateEventsMap = planDateEventsMap;
+    this._element = null;
+  }
 
-  // и стоимость
-  const priceAndRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
-  render(
-      priceAndRouteElement,
-      createTripPriceTemplate(planDateEventsMap),
-      AddedComponentPosition.BEFORE_END
-  );
-};
+  getTemplate() {
+    return createTripInformationContainerTemplate(this._planDateEventsMap);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  fillPrice() {
+    render(
+        this.getElement(),
+        new TripPriceView(this._planDateEventsMap).getElement(),
+        AddedComponentPosition.BEFORE_END
+    );
+  }
+}

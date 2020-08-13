@@ -1,4 +1,6 @@
-export const createTripPriceTemplate = (planDateEventsMap) => {
+import {createElement} from "../common.js";
+
+const createTripPriceTemplate = (planDateEventsMap) => {
   let account = 0;
   for (const eventsDate of planDateEventsMap.keys()) {
     for (const evt of planDateEventsMap.get(eventsDate)) {
@@ -17,3 +19,26 @@ export const createTripPriceTemplate = (planDateEventsMap) => {
     </p>`
   );
 };
+
+export default class TripPrice {
+  constructor(planDateEventsMap) {
+    this._planDateEventsMap = planDateEventsMap;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripPriceTemplate(this._planDateEventsMap);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

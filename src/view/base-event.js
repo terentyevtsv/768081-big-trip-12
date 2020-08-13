@@ -1,10 +1,10 @@
-import {createOffersTemplate} from "./offers.js";
-import {createDestinationTemplate} from "./destination.js";
-import {AddedComponentPosition, render, shortYearDateToString} from "../common.js";
+import {shortYearDateToString, AddedComponentPosition, render} from "../common.js";
 import {EventGroup} from "../const.js";
-import {eventTypes, getOffers, cities} from "../mock/event.js";
-
-const EMPTY_EVENT_INDEX = 0;
+import {eventTypes, cities} from "../mock/event.js";
+import {createElement} from "../common.js";
+import EventDetailsView from "./event-details.js";
+import OffersContainerView from "./offers.js";
+import DestinationView from "./destination.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -149,69 +149,62 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
         <span class="visually-hidden">Open event</span>
       </button>`}
     </header>
-
-    <section class="event__details"></section>
   </form>`;
 
-export const createEventTemplate = (evt = null, placeContainer) => {
-  let isNewEvent = false;
-  if (evt === null) {
-    const tmpCities = Array.from(cities.keys());
-    isNewEvent = true;
-    evt = {
-      eventType: eventTypes[EMPTY_EVENT_INDEX],
-      city: tmpCities[EMPTY_EVENT_INDEX],
-      offers: [],
-      destination: cities.get(tmpCities[EMPTY_EVENT_INDEX]),
-      isFavorite: false,
-      price: 0
-    };
+export default class BaseEvent {
+  constructor(evt, isNewEvent) {
+    this._evt = evt;
+    this._isNewEvent = isNewEvent;
 
-    const date = new Date();
-    date.setHours(0, 0, 0);
-
-    evt.timeInterval = {
-      leftLimitDate: date,
-      rightLimitDate: date
-    };
-
-    const offers = getOffers(evt.eventType);
-    for (let i = 0; i < offers.length; i++) {
-      evt.offers[i] = {
-        name: offers[i].name,
-        price: offers[i].price,
-        isAccepted: false
-      };
-    }
+    this._element = null;
   }
 
-  // Форма добавление/редактирования
-  render(
-      placeContainer,
-      createEmptyEventTemplate(evt, isNewEvent),
-      AddedComponentPosition.BEFORE_END
-  );
-
-  // Оферы и места
-  const eventDetailsElement = placeContainer.querySelector(`.event__details`);
-  if (evt.offers.length > 0 || evt.destination !== null) {
-    if (evt.offers.length > 0) {
-      render(
-          eventDetailsElement,
-          createOffersTemplate(evt.offers),
-          AddedComponentPosition.BEFORE_END
-      );
-    }
-
-    const destination = cities.get(evt.city);
-    if (destination !== null) {
-      render(
-          eventDetailsElement,
-          createDestinationTemplate(destination),
-          AddedComponentPosition.BEFORE_END
-      );
-    }
-  } else {
-    eventDetailsElement.remove();
+  getTemplate() {
+    return createEmptyEventTemplate(this._evt, this._isNewEvent);
   }
-};
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  fillEvent() {
+    const eventDetailsView = new EventDetailsView();
+
+    render(
+        this.getElement(),
+        eventDetailsView.getElement(),
+        AddedComponentPosition.BEFORE_END
+    );
+
+    // Оферы и места
+    if (this._evt.offers.length > 0 || this._evt.destination !== null) {
+      if (this._evt.offers.length > 0) {
+        render(
+            eventDetailsView.getElement(),
+            new OffersContainerView(this._evt.offers).getElement(),
+            AddedComponentPosition.BEFORE_END
+        );
+      }
+
+      const destination = cities.get(this._evt.city);
+      if (destination !== null) {
+        render(
+            eventDetailsView.getElement(),
+            new DestinationView(destination).getElement(),
+            AddedComponentPosition.BEFORE_END
+        );
+      }
+    } else {
+      eventDetailsView.getElement().remove();
+      eventDetailsView.removeElement();
+    }
+  }
+}

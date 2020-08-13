@@ -1,11 +1,12 @@
-import {createSiteMenuTemplate} from "./view/site-menu.js";
-import {createSiteFilterTemplate} from "./view/filter.js";
-import {createSortTemplate} from "./view/sorting.js";
-import {createEventTemplate} from "./view/full-event-creator.js";
-import {render, AddedComponentPosition} from "./common.js";
-import {createEventsPlanTemplate} from "./view/events-plan.js";
-import {createTripInformationTemplate} from "./view/trip-information.js";
+import SiteMenuView from "./view/site-menu.js";
+import SiteMenuHeaderView from "./view/site-menu-header.js";
+import FilterHeaderView from "./view/filter-header.js";
+import FilterView from "./view/filter.js";
+import SortingView from "./view/sorting.js";
+import {AddedComponentPosition, render} from "./common.js";
+import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
+import EventsPlanContainerView from "./view/events-plan-container.js";
 
 const EVENTS_COUNT = 20;
 
@@ -18,23 +19,48 @@ const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
 
 // Отрисовка меню и фильтров
 const mainTripComponents = [
-  createSiteMenuTemplate,
-  createSiteFilterTemplate
+  new SiteMenuHeaderView(),
+  new SiteMenuView(),
+  new FilterHeaderView(),
+  new FilterView()
 ];
-const tripMainControlElements = tripMainElement
-  .querySelectorAll(`.trip-main__trip-controls .visually-hidden`);
-for (let i = 0; i < tripMainControlElements.length; ++i) {
-  render(tripMainControlElements[i], mainTripComponents[i](), AddedComponentPosition.AFTER_END);
+const tripMainTripControlElement = tripMainElement
+  .querySelector(`.trip-main__trip-controls`);
+for (let i = 0; i < mainTripComponents.length; ++i) {
+  render(
+      tripMainTripControlElement,
+      mainTripComponents[i].getElement(),
+      AddedComponentPosition.BEFORE_END
+  );
 }
 
 // Сортировка
 const sortEditContentElement = pageBodyElement.querySelector(`.trip-events`);
-render(sortEditContentElement, createSortTemplate(), AddedComponentPosition.BEFORE_END);
-
-// Форма добавления и редактирования события
-createEventTemplate(null, sortEditContentElement);
+render(
+    sortEditContentElement,
+    new SortingView().getElement(),
+    AddedComponentPosition.BEFORE_END
+);
 
 // Формирование дерева плана путешествия
-const planDateEventsMap = createEventsPlanTemplate(events);
+const tripEventsElement = pageBodyElement
+    .querySelector(`.trip-events`);
 
-createTripInformationTemplate(planDateEventsMap);
+// Отрисовка контейнера дат
+const eventsPlanContainerView = new EventsPlanContainerView(events);
+const planDateEventsMap = eventsPlanContainerView.fillTree();
+render(
+    tripEventsElement,
+    eventsPlanContainerView.getElement(),
+    AddedComponentPosition.BEFORE_END
+);
+
+const tripInformationContainer =
+  new TripInformationContainerView(planDateEventsMap);
+tripInformationContainer.fillPrice();
+
+render(
+    tripMainElement,
+    tripInformationContainer.getElement(),
+    AddedComponentPosition.AFTER_BEGIN
+);

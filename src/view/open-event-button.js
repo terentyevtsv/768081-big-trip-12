@@ -1,18 +1,17 @@
 import {createElement} from "../common.js";
 
-const createSiteMenuTemplate = () =>
-  `<nav class="trip-controls__trip-tabs  trip-tabs">
-    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
-    <a class="trip-tabs__btn" href="#">Stats</a>
-  </nav>`;
+const createOpenEventButtonTemplate = () =>
+  `<button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>`;
 
-export default class SiteMenu {
+export default class OpenEventButton {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createSiteMenuTemplate();
+    return createOpenEventButtonTemplate();
   }
 
   getElement() {

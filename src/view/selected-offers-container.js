@@ -1,18 +1,15 @@
 import {createElement} from "../common.js";
 
-const createSiteMenuTemplate = () =>
-  `<nav class="trip-controls__trip-tabs  trip-tabs">
-    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
-    <a class="trip-tabs__btn" href="#">Stats</a>
-  </nav>`;
+const createSelectedOffersContainer = () =>
+  `<ul class="event__selected-offers"></ul>`;
 
-export default class SiteMenu {
+export default class SelectedOffersContainer {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createSiteMenuTemplate();
+    return createSelectedOffersContainer();
   }
 
   getElement() {
