@@ -156,6 +156,7 @@ export default class BaseEvent extends AbstractView {
     super();
     this._evt = evt;
     this._isNewEvent = isNewEvent;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
@@ -193,5 +194,15 @@ export default class BaseEvent extends AbstractView {
       eventDetailsView.getElement().remove();
       eventDetailsView.removeElement();
     }
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 }

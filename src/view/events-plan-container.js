@@ -160,20 +160,16 @@ export default class EventsPlanContainer extends AbstractView {
     );
 
     // Подписка на кнопку открытия формы
-    const elem = readingEventContentView.getElement()
-      .querySelector(`.event__rollup-btn`);
-    elem.addEventListener(`click`, () => {
+    readingEventContentView.setEditClickHandler(() => {
       replaceEventToForm();
       document.addEventListener(`keydown`, onEscKeyDown);
     });
 
     // Подписка на отправку формы
-    eventView.getElement()
-        .addEventListener(`submit`, (evt1) => {
-          evt1.preventDefault();
-          replaceFormToEvent();
-          document.removeEventListener(`keydown`, onEscKeyDown);
-        });
+    eventView.setFormSubmitHandler(() => {
+      replaceFormToEvent();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    });
   }
 
   // Формирование дерева событий с возвратом ее структуры
