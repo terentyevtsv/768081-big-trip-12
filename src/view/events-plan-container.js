@@ -1,4 +1,4 @@
-import {createElement, render, AddedComponentPosition} from "../common.js";
+import {render, AddedComponentPosition} from "../common.js";
 import TripEventsItemView from "./trip-events-item.js";
 import TripDaysItemView from "./trip-days-item.js";
 import EventsListView from "./events-list.js";
@@ -8,6 +8,7 @@ import SelectedOffersContainerView from "./selected-offers-container.js";
 import OpenEventButtonView from "./open-event-button.js";
 import ReadingEventContentView from "./reading-event-content.js";
 import OfferItemView from "./offer-item.js";
+import AbstractView from "./abstract.js";
 
 const EMPTY_EVENT_INDEX = 0;
 const MAX_OFFERS_COUNT = 3;
@@ -15,30 +16,18 @@ const MAX_OFFERS_COUNT = 3;
 const createEventsPlanContainerTemplate = () =>
   `<ul class="trip-days"></ul>`;
 
-export default class EventsPlanContainer {
+export default class EventsPlanContainer extends AbstractView {
   constructor(events) {
+    super();
     this._events = events;
-    this._element = null;
   }
 
   getTemplate() {
     return createEventsPlanContainerTemplate();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
   // Формирование структуры событий по датам
-  getMapDates() {
+  _getMapDates() {
     const datesSet = new Set();
 
     this._events.forEach((evt) => {
@@ -64,7 +53,7 @@ export default class EventsPlanContainer {
   }
 
   // Значения по умолчанию для события при создании события
-  getDefaultEvent() {
+  _getDefaultEvent() {
     const tmpCities = Array.from(cities.keys());
     const evt = {
       eventType: eventTypes[EMPTY_EVENT_INDEX],
@@ -96,9 +85,9 @@ export default class EventsPlanContainer {
   }
 
   // Отрисовка события и его подмена на форму редактирования
-  renderEvent(evt, tripEventsItemView) {
+  _renderEvent(evt, tripEventsItemView) {
     const isNewEvent = evt === null;
-    evt = evt || this.getDefaultEvent();
+    evt = evt || this._getDefaultEvent();
 
     // Содержимое события (для чтения)
     const readingEventContentView = new ReadingEventContentView(evt);
@@ -189,7 +178,7 @@ export default class EventsPlanContainer {
 
   // Формирование дерева событий с возвратом ее структуры
   fillTree() {
-    const mapDates = this.getMapDates();
+    const mapDates = this._getMapDates();
 
     let index = 0;
     for (const mapDateKey of mapDates.keys()) {
@@ -225,7 +214,7 @@ export default class EventsPlanContainer {
             AddedComponentPosition.BEFORE_END
         );
 
-        this.renderEvent(tmpEvents[j], tripEventsItemView);
+        this._renderEvent(tmpEvents[j], tripEventsItemView);
       }
     }
 

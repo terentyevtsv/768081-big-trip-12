@@ -1,5 +1,5 @@
 import {timeToString, fullDateToString, getDatesDelta} from "../common.js";
-import {createElement} from "../common.js";
+import AbstractView from "./abstract.js";
 
 const createReadingEventContentTemplate = (evt) =>
   `<div class="event">
@@ -33,25 +33,13 @@ const createReadingEventContentTemplate = (evt) =>
     <h4 class="visually-hidden">Offers:</h4>
   </div>`;
 
-export default class ReadingEventContent {
+export default class ReadingEventContent extends AbstractView {
   constructor(evt) {
+    super();
     this._evt = evt;
-    this._element = null;
   }
 
   getTemplate() {
     return createReadingEventContentTemplate(this._evt);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

@@ -1,10 +1,10 @@
 import {shortYearDateToString, AddedComponentPosition, render} from "../common.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities} from "../mock/event.js";
-import {createElement} from "../common.js";
 import EventDetailsView from "./event-details.js";
 import OffersContainerView from "./offers.js";
 import DestinationView from "./destination.js";
+import AbstractView from "./abstract.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -151,28 +151,15 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     </header>
   </form>`;
 
-export default class BaseEvent {
+export default class BaseEvent extends AbstractView {
   constructor(evt, isNewEvent) {
+    super();
     this._evt = evt;
     this._isNewEvent = isNewEvent;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createEmptyEventTemplate(this._evt, this._isNewEvent);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   fillEvent() {
