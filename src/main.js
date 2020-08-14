@@ -3,7 +3,7 @@ import SiteMenuHeaderView from "./view/site-menu-header.js";
 import FilterHeaderView from "./view/filter-header.js";
 import FilterView from "./view/filter.js";
 import SortingView from "./view/sorting.js";
-import {AddedComponentPosition, render} from "./common.js";
+import {AddedComponentPosition, render} from "./utils/render.js";
 import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
 import EventsPlanContainerView from "./view/events-plan-container.js";
@@ -30,7 +30,7 @@ const tripMainTripControlElement = tripMainElement
 for (let i = 0; i < mainTripComponents.length; ++i) {
   render(
       tripMainTripControlElement,
-      mainTripComponents[i].getElement(),
+      mainTripComponents[i],
       AddedComponentPosition.BEFORE_END
   );
 }
@@ -47,20 +47,20 @@ if (events.length > 0) {
     .querySelector(`.trip-events`);
   render(
       sortEditContentElement,
-      new SortingView().getElement(),
+      new SortingView(),
       AddedComponentPosition.BEFORE_END
   );
 
   // Отрисовка контейнера дат
   render(
       tripEventsElement,
-      eventsPlanContainerView.getElement(),
+      eventsPlanContainerView,
       AddedComponentPosition.BEFORE_END
   );
 } else {
   render(
       tripEventsElement,
-      new NoEventView().getElement(),
+      new NoEventView(),
       AddedComponentPosition.BEFORE_END
   );
 }
@@ -71,6 +71,6 @@ tripInformationContainer.fillPrice();
 
 render(
     tripMainElement,
-    tripInformationContainer.getElement(),
+    tripInformationContainer,
     AddedComponentPosition.AFTER_BEGIN
 );

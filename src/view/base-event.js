@@ -1,4 +1,5 @@
-import {shortYearDateToString, AddedComponentPosition, render} from "../common.js";
+import {AddedComponentPosition, render} from "../utils/render.js";
+import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities} from "../mock/event.js";
 import EventDetailsView from "./event-details.js";
@@ -167,8 +168,8 @@ export default class BaseEvent extends AbstractView {
     const eventDetailsView = new EventDetailsView();
 
     render(
-        this.getElement(),
-        eventDetailsView.getElement(),
+        this,
+        eventDetailsView,
         AddedComponentPosition.BEFORE_END
     );
 
@@ -176,8 +177,8 @@ export default class BaseEvent extends AbstractView {
     if (this._evt.offers.length > 0 || this._evt.destination !== null) {
       if (this._evt.offers.length > 0) {
         render(
-            eventDetailsView.getElement(),
-            new OffersContainerView(this._evt.offers).getElement(),
+            eventDetailsView,
+            new OffersContainerView(this._evt.offers),
             AddedComponentPosition.BEFORE_END
         );
       }
@@ -185,14 +186,13 @@ export default class BaseEvent extends AbstractView {
       const destination = cities.get(this._evt.city);
       if (destination !== null) {
         render(
-            eventDetailsView.getElement(),
-            new DestinationView(destination).getElement(),
+            eventDetailsView,
+            new DestinationView(destination),
             AddedComponentPosition.BEFORE_END
         );
       }
     } else {
-      eventDetailsView.getElement().remove();
-      eventDetailsView.removeElement();
+      eventDetailsView.remove();
     }
   }
 

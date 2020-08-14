@@ -1,6 +1,6 @@
-import {AddedComponentPosition, render} from "../common.js";
+import {AddedComponentPosition, render} from "../utils/render.js";
 import TripPriceView from "./trip-price.js";
-import {getDateForInterval} from "../common.js";
+import {getDateForInterval} from "../utils/formats.js";
 import AbstractView from "./abstract.js";
 
 const MAX_CITIES_COUNT = 3;
@@ -84,8 +84,8 @@ export default class TripInformationContainer extends AbstractView {
 
   fillPrice() {
     render(
-        this.getElement(),
-        new TripPriceView(this._planDateEventsMap).getElement(),
+        this,
+        new TripPriceView(this._planDateEventsMap),
         AddedComponentPosition.BEFORE_END
     );
   }

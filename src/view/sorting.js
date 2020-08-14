@@ -1,4 +1,3 @@
-import {createElement} from "../common.js";
 import AbstractView from "./abstract.js";
 
 const createSortingTemplate = () =>

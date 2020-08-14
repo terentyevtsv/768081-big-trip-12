@@ -1,4 +1,4 @@
-import {render, AddedComponentPosition} from "../common.js";
+import {render, AddedComponentPosition} from "../utils/render.js";
 import TripEventsItemView from "./trip-events-item.js";
 import TripDaysItemView from "./trip-days-item.js";
 import EventsListView from "./events-list.js";
@@ -98,17 +98,17 @@ export default class EventsPlanContainer extends AbstractView {
 
     // Подмена события на форму редактирования
     const replaceEventToForm = () => {
-      tripEventsItemView.getElement().replaceChild(
-          eventView.getElement(),
-          readingEventContentView.getElement()
+      tripEventsItemView.replace(
+          eventView,
+          readingEventContentView
       );
     };
 
     // Подмена формы редактирования на событие
     const replaceFormToEvent = () => {
-      tripEventsItemView.getElement().replaceChild(
-          readingEventContentView.getElement(),
-          eventView.getElement()
+      tripEventsItemView.replace(
+          readingEventContentView,
+          eventView
       );
     };
 
@@ -122,16 +122,16 @@ export default class EventsPlanContainer extends AbstractView {
 
     // Отрисовка события
     render(
-        tripEventsItemView.getElement(),
-        readingEventContentView.getElement(),
+        tripEventsItemView,
+        readingEventContentView,
         AddedComponentPosition.BEFORE_END
     );
 
     // Контейнер предложений для текущего события
     const selectedOffersContainer = new SelectedOffersContainerView();
     render(
-        readingEventContentView.getElement(),
-        selectedOffersContainer.getElement(),
+        readingEventContentView,
+        selectedOffersContainer,
         AddedComponentPosition.BEFORE_END
     );
 
@@ -145,8 +145,8 @@ export default class EventsPlanContainer extends AbstractView {
         }
 
         render(
-            selectedOffersContainer.getElement(),
-            new OfferItemView(evt.offers[k]).getElement(),
+            selectedOffersContainer,
+            new OfferItemView(evt.offers[k]),
             AddedComponentPosition.BEFORE_END
         );
       }
@@ -154,8 +154,8 @@ export default class EventsPlanContainer extends AbstractView {
 
     // В конце элемента для чтения кнопка открытия события
     render(
-        readingEventContentView.getElement(),
-        new OpenEventButtonView().getElement(),
+        readingEventContentView,
+        new OpenEventButtonView(),
         AddedComponentPosition.BEFORE_END
     );
 
@@ -184,15 +184,15 @@ export default class EventsPlanContainer extends AbstractView {
       // Отрисовка очередной даты
       const tripDaysItemView = new TripDaysItemView(date, index++);
       render(
-          this.getElement(),
-          tripDaysItemView.getElement(),
+          this,
+          tripDaysItemView,
           AddedComponentPosition.BEFORE_END
       );
 
       const eventsListView = new EventsListView();
       render(
-          tripDaysItemView.getElement(),
-          eventsListView.getElement(),
+          tripDaysItemView,
+          eventsListView,
           AddedComponentPosition.BEFORE_END
       );
 
@@ -205,8 +205,8 @@ export default class EventsPlanContainer extends AbstractView {
         // Контейнер события
         const tripEventsItemView = new TripEventsItemView(tmpEvents[j]);
         render(
-            eventsListView.getElement(),
-            tripEventsItemView.getElement(),
+            eventsListView,
+            tripEventsItemView,
             AddedComponentPosition.BEFORE_END
         );
 

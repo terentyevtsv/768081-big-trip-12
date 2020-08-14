@@ -1,4 +1,4 @@
-import {timeToString, fullDateToString, getDatesDelta} from "../common.js";
+import {timeToString, fullDateToString, getDatesDelta} from "../utils/formats.js";
 import AbstractView from "./abstract.js";
 
 const createReadingEventContentTemplate = (evt) =>

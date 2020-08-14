@@ -1,4 +1,4 @@
-import {dateToString, monthDayToString} from "../common.js";
+import {dateToString, monthDayToString} from "../utils/formats.js";
 import AbstractView from "./abstract.js";
 
 const createTripDaysItemTemplate = (date, index) =>
