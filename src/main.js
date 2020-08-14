@@ -2,12 +2,10 @@ import SiteMenuView from "./view/site-menu.js";
 import SiteMenuHeaderView from "./view/site-menu-header.js";
 import FilterHeaderView from "./view/filter-header.js";
 import FilterView from "./view/filter.js";
-import SortingView from "./view/sorting.js";
 import {AddedComponentPosition, render} from "./utils/render.js";
 import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
-import EventsPlanContainerView from "./view/events-plan-container.js";
-import NoEventView from "./view/no-event.js";
+import TripPresenter from "./presenter/trip.js";
 
 const EVENTS_COUNT = 20;
 
@@ -39,34 +37,11 @@ for (let i = 0; i < mainTripComponents.length; ++i) {
 const tripEventsElement = pageBodyElement
     .querySelector(`.trip-events`);
 
-const eventsPlanContainerView = new EventsPlanContainerView(events);
-const planDateEventsMap = eventsPlanContainerView.fillTree();
-if (events.length > 0) {
-  // Сортировка
-  const sortEditContentElement = pageBodyElement
-    .querySelector(`.trip-events`);
-  render(
-      sortEditContentElement,
-      new SortingView(),
-      AddedComponentPosition.BEFORE_END
-  );
-
-  // Отрисовка контейнера дат
-  render(
-      tripEventsElement,
-      eventsPlanContainerView,
-      AddedComponentPosition.BEFORE_END
-  );
-} else {
-  render(
-      tripEventsElement,
-      new NoEventView(),
-      AddedComponentPosition.BEFORE_END
-  );
-}
+const tripPresenter = new TripPresenter(tripEventsElement);
+tripPresenter.init(events);
 
 const tripInformationContainer =
-    new TripInformationContainerView(planDateEventsMap);
+    new TripInformationContainerView(tripPresenter.planDateEventsMap);
 tripInformationContainer.fillPrice();
 
 render(

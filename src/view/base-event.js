@@ -1,10 +1,6 @@
-import {AddedComponentPosition, render} from "../utils/render.js";
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities} from "../mock/event.js";
-import EventDetailsView from "./event-details.js";
-import OffersContainerView from "./offers.js";
-import DestinationView from "./destination.js";
 import AbstractView from "./abstract.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
@@ -162,38 +158,6 @@ export default class BaseEvent extends AbstractView {
 
   getTemplate() {
     return createEmptyEventTemplate(this._evt, this._isNewEvent);
-  }
-
-  fillEvent() {
-    const eventDetailsView = new EventDetailsView();
-
-    render(
-        this,
-        eventDetailsView,
-        AddedComponentPosition.BEFORE_END
-    );
-
-    // Оферы и места
-    if (this._evt.offers.length > 0 || this._evt.destination !== null) {
-      if (this._evt.offers.length > 0) {
-        render(
-            eventDetailsView,
-            new OffersContainerView(this._evt.offers),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-
-      const destination = cities.get(this._evt.city);
-      if (destination !== null) {
-        render(
-            eventDetailsView,
-            new DestinationView(destination),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-    } else {
-      eventDetailsView.remove();
-    }
   }
 
   _formSubmitHandler(evt) {
