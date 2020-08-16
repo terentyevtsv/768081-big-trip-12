@@ -1,26 +1,10 @@
-import {createElement} from "../common.js";
+import AbstractView from "./abstract.js";
 
 const createSelectedOffersContainer = () =>
   `<ul class="event__selected-offers"></ul>`;
 
-export default class SelectedOffersContainer {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SelectedOffersContainer extends AbstractView {
   getTemplate() {
     return createSelectedOffersContainer();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

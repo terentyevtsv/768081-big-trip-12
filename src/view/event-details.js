@@ -1,26 +1,10 @@
-import {createElement} from "../common.js";
+import AbstractView from "./abstract.js";
 
 const createEventDetailsTemplate = () =>
   `<section class="event__details"></section>`;
 
-export default class EventDetails {
-  constructor() {
-    this._element = null;
-  }
-
+export default class EventDetails extends AbstractView {
   getTemplate() {
     return createEventDetailsTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

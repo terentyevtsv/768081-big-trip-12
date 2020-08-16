@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomDate} from "../common.js";
+import {getRandomInteger, getRandomDate} from "../utils/common.js";
 import {EventGroup} from "../const.js";
 
 const MAX_SENTENCE_COUNT = 5;

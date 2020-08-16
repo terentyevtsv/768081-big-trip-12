@@ -1,6 +1,7 @@
-import {AddedComponentPosition, createElement, render} from "../common.js";
+import {AddedComponentPosition, render} from "../utils/render.js";
 import TripPriceView from "./trip-price.js";
-import {getDateForInterval} from "../common.js";
+import {getDateForInterval} from "../utils/formats.js";
+import AbstractView from "./abstract.js";
 
 const MAX_CITIES_COUNT = 3;
 const FIRST_CITY_INDEX = 0;
@@ -71,32 +72,20 @@ const createTripInformationContainerTemplate = (planDateEventsMap) => {
   );
 };
 
-export default class TripInformationContainer {
+export default class TripInformationContainer extends AbstractView {
   constructor(planDateEventsMap) {
+    super();
     this._planDateEventsMap = planDateEventsMap;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInformationContainerTemplate(this._planDateEventsMap);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
   fillPrice() {
     render(
-        this.getElement(),
-        new TripPriceView(this._planDateEventsMap).getElement(),
+        this,
+        new TripPriceView(this._planDateEventsMap),
         AddedComponentPosition.BEFORE_END
     );
   }

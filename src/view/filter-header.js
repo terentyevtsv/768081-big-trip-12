@@ -1,26 +1,10 @@
-import {createElement} from "../common.js";
+import AbstractView from "./abstract.js";
 
 const createSiteFilterHeaderTemplate = () =>
   `<h2 class="visually-hidden">Filter events</h2>`;
 
-export default class FilterHeader {
-  constructor() {
-    this._element = null;
-  }
-
+export default class FilterHeader extends AbstractView {
   getTemplate() {
     return createSiteFilterHeaderTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

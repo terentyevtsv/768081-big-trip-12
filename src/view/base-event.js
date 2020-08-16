@@ -1,10 +1,7 @@
-import {shortYearDateToString, AddedComponentPosition, render} from "../common.js";
+import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities} from "../mock/event.js";
-import {createElement} from "../common.js";
-import EventDetailsView from "./event-details.js";
-import OffersContainerView from "./offers.js";
-import DestinationView from "./destination.js";
+import AbstractView from "./abstract.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -151,60 +148,25 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     </header>
   </form>`;
 
-export default class BaseEvent {
+export default class BaseEvent extends AbstractView {
   constructor(evt, isNewEvent) {
+    super();
     this._evt = evt;
     this._isNewEvent = isNewEvent;
-
-    this._element = null;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return createEmptyEventTemplate(this._evt, this._isNewEvent);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
-  }
-
-  fillEvent() {
-    const eventDetailsView = new EventDetailsView();
-
-    render(
-        this.getElement(),
-        eventDetailsView.getElement(),
-        AddedComponentPosition.BEFORE_END
-    );
-
-    // Оферы и места
-    if (this._evt.offers.length > 0 || this._evt.destination !== null) {
-      if (this._evt.offers.length > 0) {
-        render(
-            eventDetailsView.getElement(),
-            new OffersContainerView(this._evt.offers).getElement(),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-
-      const destination = cities.get(this._evt.city);
-      if (destination !== null) {
-        render(
-            eventDetailsView.getElement(),
-            new DestinationView(destination).getElement(),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-    } else {
-      eventDetailsView.getElement().remove();
-      eventDetailsView.removeElement();
-    }
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 }

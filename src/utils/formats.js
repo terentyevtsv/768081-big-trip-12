@@ -1,8 +1,3 @@
-export const AddedComponentPosition = {
-  AFTER_BEGIN: `afterbegin`,
-  BEFORE_END: `beforeend`
-};
-
 const MONTH_NAMES = [
   `Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`,
   `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`
@@ -10,39 +5,6 @@ const MONTH_NAMES = [
 
 const zeroBasedFormat = (value) => {
   return value >= 10 ? `${value}` : `0${value}`;
-};
-
-export const render = (container, element, place) => {
-  switch (place) {
-    case AddedComponentPosition.AFTER_BEGIN:
-      container.prepend(element);
-      break;
-    case AddedComponentPosition.BEFORE_END:
-      container.append(element);
-      break;
-  }
-};
-
-export const renderTemplate = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-
-  return newElement.firstChild;
-};
-
-export const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-export const getRandomDate = (start, end) => {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
 export const dateToString = (date) => {
