@@ -14,17 +14,28 @@ import OpenEventButtonView from "../view/open-event-button.js";
 import EventDetailsView from "../view/event-details.js";
 import OffersContainerView from "../view/offers.js";
 import DestinationView from "../view/destination.js";
+import {SortType} from "../const.js";
 
 const EMPTY_EVENT_INDEX = 0;
 const MAX_OFFERS_COUNT = 3;
+
+const getDifference = function (timeInterval) {
+  return (
+    timeInterval.rightLimitDate.getTime() -
+    timeInterval.leftLimitDate.getTime()
+  );
+};
 
 export default class Trip {
   constructor(tripEventsContainer) {
     this._tripEventsContainer = tripEventsContainer;
 
+    this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
     this._sortingView = new SortingView();
     this._eventsPlanContainerView = new EventsPlanContainerView();
+
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   get planDateEventsMap() {
@@ -32,37 +43,71 @@ export default class Trip {
   }
 
   init(events) {
-    this._events = events.slice();
-
+    this._events = events;
+    this._planDateEventsMap = this._getMapDates();
     this._renderEventsPlan();
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._currentSortType = sortType;
+    const mapDates = this._getMapDates();
+    this._renderEvents(mapDates);
   }
 
   // Формирование структуры событий по датам
   _getMapDates() {
-    const datesSet = new Set();
-
-    // Формируем список дат, по которым будут группироваться события
-    this._events.forEach((evt) => {
-      const date = new Date(evt.timeInterval.leftLimitDate);
-      date.setHours(0, 0, 0, 0);
-
-      datesSet.add(date.getTime());
-    });
-
-    // Сортируем даты в порядке возрастания
-    const dates = Array.from(datesSet)
-      .sort((a, b) => a - b);
-
-    // Раскидываем события по датам
     const mapDates = new Map();
-    dates.forEach((date) => mapDates.set(date, []));
 
-    this._events.forEach((evt) => {
-      const date = new Date(evt.timeInterval.leftLimitDate);
-      date.setHours(0, 0, 0, 0);
+    if (this._currentSortType === SortType.EVENT) {
+      // Обычный порядок
+      const datesSet = new Set();
 
-      mapDates.get(date.getTime()).push(evt);
-    });
+      // Формируем список дат, по которым будут группироваться события
+      this._events.forEach((evt) => {
+        const date = new Date(evt.timeInterval.leftLimitDate);
+        date.setHours(0, 0, 0, 0);
+
+        datesSet.add(date.getTime());
+      });
+
+      // Сортируем даты в порядке возрастания
+      const dates = Array.from(datesSet)
+        .sort((a, b) => a - b);
+
+      // Раскидываем события по датам
+      dates.forEach((date) => mapDates.set(date, []));
+
+      this._events.forEach((evt) => {
+        const date = new Date(evt.timeInterval.leftLimitDate);
+        date.setHours(0, 0, 0, 0);
+
+        mapDates.get(date.getTime()).push(evt);
+      });
+
+      Array.from(mapDates.keys()).forEach((mapDateKey) => mapDates.get(mapDateKey)
+        .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
+                        b.timeInterval.leftLimitDate.getTime())
+      );
+      return mapDates;
+    }
+
+    const tmpDate = new Date();
+    const events = this._events.slice();
+    if (this._currentSortType === SortType.TIME) {
+      // Порядок с сортировкой по времени события
+      events.sort((evt1, evt2) => getDifference(evt2.timeInterval) -
+                                  getDifference(evt1.timeInterval));
+      mapDates.set(tmpDate, events);
+
+      return mapDates;
+    }
+
+    // Порядок с сортировкой по цене
+    events.sort((evt1, evt2) => evt2.price - evt1.price);
+    mapDates.set(tmpDate, events);
 
     return mapDates;
   }
@@ -107,6 +152,8 @@ export default class Trip {
         this._sortingView,
         AddedComponentPosition.BEFORE_END
     );
+
+    this._sortingView.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderEditableEvent(evt, isNewEvent) {
@@ -237,15 +284,8 @@ export default class Trip {
     });
   }
 
-  _renderEvents() {
-    // Метод для рендеринга N-событий за раз
-    const mapDates = this._getMapDates();
-
-    render(
-        this._tripEventsContainer,
-        this._eventsPlanContainerView,
-        AddedComponentPosition.BEFORE_END
-    );
+  _renderEvents(mapDates) {
+    this._eventsPlanContainerView.getElement().innerHTML = ``;
 
     let index = 0;
     for (const mapDateKey of mapDates.keys()) {
@@ -253,7 +293,7 @@ export default class Trip {
       const date = new Date(mapDateKey);
 
       // Отрисовка очередной даты
-      const tripDaysItemView = new TripDaysItemView(date, index++);
+      const tripDaysItemView = new TripDaysItemView(date, index++, this._currentSortType);
       render(
           this._eventsPlanContainerView,
           tripDaysItemView,
@@ -268,16 +308,12 @@ export default class Trip {
       );
 
       // события даты сортируем по дате начала
-      const tmpEvents = mapDates.get(mapDateKey)
-        .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
-                        b.timeInterval.leftLimitDate.getTime());
+      const tmpEvents = mapDates.get(mapDateKey);
       // Цикл по всем событиям данной даты
       for (let j = 0; j < tmpEvents.length; ++j) {
         this._renderEvent(tmpEvents[j], eventsListView);
       }
     }
-
-    return mapDates;
   }
 
   _renderNoEvents() {
@@ -292,11 +328,16 @@ export default class Trip {
   _renderEventsPlan() {
     if (this._events.length === 0) {
       this._renderNoEvents();
-      this._planDateEventsMap = new Map();
       return;
     }
 
     this._renderSort();
-    this._planDateEventsMap = this._renderEvents();
+
+    render(
+        this._tripEventsContainer,
+        this._eventsPlanContainerView,
+        AddedComponentPosition.BEFORE_END
+    );
+    this._renderEvents(this._planDateEventsMap);
   }
 }
