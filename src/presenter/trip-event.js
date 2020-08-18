@@ -33,19 +33,22 @@ export default class TripEvent {
 
     this._event = evt;
 
+    // Предыдущие редактируемый и компонент для чтения у точки маршрута
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
-
+    // Собранные (не подключенные к DOM) пара текущих компонентов с новой моделью
     this._renderReadOnlyEvent(evt);
     this._renderEditableEvent(evt, isNewEvent);
 
+    // Подписка к событиям компонентов
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     if (prevEventComponent === null ||
         prevEventEditComponent === null) {
+      // Изначально отрисовка компонента для чтения
       render(
           this._eventListContainer,
           this._eventComponent,
@@ -54,16 +57,17 @@ export default class TripEvent {
       return;
     }
 
-    // Проверка на наличие в DOM необходима,
-    // чтобы не пытаться заменить то, что не было отрисовано
     if (this._eventListContainer.getElement().contains(prevEventComponent.getElement())) {
+      // Обновление компонента для чтения
       replace(this._eventComponent, prevEventComponent);
     }
 
     if (this._eventListContainer.getElement().contains(prevEventEditComponent.getElement())) {
+      // Обновление компонента для записи
       replace(this._eventEditComponent, prevEventEditComponent);
     }
 
+    // Отчистка памяти от старых компонентов
     remove(prevEventComponent);
     remove(prevEventEditComponent);
   }
