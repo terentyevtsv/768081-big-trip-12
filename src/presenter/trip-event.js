@@ -2,7 +2,7 @@ import ReadingEventContentView from "../view/reading-event-content.js";
 import BaseEventView from "../view/base-event.js";
 import EventDetailsView from "../view/event-details.js";
 import {AddedComponentPosition} from "../utils/render.js";
-import {render, replace} from "../utils/render.js";
+import {render, replace, remove} from "../utils/render.js";
 import OffersContainerView from "../view/offers.js";
 import {cities, eventTypes, getOffers} from "../mock/event.js";
 import DestinationView from "../view/destination.js";
@@ -31,27 +31,57 @@ export default class TripEvent {
 
     this._event = evt;
 
+    const prevEventComponent = this._eventComponent;
+    const prevEventEditComponent = this._eventEditComponent;
+
+
     this._eventComponent = new ReadingEventContentView(evt);
     this._eventEditComponent = this._renderEditableEvent(evt, isNewEvent);
 
-    render(
-        this._eventListContainer,
-        this._eventComponent,
-        AddedComponentPosition.BEFORE_END
-    );
+    if (prevEventComponent === null ||
+        prevEventEditComponent === null) {
+      render(
+          this._eventListContainer,
+          this._eventComponent,
+          AddedComponentPosition.BEFORE_END
+      );
 
-    // Отрисовка краткого списка предложений
-    this._renderOffers(evt);
+      // Отрисовка краткого списка предложений
+      this._renderOffers(evt);
 
-    // В конце элемента для чтения кнопка открытия события
-    render(
-        this._eventComponent,
-        new OpenEventButtonView(),
-        AddedComponentPosition.BEFORE_END
-    );
+      // В конце элемента для чтения кнопка открытия события
+      render(
+          this._eventComponent,
+          new OpenEventButtonView(),
+          AddedComponentPosition.BEFORE_END
+      );
+
+      this._eventComponent.setEditClickHandler(this._handleEditClick);
+      this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+
+      return;
+    }
 
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+
+    // Проверка на наличие в DOM необходима,
+    // чтобы не пытаться заменить то, что не было отрисовано
+    if (this._eventListContainer.getElement().contains(prevEventComponent.getElement())) {
+      replace(this._eventComponent, prevEventComponent);
+    }
+
+    if (this._eventListContainer.getElement().contains(prevEventEditComponent.getElement())) {
+      replace(this._eventEditComponent, prevEventEditComponent);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditComponent);
+  }
+
+  destroy() {
+    remove(this._eventComponent);
+    remove(this._eventEditComponent);
   }
 
   _renderOffers(evt) {
