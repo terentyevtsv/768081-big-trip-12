@@ -37,24 +37,8 @@ export default class TripEvent {
     const prevEventEditComponent = this._eventEditComponent;
 
 
-    this._eventComponent = new ReadingEventContentView(evt);
-    this._eventEditComponent = this._renderEditableEvent(evt, isNewEvent);
-
-    render(
-        this._eventListContainer,
-        this._eventComponent,
-        AddedComponentPosition.BEFORE_END
-    );
-
-    // Отрисовка краткого списка предложений
-    this._renderOffers(evt);
-
-    // В конце элемента для чтения кнопка открытия события
-    render(
-        this._eventComponent,
-        new OpenEventButtonView(),
-        AddedComponentPosition.BEFORE_END
-    );
+    this._renderReadOnlyEvent(evt);
+    this._renderEditableEvent(evt, isNewEvent);
 
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
@@ -62,6 +46,11 @@ export default class TripEvent {
 
     if (prevEventComponent === null ||
         prevEventEditComponent === null) {
+      render(
+          this._eventListContainer,
+          this._eventComponent,
+          AddedComponentPosition.BEFORE_END
+      );
       return;
     }
 
@@ -143,12 +132,27 @@ export default class TripEvent {
     return evt;
   }
 
+  _renderReadOnlyEvent(evt) {
+    this._eventComponent = new ReadingEventContentView(evt);
+
+    // Отрисовка краткого списка предложений
+    this._renderOffers(evt);
+
+    // В конце элемента для чтения кнопка открытия события
+    render(
+        this._eventComponent,
+        new OpenEventButtonView(),
+        AddedComponentPosition.BEFORE_END
+    );
+  }
+
   _renderEditableEvent(evt, isNewEvent) {
-    const eventView = new BaseEventView(evt, isNewEvent);
+    this._eventEditComponent = new BaseEventView(evt, isNewEvent);
+
     const eventDetailsView = new EventDetailsView();
 
     render(
-        eventView,
+        this._eventEditComponent,
         eventDetailsView,
         AddedComponentPosition.BEFORE_END
     );
@@ -174,8 +178,6 @@ export default class TripEvent {
     } else {
       eventDetailsView.remove();
     }
-
-    return eventView;
   }
 
   // Подмена события на форму редактирования
