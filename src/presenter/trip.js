@@ -1,4 +1,4 @@
-import {render, AddedComponentPosition} from "../utils/render.js";
+import {render, AddedComponentPosition, remove} from "../utils/render.js";
 import NoEventView from "../view/no-event.js";
 import SortingView from "../view/sorting.js";
 import EventsPlanContainerView from "../view/events-plan-container.js";
@@ -7,6 +7,7 @@ import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
 import {SortType} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
+import {updateItem} from "../utils/common.js";
 
 const getDifference = function (timeInterval) {
   return (
@@ -24,6 +25,10 @@ export default class Trip {
     this._sortingView = new SortingView();
     this._eventsPlanContainerView = new EventsPlanContainerView();
 
+    this._eventPresenter = {};
+    this._dateContainers = [];
+
+    this._handleEventChange = this._handleEventChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
@@ -35,6 +40,12 @@ export default class Trip {
     this._events = events;
     this._planDateEventsMap = this._getMapDates();
     this._renderEventsPlan();
+  }
+
+  // Обновление мока и отрисовка согласно обновлению точки марщрута
+  _handleEventChange(updatedEvent) {
+    this._events = updateItem(this._events, updatedEvent);
+    this._eventPresenter[updatedEvent.id].init(updatedEvent);
   }
 
   _handleSortTypeChange(sortType) {
@@ -122,12 +133,18 @@ export default class Trip {
         AddedComponentPosition.BEFORE_END
     );
 
-    const tripEventPresenter = new TripEventPresenter(tripEventsItemView);
+    const tripEventPresenter = new TripEventPresenter(tripEventsItemView, this._handleEventChange);
     tripEventPresenter.init(evt);
+    this._eventPresenter[evt.id] = tripEventPresenter;
   }
 
   _renderEvents(mapDates) {
-    this._eventsPlanContainerView.getElement().innerHTML = ``;
+    Object.values(this._eventPresenter)
+        .forEach((presenter) => presenter.destroy());
+    this._dateContainers.forEach((d) => remove(d));
+
+    this._eventPresenter = {};
+    this._dateContainers = [];
 
     let index = 0;
     for (const mapDateKey of mapDates.keys()) {
@@ -135,7 +152,7 @@ export default class Trip {
       const date = new Date(mapDateKey);
 
       // Отрисовка очередной даты
-      const tripDaysItemView = new TripDaysItemView(date, index++, this._currentSortType);
+      const tripDaysItemView = new TripDaysItemView(date, index, this._currentSortType);
       render(
           this._eventsPlanContainerView,
           tripDaysItemView,
@@ -148,6 +165,8 @@ export default class Trip {
           eventsListView,
           AddedComponentPosition.BEFORE_END
       );
+
+      this._dateContainers[index++] = tripDaysItemView;
 
       // события даты сортируем по дате начала
       const tmpEvents = mapDates.get(mapDateKey);

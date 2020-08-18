@@ -14,8 +14,9 @@ const EMPTY_EVENT_INDEX = 0;
 const MAX_OFFERS_COUNT = 3;
 
 export default class TripEvent {
-  constructor(eventListContainer) {
+  constructor(eventListContainer, changeData) {
     this._eventListContainer = eventListContainer;
+    this._changeData = changeData;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -23,6 +24,7 @@ export default class TripEvent {
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
   init(evt) {
@@ -38,32 +40,30 @@ export default class TripEvent {
     this._eventComponent = new ReadingEventContentView(evt);
     this._eventEditComponent = this._renderEditableEvent(evt, isNewEvent);
 
-    if (prevEventComponent === null ||
-        prevEventEditComponent === null) {
-      render(
-          this._eventListContainer,
-          this._eventComponent,
-          AddedComponentPosition.BEFORE_END
-      );
+    render(
+        this._eventListContainer,
+        this._eventComponent,
+        AddedComponentPosition.BEFORE_END
+    );
 
-      // Отрисовка краткого списка предложений
-      this._renderOffers(evt);
+    // Отрисовка краткого списка предложений
+    this._renderOffers(evt);
 
-      // В конце элемента для чтения кнопка открытия события
-      render(
-          this._eventComponent,
-          new OpenEventButtonView(),
-          AddedComponentPosition.BEFORE_END
-      );
-
-      this._eventComponent.setEditClickHandler(this._handleEditClick);
-      this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-
-      return;
-    }
+    // В конце элемента для чтения кнопка открытия события
+    render(
+        this._eventComponent,
+        new OpenEventButtonView(),
+        AddedComponentPosition.BEFORE_END
+    );
 
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    if (prevEventComponent === null ||
+        prevEventEditComponent === null) {
+      return;
+    }
 
     // Проверка на наличие в DOM необходима,
     // чтобы не пытаться заменить то, что не было отрисовано
@@ -191,17 +191,31 @@ export default class TripEvent {
   }
 
   _handleEditClick() {
-    this._replaceCardToForm();
+    this._replaceEventToForm();
   }
 
-  _handleFormSubmit() {
-    this._replaceFormToCard();
+  _handleFormSubmit(evt) {
+    this._changeData(evt);
+    this._replaceFormToEvent();
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
-      this._replaceFormToCard();
+      this._replaceFormToEvent();
     }
+  }
+
+  _handleFavoriteClick() {
+    // Вызов метода изменения данных в обработчике клика по звездочке
+    this._changeData(
+        Object.assign(
+            {},
+            this._event,
+            {
+              isFavorite: !this._event.isFavorite
+            }
+        )
+    );
   }
 }

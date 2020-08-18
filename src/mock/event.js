@@ -138,6 +138,8 @@ const typeOffers = new Map([
   ]
 ]);
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const getRandomTimeInterval = () => {
   const nowDate = new Date();
 
@@ -216,6 +218,7 @@ export const getOffers = (eventType) => {
 export const generateEvent = () => {
   const tmpCities = Array.from(cities.keys());
   const evt = {
+    id: generateId(),
     eventType: getRandomEventType(),
     city: tmpCities[getRandomInteger(0, tmpCities.length - 1)],
     offers: [],
