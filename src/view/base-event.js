@@ -1,7 +1,9 @@
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
-import {eventTypes, cities} from "../mock/event.js";
+import {eventTypes, cities, getOffers} from "../mock/event.js";
 import SmartView from "./smart.js";
+
+const cityNames = new Set(cities.keys());
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -153,23 +155,26 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
   </form>`;
 
 export default class BaseEvent extends SmartView {
-  constructor(evt, isNewEvent) {
+  constructor(evt, isNewEvent, init) {
     super();
-    this._evt = evt;
+    this._data = BaseEvent.parseEventToData(evt);
     this._isNewEvent = isNewEvent;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._init = init;
 
     this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createEmptyEventTemplate(this._evt, this._isNewEvent);
+    return createEmptyEventTemplate(this._data, this._isNewEvent);
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._evt);
+    this._callback.formSubmit(this._data);
   }
 
   setFormSubmitHandler(callback) {
@@ -190,6 +195,31 @@ export default class BaseEvent extends SmartView {
       .addEventListener(`click`, this._favoriteClickHandler);
   }
 
+  _eventTypeChangeHandler(evt) {
+    evt.preventDefault();
+    const tmpEventType = eventTypes.find((eventType) => eventType.value === evt.target.value);
+    const tmpOffers = getOffers(tmpEventType);
+    this.updateData({
+      eventType: tmpEventType,
+      offers: tmpOffers
+    },
+    true);
+
+    this._init(this._data);
+  }
+
+  _cityChangeHandler(evt) {
+    evt.preventDefault();
+    if (cityNames.has(evt.target.value)) {
+      this.updateData({
+        city: evt.target.value
+      },
+      true);
+
+      this._init(this._data);
+    }
+  }
+
   _setInnerHandlers() {
     // this.getElement()
     //   .querySelector(`.card__date-deadline-toggle`)
@@ -207,13 +237,23 @@ export default class BaseEvent extends SmartView {
     //     .addEventListener(`change`, this._repeatingChangeHandler);
     // }
 
-    // this.getElement()
-    //   .querySelector(`.card__colors-wrap`)
-    //   .addEventListener(`change`, this._colorChangeHandler);
+    this.getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._eventTypeChangeHandler);
+    this.getElement()
+      .querySelector(`#event-destination-1`)
+      .addEventListener(`input`, this._cityChangeHandler);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  static parseEventToData(evt) {
+    return Object.assign(
+        {},
+        evt
+    );
   }
 }

@@ -28,9 +28,9 @@ const typeOffers = new Map([
       eventGroup: EventGroup.MOVEMENT,
       value: `taxi`
     }, [
-      {name: `Order Uber`, price: 30},
-      {name: `Order Yandex`, price: 25},
-      {name: `Order Leader`, price: 27}
+      {name: `Order Uber`, price: 30, label: `uber`},
+      {name: `Order Yandex`, price: 25, label: `yandex`},
+      {name: `Order Leader`, price: 27, label: `leader`}
     ]
   ],
   [
@@ -48,9 +48,9 @@ const typeOffers = new Map([
       eventGroup: EventGroup.MOVEMENT,
       value: `train`
     }, [
-      {name: `Econom`, price: 60},
-      {name: `Stateroom`, price: 80},
-      {name: `SV`, price: 130},
+      {name: `Econom`, price: 60, label: `econom`},
+      {name: `Stateroom`, price: 80, label: `stateroom`},
+      {name: `SV`, price: 130, label: `sv`},
     ]
   ],
   [
@@ -60,8 +60,8 @@ const typeOffers = new Map([
       eventGroup: EventGroup.MOVEMENT,
       value: `ship`
     }, [
-      {name: `Entertainments on board`, price: 20},
-      {name: `Alcohol`, price: 80},
+      {name: `Entertainments on board`, price: 20, label: `entertainments`},
+      {name: `Alcohol`, price: 80, label: `alcohol`},
     ]
   ],
   [
@@ -79,9 +79,9 @@ const typeOffers = new Map([
       eventGroup: EventGroup.MOVEMENT,
       value: `drive`
     }, [
-      {name: `Navigation`, price: 5},
-      {name: `Full tank of fuel`, price: 40},
-      {name: `Video recorder`, price: 8},
+      {name: `Navigation`, price: 5, label: `navigation`},
+      {name: `Full tank of fuel`, price: 40, label: `full`},
+      {name: `Video recorder`, price: 8, label: `recorder`},
     ]
   ],
   [
@@ -91,11 +91,11 @@ const typeOffers = new Map([
       eventGroup: EventGroup.MOVEMENT,
       value: `flight`
     }, [
-      {name: `Add luggage`, price: 30},
-      {name: `Switch to comfort class`, price: 100},
-      {name: `Add meal`, price: 15},
-      {name: `Choose seats`, price: 5},
-      {name: `Travel by train`, price: 40}
+      {name: `Add luggage`, price: 30, label: `luggage`},
+      {name: `Switch to comfort class`, price: 100, label: `comfort`},
+      {name: `Add meal`, price: 15, label: `meal`},
+      {name: `Choose seats`, price: 5, label: `seats`},
+      {name: `Travel by train`, price: 40, label: `train`}
     ]
   ],
   [
@@ -105,11 +105,11 @@ const typeOffers = new Map([
       eventGroup: EventGroup.PLACE,
       value: `check-in`
     }, [
-      {name: `Sea view`, price: 100},
-      {name: `All inclusive`, price: 100},
-      {name: `Meeting in arrival zone`, price: 15},
-      {name: `Lux`, price: 50},
-      {name: `Mini bar`, price: 20}
+      {name: `Sea view`, price: 100, label: `sea`},
+      {name: `All inclusive`, price: 100, label: `all`},
+      {name: `Meeting in arrival zone`, price: 15, label: `meeting`},
+      {name: `Lux`, price: 50, label: `lux`},
+      {name: `Mini bar`, price: 20, label: `bar`}
     ]
   ],
   [
@@ -119,9 +119,9 @@ const typeOffers = new Map([
       eventGroup: EventGroup.PLACE,
       value: `sightseeing`
     }, [
-      {name: `Book tickets`, price: 40},
-      {name: `Lunch in city`, price: 30},
-      {name: `Souvenirs`, price: 25}
+      {name: `Book tickets`, price: 40, label: `tickets`},
+      {name: `Lunch in city`, price: 30, label: `lunch`},
+      {name: `Souvenirs`, price: 25, label: `souvenirs`}
     ]
   ],
   [
@@ -131,9 +131,9 @@ const typeOffers = new Map([
       eventGroup: EventGroup.PLACE,
       value: `restaurant`
     }, [
-      {name: `Desert`, price: 3},
-      {name: `Beverage`, price: 2},
-      {name: `Snack`, price: 1},
+      {name: `Desert`, price: 3, label: `desert`},
+      {name: `Beverage`, price: 2, label: `beverage`},
+      {name: `Snack`, price: 1, label: `snack`},
     ]
   ]
 ]);
@@ -233,6 +233,7 @@ export const generateEvent = () => {
     evt.offers[i] = {
       name: offers[i].name,
       price: offers[i].price,
+      label: offers[i].label,
       isAccepted: Boolean(getRandomInteger())
     };
   }

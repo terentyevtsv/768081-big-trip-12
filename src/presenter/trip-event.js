@@ -25,6 +25,7 @@ export default class TripEvent {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this.init = this.init.bind(this);
   }
 
   init(evt) {
@@ -151,7 +152,7 @@ export default class TripEvent {
   }
 
   _renderEditableEvent(evt, isNewEvent) {
-    this._eventEditComponent = new BaseEventView(evt, isNewEvent);
+    this._eventEditComponent = new BaseEventView(evt, isNewEvent, this.init);
 
     const eventDetailsView = new EventDetailsView();
 
