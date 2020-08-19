@@ -30,6 +30,7 @@ export default class Trip {
 
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   get planDateEventsMap() {
@@ -40,6 +41,12 @@ export default class Trip {
     this._events = events;
     this._planDateEventsMap = this._getMapDates();
     this._renderEventsPlan();
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._eventPresenter)
+      .forEach((presenter) => presenter.resetView());
   }
 
   // Обновление мока и отрисовка согласно обновлению точки марщрута
@@ -133,7 +140,11 @@ export default class Trip {
         AddedComponentPosition.BEFORE_END
     );
 
-    const tripEventPresenter = new TripEventPresenter(tripEventsItemView, this._handleEventChange);
+    const tripEventPresenter = new TripEventPresenter(
+        tripEventsItemView,
+        this._handleEventChange,
+        this._handleModeChange
+    );
     tripEventPresenter.init(evt);
     this._eventPresenter[evt.id] = tripEventPresenter;
   }

@@ -13,14 +13,21 @@ import OpenEventButtonView from "../view/open-event-button.js";
 const EMPTY_EVENT_INDEX = 0;
 const MAX_OFFERS_COUNT = 3;
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
+
 export default class TripEvent {
-  constructor(eventListContainer, changeData) {
+  constructor(eventListContainer, changeData, changeMode) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
+    this._changeMode = changeMode;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
     this._prevEvent = null;
+    this._mode = Mode.DEFAULT;
 
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -33,7 +40,9 @@ export default class TripEvent {
     const isNewEvent = evt === null;
     evt = evt || this._getDefaultEvent();
 
-    this._prevEvent = this._event;
+    this._prevEvent = this._prevEvent !== null
+      ? this._event
+      : evt;
     this._event = evt;
 
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
@@ -60,12 +69,12 @@ export default class TripEvent {
       return;
     }
 
-    if (this._eventListContainer.getElement().contains(prevEventComponent.getElement())) {
+    if (this._mode === Mode.DEFAULT) {
       // Обновление компонента для чтения
       replace(this._eventComponent, prevEventComponent);
     }
 
-    if (this._eventListContainer.getElement().contains(prevEventEditComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       // Обновление компонента для записи
       replace(this._eventEditComponent, prevEventEditComponent);
     }
@@ -78,6 +87,14 @@ export default class TripEvent {
   destroy() {
     remove(this._eventComponent);
     remove(this._eventEditComponent);
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._eventEditComponent.reset(this._prevEvent);
+      this._changeData(this._prevEvent);
+      this._replaceFormToEvent();
+    }
   }
 
   _renderOffers(evt) {
@@ -191,12 +208,17 @@ export default class TripEvent {
   _replaceEventToForm() {
     replace(this._eventEditComponent, this._eventComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
+
+    this._changeMode();
+    this._mode = Mode.EDITING;
   }
 
   // Подмена формы редактирования на событие
   _replaceFormToEvent() {
     replace(this._eventComponent, this._eventEditComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
+
+    this._mode = Mode.DEFAULT;
   }
 
   _handleEditClick() {
