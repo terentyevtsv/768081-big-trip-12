@@ -20,6 +20,7 @@ export default class TripEvent {
 
     this._eventComponent = null;
     this._eventEditComponent = null;
+    this._prevEvent = null;
 
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
@@ -32,6 +33,7 @@ export default class TripEvent {
     const isNewEvent = evt === null;
     evt = evt || this._getDefaultEvent();
 
+    this._prevEvent = this._event;
     this._event = evt;
 
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
@@ -209,6 +211,8 @@ export default class TripEvent {
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
+      this._eventEditComponent.reset(this._prevEvent);
+      this._changeData(this._prevEvent);
       this._replaceFormToEvent();
     }
   }

@@ -220,23 +220,15 @@ export default class BaseEvent extends SmartView {
     }
   }
 
+  reset(evt) {
+    if (evt !== null) {
+      this.updateData(
+          BaseEvent.parseEventToData(evt)
+      );
+    }
+  }
+
   _setInnerHandlers() {
-    // this.getElement()
-    //   .querySelector(`.card__date-deadline-toggle`)
-    //   .addEventListener(`click`, this._dueDateToggleHandler);
-    // this.getElement()
-    //   .querySelector(`.card__repeat-toggle`)
-    //   .addEventListener(`click`, this._repeatingToggleHandler);
-    // this.getElement()
-    //   .querySelector(`.card__text`)
-    //   .addEventListener(`input`, this._descriptionInputHandler);
-
-    // if (this._data.isRepeating) {
-    //   this.getElement()
-    //     .querySelector(`.card__repeat-days-inner`)
-    //     .addEventListener(`change`, this._repeatingChangeHandler);
-    // }
-
     this.getElement()
       .querySelector(`.event__type-list`)
       .addEventListener(`change`, this._eventTypeChangeHandler);
