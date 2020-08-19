@@ -1,7 +1,7 @@
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities} from "../mock/event.js";
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -17,7 +17,11 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
             alt="Event type icon"
           >
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input
+          class="event__type-toggle  visually-hidden"
+          id="event-type-toggle-1"
+          type="checkbox"
+        >
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
@@ -148,13 +152,15 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     </header>
   </form>`;
 
-export default class BaseEvent extends AbstractView {
+export default class BaseEvent extends SmartView {
   constructor(evt, isNewEvent) {
     super();
     this._evt = evt;
     this._isNewEvent = isNewEvent;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
@@ -182,5 +188,32 @@ export default class BaseEvent extends AbstractView {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  _setInnerHandlers() {
+    // this.getElement()
+    //   .querySelector(`.card__date-deadline-toggle`)
+    //   .addEventListener(`click`, this._dueDateToggleHandler);
+    // this.getElement()
+    //   .querySelector(`.card__repeat-toggle`)
+    //   .addEventListener(`click`, this._repeatingToggleHandler);
+    // this.getElement()
+    //   .querySelector(`.card__text`)
+    //   .addEventListener(`input`, this._descriptionInputHandler);
+
+    // if (this._data.isRepeating) {
+    //   this.getElement()
+    //     .querySelector(`.card__repeat-days-inner`)
+    //     .addEventListener(`change`, this._repeatingChangeHandler);
+    // }
+
+    // this.getElement()
+    //   .querySelector(`.card__colors-wrap`)
+    //   .addEventListener(`change`, this._colorChangeHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
   }
 }
