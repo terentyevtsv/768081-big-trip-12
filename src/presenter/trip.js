@@ -141,6 +141,7 @@ export default class Trip {
     );
 
     const tripEventPresenter = new TripEventPresenter(
+        evt,
         tripEventsItemView,
         this._handleEventChange,
         this._handleModeChange

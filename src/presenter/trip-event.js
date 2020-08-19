@@ -19,14 +19,14 @@ const Mode = {
 };
 
 export default class TripEvent {
-  constructor(eventListContainer, changeData, changeMode) {
+  constructor(evt, eventListContainer, changeData, changeMode) {
+    this._event = evt;
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
-    this._prevEvent = null;
     this._mode = Mode.DEFAULT;
 
     this._handleEditClick = this._handleEditClick.bind(this);
@@ -39,11 +39,6 @@ export default class TripEvent {
   init(evt) {
     const isNewEvent = evt === null;
     evt = evt || this._getDefaultEvent();
-
-    this._prevEvent = this._prevEvent !== null
-      ? this._event
-      : evt;
-    this._event = evt;
 
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
     const prevEventComponent = this._eventComponent;
@@ -91,8 +86,7 @@ export default class TripEvent {
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
-      this._eventEditComponent.reset(this._prevEvent);
-      this._changeData(this._prevEvent);
+      this.init(this._event);
       this._replaceFormToEvent();
     }
   }
@@ -226,29 +220,24 @@ export default class TripEvent {
   }
 
   _handleFormSubmit(evt) {
-    this._changeData(evt);
+    this._event = evt;
+    this.init(this._event);
     this._replaceFormToEvent();
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
-      this._eventEditComponent.reset(this._prevEvent);
-      this._changeData(this._prevEvent);
+      this.init(this._event);
       this._replaceFormToEvent();
     }
   }
 
   _handleFavoriteClick() {
-    // Вызов метода изменения данных в обработчике клика по звездочке
-    this._changeData(
-        Object.assign(
-            {},
-            this._event,
-            {
-              isFavorite: !this._event.isFavorite
-            }
-        )
-    );
+    this._event.isFavorite = !this._event.isFavorite;
+    this._eventEditComponent.updateData({
+      isFavorite: this._event.isFavorite
+    }, true);
+    this.init(this._event);
   }
 }
