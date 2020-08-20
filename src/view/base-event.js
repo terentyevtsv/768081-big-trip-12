@@ -297,6 +297,7 @@ export default class BaseEvent extends SmartView {
         {
           maxDate: this._data.timeInterval.rightLimitDate,
           enableTime: true,
+          // eslint-disable-next-line camelcase
           time_24hr: true,
           allowInput: false,
           dateFormat: `d/m/y H:i`,
@@ -320,6 +321,7 @@ export default class BaseEvent extends SmartView {
         {
           minDate: this._data.timeInterval.leftLimitDate,
           enableTime: true,
+          // eslint-disable-next-line camelcase
           time_24hr: true,
           allowInput: false,
           dateFormat: `d/m/y H:i`,
