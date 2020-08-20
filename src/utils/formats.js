@@ -1,3 +1,5 @@
+import moment from "moment";
+
 const MONTH_NAMES = [
   `Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`,
   `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`
@@ -47,37 +49,38 @@ export const shortYearDateToString = (date) => {
 };
 
 export const getDatesDelta = (date1, date2) => {
-  let dateDelta = date2 - date1;
+  let a = moment([
+    date1.getFullYear(), date1.getMonth(), date1.getDate(),
+    date1.getHours(), date1.getMinutes(), date1.getSeconds()
+  ]);
+  const b = moment([
+    date2.getFullYear(), date2.getMonth(), date2.getDate(),
+    date2.getHours(), date2.getMinutes(), date2.getSeconds()
+  ]);
 
-  const millisInDay = 1000 * 60 * 60 * 24;
-  const millisInHour = 1000 * 60 * 60;
-  const millisInMinute = 1000 * 60;
-  const millisInSecond = 1000;
+  let duration = moment.duration(b.diff(a));
+  const days = Math.floor(duration.asDays());
+  a = a.add(days, `days`);
 
-  const daysCount = Math.floor(dateDelta / millisInDay);
-  dateDelta = dateDelta - daysCount * millisInDay;
+  duration = moment.duration(b.diff(a));
+  const hours = Math.floor(duration.asHours());
 
-  const hoursCount = Math.floor(dateDelta / millisInHour);
-  dateDelta = dateDelta - hoursCount * millisInHour;
-
-  const minutesCount = Math.floor(dateDelta / millisInMinute);
-  dateDelta = dateDelta - minutesCount * millisInMinute;
-
-  const secondsCount = Math.floor(dateDelta / millisInSecond);
-  dateDelta = dateDelta - secondsCount * millisInSecond;
+  a = a.add(hours, `hours`);
+  duration = moment.duration(b.diff(a));
+  const minutes = Math.floor(duration.asMinutes());
 
   // 01D 02H 30M
   let delta = ``;
-  if (daysCount > 0) {
-    delta += `${zeroBasedFormat(daysCount)}D `;
+  if (days > 0) {
+    delta += `${zeroBasedFormat(days)}D `;
   }
 
-  if (hoursCount > 0) {
-    delta += `${zeroBasedFormat(hoursCount)}H `;
+  if (hours > 0) {
+    delta += `${zeroBasedFormat(hours)}H `;
   }
 
-  if (minutesCount > 0) {
-    delta += `${zeroBasedFormat(minutesCount)}M`;
+  if (minutes > 0) {
+    delta += `${zeroBasedFormat(minutes)}M`;
   }
 
   delta = delta.trimRight();

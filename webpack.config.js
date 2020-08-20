@@ -1,5 +1,6 @@
 // Библиотека для получения пути с учетом кроссплатформенности
 const path = require('path');
+const MomentLocalesPlugin = require(`moment-locales-webpack-plugin`);
 
 module.exports = {
   mode: 'development',                      // Режим сборки для разработки
@@ -20,5 +21,8 @@ module.exports = {
             use: ['style-loader', 'css-loader']
         }
     ]
-  }
+  },
+  plugins: [
+    new MomentLocalesPlugin()
+  ]
 };

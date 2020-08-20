@@ -255,9 +255,7 @@ export default class BaseEvent extends SmartView {
   }
 
   _leftDateTimeChangeHandler(selectedDates) {
-    const selectedDate = selectedDates[0] !== undefined
-      ? selectedDates[0]
-      : this._data.timeInterval.leftLimitDate;
+    const selectedDate = selectedDates[0];
 
     const tmpTimeInterval = {
       leftLimitDate: selectedDate,
@@ -266,12 +264,12 @@ export default class BaseEvent extends SmartView {
     this.updateData({
       timeInterval: tmpTimeInterval
     }, true);
+
+    this._toDatepicker.config.minDate = selectedDate;
   }
 
   _rightDateTimeChangeHandler(selectedDates) {
-    const selectedDate = selectedDates[0] !== undefined
-      ? selectedDates[0]
-      : this._data.timeInterval.rightLimitDate;
+    const selectedDate = selectedDates[0];
 
     const tmpTimeInterval = {
       leftLimitDate: this._data.timeInterval.leftLimitDate,
@@ -280,6 +278,8 @@ export default class BaseEvent extends SmartView {
     this.updateData({
       timeInterval: tmpTimeInterval
     }, true);
+
+    this._fromDatepicker.config.maxDate = selectedDate;
   }
 
   _setFromDatepicker() {
