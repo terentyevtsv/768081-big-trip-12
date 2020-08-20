@@ -8,12 +8,12 @@ const createOffersTemplate = (offers) =>
       ${offers.map((offer) => `<div class="event__offer-selector">
         <input
           class="event__offer-checkbox  visually-hidden"
-          id="event-offer-luggage-1"
+          id="event-offer-${offer.label}"
           type="checkbox"
           name="event-offer-luggage"
           ${offer.isAccepted ? `checked` : ``}
         >
-        <label class="event__offer-label" for="event-offer-luggage-1">
+        <label class="event__offer-label" for="event-offer-${offer.label}">
           <span class="event__offer-title">${offer.name}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>

@@ -1,7 +1,9 @@
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
-import {eventTypes, cities} from "../mock/event.js";
-import AbstractView from "./abstract.js";
+import {eventTypes, cities, getOffers} from "../mock/event.js";
+import SmartView from "./smart.js";
+
+const cityNames = new Set(cities.keys());
 
 const createEmptyEventTemplate = (evt, isNewEvent) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -17,7 +19,11 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
             alt="Event type icon"
           >
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input
+          class="event__type-toggle  visually-hidden"
+          id="event-type-toggle-1"
+          type="checkbox"
+        >
 
         <div class="event__type-list">
           <fieldset class="event__type-group">
@@ -148,25 +154,98 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
     </header>
   </form>`;
 
-export default class BaseEvent extends AbstractView {
-  constructor(evt, isNewEvent) {
+export default class BaseEvent extends SmartView {
+  constructor(evt, isNewEvent, init) {
     super();
-    this._evt = evt;
+    this._data = BaseEvent.parseEventToData(evt);
     this._isNewEvent = isNewEvent;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._init = init;
+
+    this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createEmptyEventTemplate(this._evt, this._isNewEvent);
+    return createEmptyEventTemplate(this._data, this._isNewEvent);
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._data);
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  // обработчик клика для звёздочки.
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  // метод для установки обработчика клика для звёздочки.
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.event__favorite-btn`)
+      .addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  _eventTypeChangeHandler(evt) {
+    evt.preventDefault();
+    const tmpEventType = eventTypes.find((eventType) => eventType.value === evt.target.value);
+    const tmpOffers = getOffers(tmpEventType);
+    this.updateData({
+      eventType: tmpEventType,
+      offers: tmpOffers
+    },
+    true);
+
+    this._init(this._data);
+  }
+
+  _cityChangeHandler(evt) {
+    evt.preventDefault();
+    if (cityNames.has(evt.target.value)) {
+      this.updateData({
+        city: evt.target.value
+      },
+      true);
+
+      this._init(this._data);
+    }
+  }
+
+  reset(evt) {
+    if (evt !== null) {
+      this.updateData(
+          BaseEvent.parseEventToData(evt)
+      );
+    }
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._eventTypeChangeHandler);
+    this.getElement()
+      .querySelector(`#event-destination-1`)
+      .addEventListener(`input`, this._cityChangeHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  static parseEventToData(evt) {
+    return Object.assign(
+        {},
+        evt
+    );
   }
 }
