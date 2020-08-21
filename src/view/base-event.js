@@ -2,6 +2,8 @@ import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
 import {eventTypes, cities, getOffers} from "../mock/event.js";
 import SmartView from "./smart.js";
+import flatpickr from "flatpickr";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const cityNames = new Set(cities.keys());
 
@@ -157,15 +159,23 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
 export default class BaseEvent extends SmartView {
   constructor(evt, isNewEvent, init) {
     super();
+
+    this._fromDatepicker = null;
+    this._toDatepicker = null;
+
     this._data = BaseEvent.parseEventToData(evt);
     this._isNewEvent = isNewEvent;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._leftDateTimeChangeHandler = this._leftDateTimeChangeHandler.bind(this);
+    this._rightDateTimeChangeHandler = this._rightDateTimeChangeHandler.bind(this);
     this._init = init;
 
     this._setInnerHandlers();
+    this._setFromDatepicker();
+    this._setToDatepicker();
   }
 
   getTemplate() {
@@ -239,7 +249,85 @@ export default class BaseEvent extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setFromDatepicker();
+    this._setToDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  _leftDateTimeChangeHandler(selectedDates) {
+    const selectedDate = selectedDates[0];
+
+    const tmpTimeInterval = {
+      leftLimitDate: selectedDate,
+      rightLimitDate: this._data.timeInterval.rightLimitDate
+    };
+    this.updateData({
+      timeInterval: tmpTimeInterval
+    }, true);
+
+    this._toDatepicker.config.minDate = selectedDate;
+  }
+
+  _rightDateTimeChangeHandler(selectedDates) {
+    const selectedDate = selectedDates[0];
+
+    const tmpTimeInterval = {
+      leftLimitDate: this._data.timeInterval.leftLimitDate,
+      rightLimitDate: selectedDate
+    };
+    this.updateData({
+      timeInterval: tmpTimeInterval
+    }, true);
+
+    this._fromDatepicker.config.maxDate = selectedDate;
+  }
+
+  _setFromDatepicker() {
+    if (this._fromDatepicker) {
+      // В случае обновления компонента удаляем вспомогательные DOM-элементы,
+      // которые создает flatpickr при инициализации
+      this._fromDatepicker.destroy();
+      this._fromDatepicker = null;
+    }
+
+    // flatpickr есть смысл инициализировать только в случае,
+    // если поле выбора даты доступно для заполнения
+    this._fromDatepicker = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          maxDate: this._data.timeInterval.rightLimitDate,
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          allowInput: false,
+          dateFormat: `d/m/y H:i`,
+          onChange: this._leftDateTimeChangeHandler
+        }
+    );
+  }
+
+  _setToDatepicker() {
+    if (this._toDatepicker) {
+      // В случае обновления компонента удаляем вспомогательные DOM-элементы,
+      // которые создает flatpickr при инициализации
+      this._toDatepicker.destroy();
+      this._toDatepicker = null;
+    }
+
+    // flatpickr есть смысл инициализировать только в случае,
+    // если поле выбора даты доступно для заполнения
+    this._toDatepicker = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          minDate: this._data.timeInterval.leftLimitDate,
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          allowInput: false,
+          dateFormat: `d/m/y H:i`,
+          onChange: this._rightDateTimeChangeHandler
+        }
+    );
   }
 
   static parseEventToData(evt) {
