@@ -6,10 +6,15 @@ import {AddedComponentPosition, render} from "./utils/render.js";
 import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent} from "./mock/event.js";
 import TripPresenter from "./presenter/trip.js";
+import PointsModel from "./model/points.js";
 
 const EVENTS_COUNT = 20;
 
 const events = new Array(EVENTS_COUNT).fill().map(generateEvent);
+
+// Инициализация модели точек маршрута
+const pointsModel = new PointsModel();
+pointsModel.setPoints(events);
 
 const pageBodyElement = document.querySelector(`.page-body`);
 
@@ -37,8 +42,8 @@ for (let i = 0; i < mainTripComponents.length; ++i) {
 const tripEventsElement = pageBodyElement
     .querySelector(`.trip-events`);
 
-const tripPresenter = new TripPresenter(tripEventsElement);
-tripPresenter.init(events);
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel);
+tripPresenter.init();
 
 const tripInformationContainer =
     new TripInformationContainerView(tripPresenter.planDateEventsMap);

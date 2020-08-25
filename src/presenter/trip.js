@@ -5,9 +5,8 @@ import EventsPlanContainerView from "../view/events-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
 import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
-import {SortType} from "../const.js";
+import {SortType, UpdateType} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
-import {updateItem} from "../utils/common.js";
 
 const getDifference = function (timeInterval) {
   return (
@@ -17,8 +16,9 @@ const getDifference = function (timeInterval) {
 };
 
 export default class Trip {
-  constructor(tripEventsContainer) {
+  constructor(tripEventsContainer, pointsModel) {
     this._tripEventsContainer = tripEventsContainer;
+    this._pointsModel = pointsModel;
 
     this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
@@ -37,8 +37,7 @@ export default class Trip {
     return this._planDateEventsMap;
   }
 
-  init(events) {
-    this._events = events;
+  init() {
     this._planDateEventsMap = this._getMapDates();
     this._renderEventsPlan();
   }
@@ -51,7 +50,7 @@ export default class Trip {
 
   // Обновление мока и отрисовка согласно обновлению точки марщрута
   _handleEventChange(updatedEvent) {
-    this._events = updateItem(this._events, updatedEvent);
+    this._pointsModel.updatePoint(UpdateType.MINOR, updatedEvent);
     this._eventPresenter[updatedEvent.id].init(updatedEvent);
   }
 
@@ -73,7 +72,7 @@ export default class Trip {
       const datesSet = new Set();
 
       // Формируем список дат, по которым будут группироваться события
-      this._events.forEach((evt) => {
+      this._pointsModel.getPoints().forEach((evt) => {
         const date = new Date(evt.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
@@ -87,7 +86,7 @@ export default class Trip {
       // Раскидываем события по датам
       dates.forEach((date) => mapDates.set(date, []));
 
-      this._events.forEach((evt) => {
+      this._pointsModel.getPoints().forEach((evt) => {
         const date = new Date(evt.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
@@ -102,7 +101,7 @@ export default class Trip {
     }
 
     const tmpDate = new Date();
-    const events = this._events.slice();
+    const events = this._pointsModel.getPoints().slice();
     if (this._currentSortType === SortType.TIME) {
       // Порядок с сортировкой по времени события
       events.sort((evt1, evt2) => getDifference(evt2.timeInterval) -
@@ -199,7 +198,7 @@ export default class Trip {
   }
 
   _renderEventsPlan() {
-    if (this._events.length === 0) {
+    if (this._pointsModel.getPoints().length === 0) {
       this._renderNoEvents();
       return;
     }

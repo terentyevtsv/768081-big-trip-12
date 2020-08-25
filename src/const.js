@@ -8,3 +8,9 @@ export const SortType = {
   TIME: `sort-time`,
   PRICE: `sort-price`
 };
+
+export const UpdateType = {
+  PATCH: `PATCH`,
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
