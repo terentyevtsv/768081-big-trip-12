@@ -16,9 +16,10 @@ const getDifference = function (timeInterval) {
 };
 
 export default class Trip {
-  constructor(tripEventsContainer, pointsModel) {
+  constructor(tripEventsContainer, pointsModel, offersModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
+    this._offersModel = offersModel;
 
     this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
@@ -142,6 +143,7 @@ export default class Trip {
     const tripEventPresenter = new TripEventPresenter(
         evt,
         tripEventsItemView,
+        this._offersModel,
         this._handleEventChange,
         this._handleModeChange
     );

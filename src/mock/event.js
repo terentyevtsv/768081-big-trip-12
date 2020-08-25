@@ -20,7 +20,72 @@ const MIN_PRICE = 20;
 const MAX_PRICE = 200;
 const DAYS_BEFORE_AFTER = 5;
 
-const typeOffers = new Map([
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
+const getRandomTimeInterval = () => {
+  const nowDate = new Date();
+
+  const firstDate = new Date();
+  const lastDate = new Date();
+
+  // Определили диапазон дат
+  firstDate.setDate(nowDate.getDate() - DAYS_BEFORE_AFTER);
+  firstDate.setHours(0, 0, 0);
+
+  lastDate.setDate(nowDate.getDate() + DAYS_BEFORE_AFTER);
+  lastDate.setHours(23, 59, 59);
+
+  const date1 = getRandomDate(firstDate, lastDate);
+  const date2 = getRandomDate(firstDate, lastDate);
+
+  if (date1 === date2) {
+    return {
+      leftLimitDate: date1,
+      rightLimitDate: date2
+    };
+  }
+
+  const leftLimitDate = date1 < date2 ? date1 : date2;
+  const rightLimitDate = date1 < date2 ? date2 : date1;
+
+  return {
+    leftLimitDate,
+    rightLimitDate
+  };
+};
+
+const getRandomDestinationsDescription = () => {
+  // Случайное количество предложений
+  const sentenceCount = getRandomInteger(0, MAX_SENTENCE_COUNT);
+
+  // Считаем, что если количество предложений 0, то описание отсутствует
+  if (sentenceCount === 0) {
+    return null;
+  }
+
+  // Формируем описание из заданного количества предложений и фотографий
+  let fullDescription = ``;
+  const photos = [];
+  for (let i = 0; i < sentenceCount; i++) {
+    fullDescription +=
+      ` ${destinationDescriptions[getRandomInteger(0, destinationDescriptions.length - 1)]}`;
+    photos[i] = `http://picsum.photos/248/152?r=${Math.random()}`;
+  }
+
+  return {
+    description: fullDescription,
+    photos
+  };
+};
+
+export const cities = new Map([
+  [`Amsterdam`, getRandomDestinationsDescription()],
+  [`Geneva`, getRandomDestinationsDescription()],
+  [`Chamonix`, getRandomDestinationsDescription()],
+  [`Saint Petersburg`, getRandomDestinationsDescription()]
+]);
+
+export const typeOffers = new Map([
   [
     {
       name: `Taxi`,
@@ -138,88 +203,15 @@ const typeOffers = new Map([
   ]
 ]);
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
-const getRandomTimeInterval = () => {
-  const nowDate = new Date();
-
-  const firstDate = new Date();
-  const lastDate = new Date();
-
-  // Определили диапазон дат
-  firstDate.setDate(nowDate.getDate() - DAYS_BEFORE_AFTER);
-  firstDate.setHours(0, 0, 0);
-
-  lastDate.setDate(nowDate.getDate() + DAYS_BEFORE_AFTER);
-  lastDate.setHours(23, 59, 59);
-
-  const date1 = getRandomDate(firstDate, lastDate);
-  const date2 = getRandomDate(firstDate, lastDate);
-
-  if (date1 === date2) {
-    return {
-      leftLimitDate: date1,
-      rightLimitDate: date2
-    };
-  }
-
-  const leftLimitDate = date1 < date2 ? date1 : date2;
-  const rightLimitDate = date1 < date2 ? date2 : date1;
-
-  return {
-    leftLimitDate,
-    rightLimitDate
-  };
-};
-
-const getRandomDestinationsDescription = () => {
-  // Случайное количество предложений
-  const sentenceCount = getRandomInteger(0, MAX_SENTENCE_COUNT);
-
-  // Считаем, что если количество предложений 0, то описание отсутствует
-  if (sentenceCount === 0) {
-    return null;
-  }
-
-  // Формируем описание из заданного количества предложений и фотографий
-  let fullDescription = ``;
-  const photos = [];
-  for (let i = 0; i < sentenceCount; i++) {
-    fullDescription +=
-      ` ${destinationDescriptions[getRandomInteger(0, destinationDescriptions.length - 1)]}`;
-    photos[i] = `http://picsum.photos/248/152?r=${Math.random()}`;
-  }
-
-  return {
-    description: fullDescription,
-    photos
-  };
-};
-
-export const cities = new Map([
-  [`Amsterdam`, getRandomDestinationsDescription()],
-  [`Geneva`, getRandomDestinationsDescription()],
-  [`Chamonix`, getRandomDestinationsDescription()],
-  [`Saint Petersburg`, getRandomDestinationsDescription()]
-]);
-
-export const eventTypes = Array.from(typeOffers.keys());
-
-const getRandomEventType = () => {
+const getRandomEventType = (eventTypes) => {
   return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
 };
 
-export const getOffers = (eventType) => {
-  return typeOffers.has(eventType)
-    ? typeOffers.get(eventType)
-    : null;
-};
-
-export const generateEvent = () => {
+export const generateEvent = (offersModel) => {
   const tmpCities = Array.from(cities.keys());
   const evt = {
     id: generateId(),
-    eventType: getRandomEventType(),
+    eventType: getRandomEventType(offersModel.eventTypes),
     city: tmpCities[getRandomInteger(0, tmpCities.length - 1)],
     offers: [],
     isFavorite: Boolean(getRandomInteger()),
@@ -227,7 +219,7 @@ export const generateEvent = () => {
     timeInterval: getRandomTimeInterval()
   };
 
-  const offers = getOffers(evt.eventType);
+  const offers = offersModel.getOffers(evt.eventType);
 
   for (let i = 0; i < offers.length; i++) {
     evt.offers[i] = {

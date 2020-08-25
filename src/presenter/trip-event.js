@@ -4,7 +4,7 @@ import EventDetailsView from "../view/event-details.js";
 import {AddedComponentPosition} from "../utils/render.js";
 import {render, replace, remove} from "../utils/render.js";
 import OffersContainerView from "../view/offers.js";
-import {cities, eventTypes, getOffers} from "../mock/event.js";
+import {cities} from "../mock/event.js";
 import DestinationView from "../view/destination.js";
 import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
@@ -19,9 +19,11 @@ const Mode = {
 };
 
 export default class TripEvent {
-  constructor(evt, eventListContainer, changeData, changeMode) {
+  constructor(evt, eventListContainer, offersModel, changeData, changeMode) {
     this._event = evt;
     this._eventListContainer = eventListContainer;
+    this._offersModel = offersModel;
+
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -122,7 +124,7 @@ export default class TripEvent {
   _getDefaultEvent() {
     const tmpCities = Array.from(cities.keys());
     const evt = {
-      eventType: eventTypes[EMPTY_EVENT_INDEX],
+      eventType: this._offersModel.eventTypes[EMPTY_EVENT_INDEX],
       city: tmpCities[EMPTY_EVENT_INDEX],
       offers: [],
       destination: cities.get(tmpCities[EMPTY_EVENT_INDEX]),
@@ -138,7 +140,7 @@ export default class TripEvent {
       rightLimitDate: date
     };
 
-    const offers = getOffers(evt.eventType);
+    const offers = this._offersModel.getOffers(evt.eventType);
     for (let i = 0; i < offers.length; i++) {
       evt.offers[i] = {
         name: offers[i].name,
@@ -165,7 +167,7 @@ export default class TripEvent {
   }
 
   _renderEditableEvent(evt, isNewEvent) {
-    this._eventEditComponent = new BaseEventView(evt, isNewEvent, this.init);
+    this._eventEditComponent = new BaseEventView(evt, isNewEvent, this._offersModel, this.init);
 
     const eventDetailsView = new EventDetailsView();
 

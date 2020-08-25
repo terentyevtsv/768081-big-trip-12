@@ -4,13 +4,19 @@ import FilterHeaderView from "./view/filter-header.js";
 import FilterView from "./view/filter.js";
 import {AddedComponentPosition, render} from "./utils/render.js";
 import TripInformationContainerView from "./view/trip-information.js";
-import {generateEvent} from "./mock/event.js";
+import {generateEvent, typeOffers} from "./mock/event.js";
 import TripPresenter from "./presenter/trip.js";
 import PointsModel from "./model/points.js";
+import OffersModel from "./model/offers.js";
 
 const EVENTS_COUNT = 20;
 
-const events = new Array(EVENTS_COUNT).fill().map(generateEvent);
+// Инициализация модели предложений
+const offersModel = new OffersModel();
+offersModel.setOffers(typeOffers);
+
+const events = new Array(EVENTS_COUNT).fill()
+  .map(() => generateEvent(offersModel));
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
@@ -42,7 +48,7 @@ for (let i = 0; i < mainTripComponents.length; ++i) {
 const tripEventsElement = pageBodyElement
     .querySelector(`.trip-events`);
 
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel);
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, offersModel);
 tripPresenter.init();
 
 const tripInformationContainer =

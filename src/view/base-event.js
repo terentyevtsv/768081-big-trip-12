@@ -1,13 +1,13 @@
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
-import {eventTypes, cities, getOffers} from "../mock/event.js";
+import {cities} from "../mock/event.js";
 import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const cityNames = new Set(cities.keys());
 
-const createEmptyEventTemplate = (evt, isNewEvent) =>
+const createEmptyEventTemplate = (evt, isNewEvent, eventTypes) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -157,8 +157,10 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
   </form>`;
 
 export default class BaseEvent extends SmartView {
-  constructor(evt, isNewEvent, init) {
+  constructor(evt, isNewEvent, offersModel, init) {
     super();
+
+    this._offersModel = offersModel;
 
     this._fromDatepicker = null;
     this._toDatepicker = null;
@@ -179,7 +181,7 @@ export default class BaseEvent extends SmartView {
   }
 
   getTemplate() {
-    return createEmptyEventTemplate(this._data, this._isNewEvent);
+    return createEmptyEventTemplate(this._data, this._isNewEvent, this._offersModel.eventTypes);
   }
 
   _formSubmitHandler(evt) {
@@ -207,8 +209,9 @@ export default class BaseEvent extends SmartView {
 
   _eventTypeChangeHandler(evt) {
     evt.preventDefault();
-    const tmpEventType = eventTypes.find((eventType) => eventType.value === evt.target.value);
-    const tmpOffers = getOffers(tmpEventType);
+    const tmpEventType = this._offersModel.eventTypes
+      .find((eventType) => eventType.value === evt.target.value);
+    const tmpOffers = this._offersModel.getOffers(tmpEventType);
     this.updateData({
       eventType: tmpEventType,
       offers: tmpOffers
