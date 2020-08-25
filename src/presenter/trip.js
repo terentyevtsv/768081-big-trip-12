@@ -5,8 +5,9 @@ import EventsPlanContainerView from "../view/events-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
 import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
-import {SortType, UpdateType} from "../const.js";
+import {SortType} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
+import {filter} from "../utils/filter.js";
 
 const getDifference = function (timeInterval) {
   return (
@@ -16,14 +17,15 @@ const getDifference = function (timeInterval) {
 };
 
 export default class Trip {
-  constructor(tripEventsContainer, pointsModel, offersModel) {
+  constructor(tripEventsContainer, pointsModel, offersModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
+    this._filterModel = filterModel;
 
     this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
-    this._sortingView = new SortingView();
+    this._sortingView = null;
     this._eventsPlanContainerView = new EventsPlanContainerView();
 
     this._eventPresenter = {};
@@ -32,6 +34,14 @@ export default class Trip {
     this._handleEventChange = this._handleEventChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleFilterChanged = this._handleFilterChanged.bind(this);
+
+    this._filterModel.addObserver(this._handleFilterChanged);
+  }
+
+  _handleFilterChanged() {
+    this._currentSortType = SortType.EVENT;
+    this.init();
   }
 
   get planDateEventsMap() {
@@ -43,6 +53,10 @@ export default class Trip {
     this._renderEventsPlan();
   }
 
+  _getPoints(filterType) {
+    return filter[filterType](this._pointsModel.getPoints());
+  }
+
   _handleModeChange() {
     Object
       .values(this._eventPresenter)
@@ -51,7 +65,7 @@ export default class Trip {
 
   // Обновление мока и отрисовка согласно обновлению точки марщрута
   _handleEventChange(updatedEvent) {
-    this._pointsModel.updatePoint(UpdateType.MINOR, updatedEvent);
+    this._pointsModel.updatePoint(updatedEvent);
     this._eventPresenter[updatedEvent.id].init(updatedEvent);
   }
 
@@ -67,13 +81,14 @@ export default class Trip {
   // Формирование структуры событий по датам
   _getMapDates() {
     const mapDates = new Map();
+    const points = this._getPoints(this._filterModel.getFilter());
 
     if (this._currentSortType === SortType.EVENT) {
       // Обычный порядок
       const datesSet = new Set();
 
       // Формируем список дат, по которым будут группироваться события
-      this._pointsModel.getPoints().forEach((evt) => {
+      points.forEach((evt) => {
         const date = new Date(evt.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
@@ -87,7 +102,7 @@ export default class Trip {
       // Раскидываем события по датам
       dates.forEach((date) => mapDates.set(date, []));
 
-      this._pointsModel.getPoints().forEach((evt) => {
+      points.forEach((evt) => {
         const date = new Date(evt.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
@@ -102,7 +117,7 @@ export default class Trip {
     }
 
     const tmpDate = new Date();
-    const events = this._pointsModel.getPoints().slice();
+    const events = points.slice();
     if (this._currentSortType === SortType.TIME) {
       // Порядок с сортировкой по времени события
       events.sort((evt1, evt2) => getDifference(evt2.timeInterval) -
@@ -120,6 +135,12 @@ export default class Trip {
   }
 
   _renderSort() {
+    if (this._sortingView !== null) {
+      remove(this._sortingView);
+    }
+
+    this._sortingView = new SortingView(this._currentSortType);
+
     // Метод для рендеринга сортировки
     // Сортировка
     render(
@@ -200,7 +221,8 @@ export default class Trip {
   }
 
   _renderEventsPlan() {
-    if (this._pointsModel.getPoints().length === 0) {
+    const points = this._getPoints(this._filterModel.getFilter());
+    if (points.length === 0) {
       this._renderNoEvents();
       return;
     }

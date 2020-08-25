@@ -1,7 +1,6 @@
 import {render, AddedComponentPosition} from "../utils/render.js";
 import FilterHeaderView from "../view/filter-header.js";
 import FilterView from "../view/filter.js";
-import { UpdateType } from "../const.js";
 
 export default class Filter {
   constructor(tripMainTripControlElement, filterModel) {
@@ -31,6 +30,6 @@ export default class Filter {
   }
 
   _handleFilterTypeChange(filterType) {
-    this._filterModel.setFilter(UpdateType.MINOR, filterType);
+    this._filterModel.setFilter(filterType);
   }
 }

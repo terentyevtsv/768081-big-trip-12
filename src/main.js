@@ -50,7 +50,7 @@ filterPresenter.init();
 const tripEventsElement = pageBodyElement
     .querySelector(`.trip-events`);
 
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, offersModel);
+const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, offersModel, filterModel);
 tripPresenter.init();
 
 const tripInformationContainer =
