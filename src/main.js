@@ -1,13 +1,13 @@
 import SiteMenuView from "./view/site-menu.js";
 import SiteMenuHeaderView from "./view/site-menu-header.js";
 import {AddedComponentPosition, render} from "./utils/render.js";
-import TripInformationContainerView from "./view/trip-information.js";
 import {generateEvent, typeOffers} from "./mock/event.js";
 import TripPresenter from "./presenter/trip.js";
 import PointsModel from "./model/points.js";
 import OffersModel from "./model/offers.js";
 import FilterPresenter from "./presenter/filter.js";
 import FilterModel from "./model/filter.js";
+import TripInformationPresenter from "./presenter/trip-information.js";
 
 const EVENTS_COUNT = 20;
 
@@ -53,12 +53,9 @@ const tripEventsElement = pageBodyElement
 const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, offersModel, filterModel);
 tripPresenter.init();
 
-const tripInformationContainer =
-    new TripInformationContainerView(tripPresenter.planDateEventsMap);
-tripInformationContainer.fillPrice();
+const getPlanDateEventMap = () => tripPresenter.planDateEventsMap;
+const tripInformationPresenter = new TripInformationPresenter(tripMainElement,
+    filterModel, getPlanDateEventMap);
+tripInformationPresenter.init();
 
-render(
-    tripMainElement,
-    tripInformationContainer,
-    AddedComponentPosition.AFTER_BEGIN
-);
+

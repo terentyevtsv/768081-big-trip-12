@@ -39,13 +39,13 @@ export default class Trip {
     this._filterModel.addObserver(this._handleFilterChanged);
   }
 
+  get planDateEventsMap() {
+    return this._planDateEventsMap;
+  }
+
   _handleFilterChanged() {
     this._currentSortType = SortType.EVENT;
     this.init();
-  }
-
-  get planDateEventsMap() {
-    return this._planDateEventsMap;
   }
 
   init() {
