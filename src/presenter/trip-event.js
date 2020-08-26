@@ -1,16 +1,11 @@
 import ReadingEventContentView from "../view/reading-event-content.js";
 import BaseEventView from "../view/base-event.js";
-import EventDetailsView from "../view/event-details.js";
-import {AddedComponentPosition} from "../utils/render.js";
-import {render, replace, remove} from "../utils/render.js";
-import OffersContainerView from "../view/offers.js";
-import {cities} from "../mock/event.js";
-import DestinationView from "../view/destination.js";
+import {renderEventsOptions} from "../utils/editable-event.js";
+import {render, replace, remove, AddedComponentPosition} from "../utils/render.js";
 import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenEventButtonView from "../view/open-event-button.js";
 
-const EMPTY_EVENT_INDEX = 0;
 const MAX_OFFERS_COUNT = 3;
 
 const Mode = {
@@ -39,16 +34,13 @@ export default class TripEvent {
   }
 
   init(evt) {
-    const isNewEvent = evt === null;
-    evt = evt || this._getDefaultEvent();
-
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
     // Собранные (не подключенные к DOM) пара текущих компонентов с новой моделью
     this._renderReadOnlyEvent(evt);
-    this._renderEditableEvent(evt, isNewEvent);
+    this._renderEditableEvent(evt);
 
     // Подписка к событиям компонентов
     this._eventComponent.setEditClickHandler(this._handleEditClick);
@@ -120,38 +112,6 @@ export default class TripEvent {
     }
   }
 
-  // Значения по умолчанию для события при создании события
-  _getDefaultEvent() {
-    const tmpCities = Array.from(cities.keys());
-    const evt = {
-      eventType: this._offersModel.eventTypes[EMPTY_EVENT_INDEX],
-      city: tmpCities[EMPTY_EVENT_INDEX],
-      offers: [],
-      destination: cities.get(tmpCities[EMPTY_EVENT_INDEX]),
-      isFavorite: false,
-      price: 0
-    };
-
-    const date = new Date();
-    date.setHours(0, 0, 0);
-
-    evt.timeInterval = {
-      leftLimitDate: date,
-      rightLimitDate: date
-    };
-
-    const offers = this._offersModel.getOffers(evt.eventType);
-    for (let i = 0; i < offers.length; i++) {
-      evt.offers[i] = {
-        name: offers[i].name,
-        price: offers[i].price,
-        isAccepted: false
-      };
-    }
-
-    return evt;
-  }
-
   _renderReadOnlyEvent(evt) {
     this._eventComponent = new ReadingEventContentView(evt);
 
@@ -166,38 +126,10 @@ export default class TripEvent {
     );
   }
 
-  _renderEditableEvent(evt, isNewEvent) {
-    this._eventEditComponent = new BaseEventView(evt, isNewEvent, this._offersModel, this.init);
+  _renderEditableEvent(evt) {
+    this._eventEditComponent = new BaseEventView(evt, false, this._offersModel, this.init);
 
-    const eventDetailsView = new EventDetailsView();
-
-    render(
-        this._eventEditComponent,
-        eventDetailsView,
-        AddedComponentPosition.BEFORE_END
-    );
-
-    // Оферы и места
-    if (evt.offers.length > 0 || evt.destination !== null) {
-      if (evt.offers.length > 0) {
-        render(
-            eventDetailsView,
-            new OffersContainerView(evt.offers),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-
-      const destination = cities.get(evt.city);
-      if (destination !== null) {
-        render(
-            eventDetailsView,
-            new DestinationView(destination),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-    } else {
-      eventDetailsView.remove();
-    }
+    renderEventsOptions(this._eventEditComponent, evt);
   }
 
   // Подмена события на форму редактирования

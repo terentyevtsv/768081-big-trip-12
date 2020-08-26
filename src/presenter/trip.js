@@ -5,9 +5,10 @@ import EventsPlanContainerView from "../view/events-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
 import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
-import {SortType} from "../const.js";
+import {SortType, FilterType} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
 import {filter} from "../utils/filter.js";
+import EventNewPresenter from "./event-new.js";
 
 const getDifference = function (timeInterval) {
   return (
@@ -37,10 +38,23 @@ export default class Trip {
     this._handleFilterChanged = this._handleFilterChanged.bind(this);
 
     this._filterModel.addObserver(this._handleFilterChanged);
+    this._eventNewPresenter = new EventNewPresenter(
+        this._tripEventsContainer,
+        this._offersModel,
+        this._handleEventChange,
+        this._handleModeChange
+    );
   }
 
   get planDateEventsMap() {
     return this._planDateEventsMap;
+  }
+
+  createEvent() {
+    this._filterModel.setFilter(FilterType.EVERYTHING);
+    this._currentSortType = SortType.EVENT;
+    this._planDateEventsMap = this._getMapDates();
+    this._renderEventsPlan(true);
   }
 
   _handleFilterChanged() {
@@ -50,7 +64,7 @@ export default class Trip {
 
   init() {
     this._planDateEventsMap = this._getMapDates();
-    this._renderEventsPlan();
+    this._renderEventsPlan(false);
   }
 
   _getPoints(filterType) {
@@ -220,7 +234,7 @@ export default class Trip {
     );
   }
 
-  _renderEventsPlan() {
+  _renderEventsPlan(renderNewEventFlag) {
     const points = this._getPoints(this._filterModel.getFilter());
     if (points.length === 0) {
       this._renderNoEvents();
@@ -228,6 +242,10 @@ export default class Trip {
     }
 
     this._renderSort();
+
+    if (renderNewEventFlag) {
+      this._eventNewPresenter.init();
+    }
 
     render(
         this._tripEventsContainer,
