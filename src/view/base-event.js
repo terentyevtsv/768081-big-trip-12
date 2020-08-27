@@ -174,11 +174,13 @@ export default class BaseEvent extends SmartView {
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
     this._leftDateTimeChangeHandler = this._leftDateTimeChangeHandler.bind(this);
     this._rightDateTimeChangeHandler = this._rightDateTimeChangeHandler.bind(this);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
     this._init = init;
 
     this._setInnerHandlers();
     this._setFromDatepicker();
     this._setToDatepicker();
+    this._setPriceChangeHandler();
   }
 
   getTemplate() {
@@ -243,6 +245,21 @@ export default class BaseEvent extends SmartView {
 
       this._init(this._data);
     }
+  }
+
+  // обработчик изменения цены.
+  _priceChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: parseInt(evt.target.value, 10)
+    },
+    true);
+  }
+
+  // метод для установки обработчика клика для звёздочки.
+  _setPriceChangeHandler() {
+    this.getElement().querySelector(`#event-price-1`)
+      .addEventListener(`change`, this._priceChangeHandler);
   }
 
   reset(evt) {

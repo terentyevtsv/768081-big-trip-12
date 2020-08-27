@@ -13,11 +13,12 @@ export const renderEventsOptions = (eventEditComponent, evt) => {
       AddedComponentPosition.BEFORE_END
   );
 
+  let offersContainerView = null;
+
   // Оферы и места
   if (evt.offers.length > 0 || evt.destination !== null) {
     if (evt.offers.length > 0) {
-      const offersContainerView = new OffersContainerView(evt.offers);
-      offersContainerView.setCheckOffersHandler(null);
+      offersContainerView = new OffersContainerView(evt.offers);
       render(
           eventDetailsView,
           offersContainerView,
@@ -36,4 +37,6 @@ export const renderEventsOptions = (eventEditComponent, evt) => {
   } else {
     eventDetailsView.remove();
   }
+
+  return offersContainerView;
 };

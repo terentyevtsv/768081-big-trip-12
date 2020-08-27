@@ -27,6 +27,8 @@ export default class OffersContainer extends AbstractView {
   constructor(offers) {
     super();
     this._offers = offers;
+
+    this._checkOffersHandler = this._checkOffersHandler.bind(this);
   }
 
   getTemplate() {
@@ -35,7 +37,9 @@ export default class OffersContainer extends AbstractView {
 
   _checkOffersHandler(evt) {
     evt.preventDefault();
-    this._callback.checkOffers(this._data);
+    if (evt.target.tagName === `INPUT`) {
+      this._callback.checkOffers();
+    }
   }
 
   setCheckOffersHandler(callback) {

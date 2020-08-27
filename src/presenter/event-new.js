@@ -19,7 +19,9 @@ export default class EventNew {
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._initBaseEvent = this._initBaseEvent.bind(this);
+    this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
     this._event = this._getDefaultEvent();
+    this._offers = this._event.offers.slice();
   }
 
   destroy() {
@@ -41,6 +43,9 @@ export default class EventNew {
   }
 
   _handleFormSubmit(evt) {
+    for (let i = 0; i < this._offers.length; ++i) {
+      evt.offers[i].isAccepted = this._offers[i].isAccepted;
+    }
     this._changeData(
         UserAction.ADD_EVENT,
         // Пока у нас нет сервера, который бы после сохранения
@@ -100,6 +105,14 @@ export default class EventNew {
     remove(prevEventEditComponent);
   }
 
+  _changeOffersListHandler() {
+    const offerElements = this._eventEditComponent.getElement()
+      .querySelectorAll(`.event__offer-checkbox`);
+    for (let i = 0; i < offerElements.length; ++i) {
+      this._offers[i].isAccepted = offerElements[i].checked;
+    }
+  }
+
   _renderNewEvent(evt) {
     this._eventEditComponent = new BaseEventView(
         evt,
@@ -108,7 +121,10 @@ export default class EventNew {
         this._initBaseEvent
     );
 
-    renderEventsOptions(this._eventEditComponent, evt);
+    const offersContainerView = renderEventsOptions(this._eventEditComponent, evt);
+    if (offersContainerView !== null) {
+      offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+    }
 
     render(
         this._eventListContainer,

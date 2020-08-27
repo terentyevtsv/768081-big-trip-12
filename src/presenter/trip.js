@@ -53,6 +53,8 @@ export default class Trip {
   }
 
   createEvent() {
+    this._eventNewPresenter.destroy();
+
     this._filterModel.setFilter(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
     this._planDateEventsMap = this._getMapDates();
