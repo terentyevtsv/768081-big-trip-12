@@ -1,4 +1,4 @@
-import {render, AddedComponentPosition} from "../utils/render.js";
+import {render, AddedComponentPosition, remove} from "../utils/render.js";
 import FilterHeaderView from "../view/filter-header.js";
 import FilterView from "../view/filter.js";
 
@@ -14,13 +14,19 @@ export default class Filter {
   }
 
   init() {
-    this._filterView.setFilterTypeChangeHandler(this._handleFilterTypeChange);
-
     render(
         this._tripMainTripControlElement,
         this._filterHeaderView,
         AddedComponentPosition.BEFORE_END
     );
+
+    if (this._filterView !== null) {
+      remove(this._filterView);
+      this._filterView = null;
+    }
+
+    this._filterView = new FilterView();
+    this._filterView.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     render(
         this._tripMainTripControlElement,
