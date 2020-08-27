@@ -198,6 +198,7 @@ export default class Trip {
     const tripEventPresenter = new TripEventPresenter(
         evt,
         tripEventsItemView,
+        this._pointsModel,
         this._offersModel,
         this._handleViewAction,
         this._handleModeChange

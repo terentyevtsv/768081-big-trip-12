@@ -15,9 +15,10 @@ const Mode = {
 };
 
 export default class TripEvent {
-  constructor(evt, eventListContainer, offersModel, changeData, changeMode) {
+  constructor(evt, eventListContainer, pointsModel, offersModel, changeData, changeMode) {
     this._event = evt;
     this._eventListContainer = eventListContainer;
+    this._pointsModel = pointsModel;
     this._offersModel = offersModel;
 
     this._changeData = changeData;
@@ -185,6 +186,8 @@ export default class TripEvent {
 
     this.init(this._event);
     this._replaceFormToEvent();
+
+    this._pointsModel.updatePoint(this._event);
   }
 
   _handleDeleteClick(evt) {

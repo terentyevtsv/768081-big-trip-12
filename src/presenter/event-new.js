@@ -21,7 +21,14 @@ export default class EventNew {
     this._initBaseEvent = this._initBaseEvent.bind(this);
     this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
     this._event = this._getDefaultEvent();
-    this._offers = this._event.offers.slice();
+
+    this._offers = [];
+
+    for (const offer of this._event.offers) {
+      this._offers.push({
+        isAccepted: offer.isAccepted
+      });
+    }
   }
 
   destroy() {
@@ -44,7 +51,7 @@ export default class EventNew {
 
   _handleFormSubmit(evt) {
     for (let i = 0; i < this._offers.length; ++i) {
-      evt.offers[i].isAccepted = this._offers[i].isAccepted;
+      evt.offers[i].isAccepted = this._offers[i];
     }
     this._changeData(
         UserAction.ADD_EVENT,
