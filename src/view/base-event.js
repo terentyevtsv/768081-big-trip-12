@@ -168,6 +168,7 @@ export default class BaseEvent extends SmartView {
     this._data = BaseEvent.parseEventToData(evt);
     this._isNewEvent = isNewEvent;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
@@ -192,6 +193,17 @@ export default class BaseEvent extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(this._data);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   // обработчик клика для звёздочки.

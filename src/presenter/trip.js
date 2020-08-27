@@ -5,7 +5,7 @@ import EventsPlanContainerView from "../view/events-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
 import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
-import {SortType, FilterType} from "../const.js";
+import {SortType, FilterType, UserAction} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
 import {filter} from "../utils/filter.js";
 import EventNewPresenter from "./event-new.js";
@@ -32,16 +32,18 @@ export default class Trip {
     this._eventPresenter = {};
     this._dateContainers = [];
 
-    this._handleEventChange = this._handleEventChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleFilterChanged = this._handleFilterChanged.bind(this);
+    this._handleModelChange = this._handleModelChange.bind(this);
 
     this._filterModel.addObserver(this._handleFilterChanged);
+    this._pointsModel.addObserver(this._handleModelChange);
     this._eventNewPresenter = new EventNewPresenter(
         this._tripEventsContainer,
         this._offersModel,
-        this._handleEventChange,
+        this._handleViewAction,
         this._handleModeChange
     );
   }
@@ -55,6 +57,11 @@ export default class Trip {
     this._currentSortType = SortType.EVENT;
     this._planDateEventsMap = this._getMapDates();
     this._renderEventsPlan(true);
+  }
+
+  _handleModelChange() {
+    this._planDateEventsMap = this._getMapDates();
+    this._renderEventsPlan(false);
   }
 
   _handleFilterChanged() {
@@ -72,15 +79,25 @@ export default class Trip {
   }
 
   _handleModeChange() {
+    this._eventNewPresenter.destroy();
     Object
       .values(this._eventPresenter)
       .forEach((presenter) => presenter.resetView());
   }
 
   // Обновление мока и отрисовка согласно обновлению точки марщрута
-  _handleEventChange(updatedEvent) {
-    this._pointsModel.updatePoint(updatedEvent);
-    this._eventPresenter[updatedEvent.id].init(updatedEvent);
+  _handleViewAction(actionType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this._pointsModel.updatePoint(update);
+        break;
+      case UserAction.ADD_EVENT:
+        this._pointsModel.addPoint(update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this._pointsModel.deletePoint(update);
+        break;
+    }
   }
 
   _handleSortTypeChange(sortType) {
@@ -151,6 +168,7 @@ export default class Trip {
   _renderSort() {
     if (this._sortingView !== null) {
       remove(this._sortingView);
+      this._sortingView = null;
     }
 
     this._sortingView = new SortingView(this._currentSortType);
@@ -179,7 +197,7 @@ export default class Trip {
         evt,
         tripEventsItemView,
         this._offersModel,
-        this._handleEventChange,
+        this._handleViewAction,
         this._handleModeChange
     );
     tripEventPresenter.init(evt);
@@ -226,6 +244,13 @@ export default class Trip {
   }
 
   _renderNoEvents() {
+    if (this._sortingView !== null) {
+      remove(this._sortingView);
+      this._sortingView = null;
+    }
+
+    remove(this._eventsPlanContainerView);
+
     // Метод для рендеринга заглушки
     render(
         this._tripEventsContainer,
@@ -235,8 +260,14 @@ export default class Trip {
   }
 
   _renderEventsPlan(renderNewEventFlag) {
+
     const points = this._getPoints(this._filterModel.getFilter());
     if (points.length === 0) {
+      if (renderNewEventFlag) {
+        remove(this._noEventView);
+        this._eventNewPresenter.init();
+        return;
+      }
       this._renderNoEvents();
       return;
     }

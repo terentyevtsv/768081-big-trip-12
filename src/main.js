@@ -55,7 +55,7 @@ tripPresenter.init();
 
 const getPlanDateEventMap = () => tripPresenter.planDateEventsMap;
 const tripInformationPresenter = new TripInformationPresenter(tripMainElement,
-    filterModel, getPlanDateEventMap);
+    filterModel, pointsModel, getPlanDateEventMap);
 tripInformationPresenter.init();
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {

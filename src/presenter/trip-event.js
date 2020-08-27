@@ -5,6 +5,7 @@ import {render, replace, remove, AddedComponentPosition} from "../utils/render.j
 import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenEventButtonView from "../view/open-event-button.js";
+import {UserAction} from "../const.js";
 
 const MAX_OFFERS_COUNT = 3;
 
@@ -28,6 +29,7 @@ export default class TripEvent {
 
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this.init = this.init.bind(this);
@@ -45,6 +47,7 @@ export default class TripEvent {
     // Подписка к событиям компонентов
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._eventEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     if (prevEventComponent === null ||
@@ -157,6 +160,10 @@ export default class TripEvent {
     this._event = evt;
     this.init(this._event);
     this._replaceFormToEvent();
+  }
+
+  _handleDeleteClick(evt) {
+    this._changeData(UserAction.DELETE_EVENT, evt);
   }
 
   _escKeyDownHandler(evt) {

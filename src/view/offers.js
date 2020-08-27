@@ -10,7 +10,7 @@ const createOffersTemplate = (offers) =>
           class="event__offer-checkbox  visually-hidden"
           id="event-offer-${offer.label}"
           type="checkbox"
-          name="event-offer-luggage"
+          name="event-offer-${offer.label}"
           ${offer.isAccepted ? `checked` : ``}
         >
         <label class="event__offer-label" for="event-offer-${offer.label}">
@@ -31,5 +31,15 @@ export default class OffersContainer extends AbstractView {
 
   getTemplate() {
     return createOffersTemplate(this._offers);
+  }
+
+  _checkOffersHandler(evt) {
+    evt.preventDefault();
+    this._callback.checkOffers(this._data);
+  }
+
+  setCheckOffersHandler(callback) {
+    this._callback.checkOffers = callback;
+    this.getElement().addEventListener(`change`, this._checkOffersHandler);
   }
 }

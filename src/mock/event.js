@@ -20,8 +20,6 @@ const MIN_PRICE = 20;
 const MAX_PRICE = 200;
 const DAYS_BEFORE_AFTER = 5;
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
 const getRandomTimeInterval = () => {
   const nowDate = new Date();
 
@@ -206,6 +204,8 @@ export const typeOffers = new Map([
 const getRandomEventType = (eventTypes) => {
   return eventTypes[getRandomInteger(0, eventTypes.length - 1)];
 };
+
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 export const generateEvent = (offersModel) => {
   const tmpCities = Array.from(cities.keys());

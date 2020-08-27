@@ -1,7 +1,8 @@
 import BaseEventView from "../view/base-event.js";
 import {renderEventsOptions} from "../utils/editable-event.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
-import {cities} from "../mock/event.js";
+import {cities, generateId} from "../mock/event.js";
+import {UserAction} from "../const.js";
 
 const EMPTY_EVENT_INDEX = 0;
 
@@ -14,11 +15,43 @@ export default class EventNew {
 
     this._eventEditComponent = null;
 
-    // this._handleFormSubmit = this._handleFormSubmit.bind(this);
-    // this._handleDeleteClick = this._handleDeleteClick.bind(this);
-    // this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleCancelClick = this._handleCancelClick.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._initBaseEvent = this._initBaseEvent.bind(this);
     this._event = this._getDefaultEvent();
+  }
+
+  destroy() {
+    if (this._eventEditComponent === null) {
+      return;
+    }
+
+    remove(this._eventEditComponent);
+    this._eventEditComponent = null;
+
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+  }
+
+  _escKeyDownHandler(evt) {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      this.destroy();
+    }
+  }
+
+  _handleFormSubmit(evt) {
+    this._changeData(
+        UserAction.ADD_EVENT,
+        // Пока у нас нет сервера, который бы после сохранения
+        // выдывал честный id задачи, нам нужно позаботиться об этом самим
+        Object.assign({id: generateId()}, evt)
+    );
+    this.destroy();
+  }
+
+  _handleCancelClick() {
+    this.destroy();
   }
 
   // Значения по умолчанию для события при создании события
@@ -46,6 +79,7 @@ export default class EventNew {
       evt.offers[i] = {
         name: offers[i].name,
         price: offers[i].price,
+        label: offers[i].label,
         isAccepted: false
       };
     }
@@ -57,6 +91,11 @@ export default class EventNew {
     const prevEventEditComponent = this._eventEditComponent;
 
     this._renderNewEvent(data);
+    this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventEditComponent.setDeleteClickHandler(this._handleCancelClick);
+
+    document.addEventListener(`keydown`, this._escKeyDownHandler);
+
     replace(this._eventEditComponent, prevEventEditComponent);
     remove(prevEventEditComponent);
   }
@@ -79,10 +118,11 @@ export default class EventNew {
   }
 
   init() {
-    if (this._eventEditComponent !== null) {
-      return;
-    }
-
     this._renderNewEvent(this._event);
+
+    this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventEditComponent.setDeleteClickHandler(this._handleCancelClick);
+
+    document.addEventListener(`keydown`, this._escKeyDownHandler);
   }
 }
