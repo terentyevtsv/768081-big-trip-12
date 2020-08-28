@@ -5,9 +5,10 @@ import EventsPlanContainerView from "../view/events-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
 import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
-import {SortType} from "../const.js";
+import {SortType, FilterType, UserAction} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
-import {updateItem} from "../utils/common.js";
+import {filter} from "../utils/filter.js";
+import EventNewPresenter from "./event-new.js";
 
 const getDifference = function (timeInterval) {
   return (
@@ -17,42 +18,88 @@ const getDifference = function (timeInterval) {
 };
 
 export default class Trip {
-  constructor(tripEventsContainer) {
+  constructor(tripEventsContainer, pointsModel, offersModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
+    this._pointsModel = pointsModel;
+    this._offersModel = offersModel;
+    this._filterModel = filterModel;
 
     this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
-    this._sortingView = new SortingView();
+    this._sortingView = null;
     this._eventsPlanContainerView = new EventsPlanContainerView();
 
     this._eventPresenter = {};
     this._dateContainers = [];
 
-    this._handleEventChange = this._handleEventChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleFilterChanged = this._handleFilterChanged.bind(this);
+    this._handleModelChange = this._handleModelChange.bind(this);
+
+    this._filterModel.addObserver(this._handleFilterChanged);
+    this._pointsModel.addObserver(this._handleModelChange);
+    this._eventNewPresenter = new EventNewPresenter(
+        this._tripEventsContainer,
+        this._offersModel,
+        this._handleViewAction,
+        this._handleModeChange
+    );
   }
 
   get planDateEventsMap() {
     return this._planDateEventsMap;
   }
 
-  init(events) {
-    this._events = events;
+  createEvent() {
+    this._eventNewPresenter.destroy();
+
+    this._filterModel.setFilter(FilterType.EVERYTHING);
+    this._currentSortType = SortType.EVENT;
     this._planDateEventsMap = this._getMapDates();
-    this._renderEventsPlan();
+    this._renderEventsPlan(true);
+  }
+
+  _handleModelChange() {
+    this._planDateEventsMap = this._getMapDates();
+    this._renderEventsPlan(false);
+  }
+
+  _handleFilterChanged() {
+    this._currentSortType = SortType.EVENT;
+    this.init();
+  }
+
+  init() {
+    this._planDateEventsMap = this._getMapDates();
+    this._renderEventsPlan(false);
+  }
+
+  _getPoints(filterType) {
+    return filter[filterType](this._pointsModel.getPoints());
   }
 
   _handleModeChange() {
+    this._eventNewPresenter.destroy();
     Object
       .values(this._eventPresenter)
       .forEach((presenter) => presenter.resetView());
   }
 
   // Обновление мока и отрисовка согласно обновлению точки марщрута
-  _handleEventChange(updatedEvent) {
-    this._events = updateItem(this._events, updatedEvent);
-    this._eventPresenter[updatedEvent.id].init(updatedEvent);
+  _handleViewAction(actionType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this._pointsModel.updatePoint(update);
+        break;
+      case UserAction.ADD_EVENT:
+        this._pointsModel.addPoint(update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this._pointsModel.deletePoint(update);
+        break;
+    }
   }
 
   _handleSortTypeChange(sortType) {
@@ -67,13 +114,14 @@ export default class Trip {
   // Формирование структуры событий по датам
   _getMapDates() {
     const mapDates = new Map();
+    const points = this._getPoints(this._filterModel.getFilter());
 
     if (this._currentSortType === SortType.EVENT) {
       // Обычный порядок
       const datesSet = new Set();
 
       // Формируем список дат, по которым будут группироваться события
-      this._events.forEach((evt) => {
+      points.forEach((evt) => {
         const date = new Date(evt.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
@@ -87,7 +135,7 @@ export default class Trip {
       // Раскидываем события по датам
       dates.forEach((date) => mapDates.set(date, []));
 
-      this._events.forEach((evt) => {
+      points.forEach((evt) => {
         const date = new Date(evt.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
@@ -102,7 +150,7 @@ export default class Trip {
     }
 
     const tmpDate = new Date();
-    const events = this._events.slice();
+    const events = points.slice();
     if (this._currentSortType === SortType.TIME) {
       // Порядок с сортировкой по времени события
       events.sort((evt1, evt2) => getDifference(evt2.timeInterval) -
@@ -120,6 +168,13 @@ export default class Trip {
   }
 
   _renderSort() {
+    if (this._sortingView !== null) {
+      remove(this._sortingView);
+      this._sortingView = null;
+    }
+
+    this._sortingView = new SortingView(this._currentSortType);
+
     // Метод для рендеринга сортировки
     // Сортировка
     render(
@@ -143,7 +198,9 @@ export default class Trip {
     const tripEventPresenter = new TripEventPresenter(
         evt,
         tripEventsItemView,
-        this._handleEventChange,
+        this._pointsModel,
+        this._offersModel,
+        this._handleViewAction,
         this._handleModeChange
     );
     tripEventPresenter.init(evt);
@@ -190,6 +247,13 @@ export default class Trip {
   }
 
   _renderNoEvents() {
+    if (this._sortingView !== null) {
+      remove(this._sortingView);
+      this._sortingView = null;
+    }
+
+    remove(this._eventsPlanContainerView);
+
     // Метод для рендеринга заглушки
     render(
         this._tripEventsContainer,
@@ -198,13 +262,24 @@ export default class Trip {
     );
   }
 
-  _renderEventsPlan() {
-    if (this._events.length === 0) {
+  _renderEventsPlan(renderNewEventFlag) {
+
+    const points = this._getPoints(this._filterModel.getFilter());
+    if (points.length === 0) {
+      if (renderNewEventFlag) {
+        remove(this._noEventView);
+        this._eventNewPresenter.init();
+        return;
+      }
       this._renderNoEvents();
       return;
     }
 
     this._renderSort();
+
+    if (renderNewEventFlag) {
+      this._eventNewPresenter.init();
+    }
 
     render(
         this._tripEventsContainer,

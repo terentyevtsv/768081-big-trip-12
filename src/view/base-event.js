@@ -1,13 +1,13 @@
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
-import {eventTypes, cities, getOffers} from "../mock/event.js";
+import {cities} from "../mock/event.js";
 import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const cityNames = new Set(cities.keys());
 
-const createEmptyEventTemplate = (evt, isNewEvent) =>
+const createEmptyEventTemplate = (evt, isNewEvent, eventTypes) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -125,7 +125,7 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
         <input
           class="event__input  event__input--price"
           id="event-price-1"
-          type="text"
+          type="number"
           name="event-price"
           value="${evt.price}"
         >
@@ -157,8 +157,10 @@ const createEmptyEventTemplate = (evt, isNewEvent) =>
   </form>`;
 
 export default class BaseEvent extends SmartView {
-  constructor(evt, isNewEvent, init) {
+  constructor(evt, isNewEvent, offersModel, init) {
     super();
+
+    this._offersModel = offersModel;
 
     this._fromDatepicker = null;
     this._toDatepicker = null;
@@ -166,20 +168,23 @@ export default class BaseEvent extends SmartView {
     this._data = BaseEvent.parseEventToData(evt);
     this._isNewEvent = isNewEvent;
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
     this._leftDateTimeChangeHandler = this._leftDateTimeChangeHandler.bind(this);
     this._rightDateTimeChangeHandler = this._rightDateTimeChangeHandler.bind(this);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
     this._init = init;
 
     this._setInnerHandlers();
     this._setFromDatepicker();
     this._setToDatepicker();
+    this._setPriceChangeHandler();
   }
 
   getTemplate() {
-    return createEmptyEventTemplate(this._data, this._isNewEvent);
+    return createEmptyEventTemplate(this._data, this._isNewEvent, this._offersModel.eventTypes);
   }
 
   _formSubmitHandler(evt) {
@@ -190,6 +195,17 @@ export default class BaseEvent extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(this._data);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   // обработчик клика для звёздочки.
@@ -207,8 +223,9 @@ export default class BaseEvent extends SmartView {
 
   _eventTypeChangeHandler(evt) {
     evt.preventDefault();
-    const tmpEventType = eventTypes.find((eventType) => eventType.value === evt.target.value);
-    const tmpOffers = getOffers(tmpEventType);
+    const tmpEventType = this._offersModel.eventTypes
+      .find((eventType) => eventType.value === evt.target.value);
+    const tmpOffers = this._offersModel.getOffers(tmpEventType);
     this.updateData({
       eventType: tmpEventType,
       offers: tmpOffers
@@ -228,6 +245,21 @@ export default class BaseEvent extends SmartView {
 
       this._init(this._data);
     }
+  }
+
+  // обработчик изменения цены.
+  _priceChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: parseInt(evt.target.value, 10)
+    },
+    true);
+  }
+
+  // метод для установки обработчика клика для звёздочки.
+  _setPriceChangeHandler() {
+    this.getElement().querySelector(`#event-price-1`)
+      .addEventListener(`change`, this._priceChangeHandler);
   }
 
   reset(evt) {

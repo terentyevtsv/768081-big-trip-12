@@ -1,16 +1,12 @@
 import ReadingEventContentView from "../view/reading-event-content.js";
 import BaseEventView from "../view/base-event.js";
-import EventDetailsView from "../view/event-details.js";
-import {AddedComponentPosition} from "../utils/render.js";
-import {render, replace, remove} from "../utils/render.js";
-import OffersContainerView from "../view/offers.js";
-import {cities, eventTypes, getOffers} from "../mock/event.js";
-import DestinationView from "../view/destination.js";
+import {renderEventsOptions} from "../utils/editable-event.js";
+import {render, replace, remove, AddedComponentPosition} from "../utils/render.js";
 import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenEventButtonView from "../view/open-event-button.js";
+import {UserAction} from "../const.js";
 
-const EMPTY_EVENT_INDEX = 0;
 const MAX_OFFERS_COUNT = 3;
 
 const Mode = {
@@ -19,9 +15,12 @@ const Mode = {
 };
 
 export default class TripEvent {
-  constructor(evt, eventListContainer, changeData, changeMode) {
+  constructor(evt, eventListContainer, pointsModel, offersModel, changeData, changeMode) {
     this._event = evt;
     this._eventListContainer = eventListContainer;
+    this._pointsModel = pointsModel;
+    this._offersModel = offersModel;
+
     this._changeData = changeData;
     this._changeMode = changeMode;
 
@@ -31,26 +30,34 @@ export default class TripEvent {
 
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
     this.init = this.init.bind(this);
+
+    this._offers = [];
+
+    for (const offer of this._event.offers) {
+      this._offers.push({
+        isAccepted: offer.isAccepted
+      });
+    }
   }
 
   init(evt) {
-    const isNewEvent = evt === null;
-    evt = evt || this._getDefaultEvent();
-
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
     // Собранные (не подключенные к DOM) пара текущих компонентов с новой моделью
     this._renderReadOnlyEvent(evt);
-    this._renderEditableEvent(evt, isNewEvent);
+    this._renderEditableEvent(evt);
 
     // Подписка к событиям компонентов
     this._eventComponent.setEditClickHandler(this._handleEditClick);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._eventEditComponent.setDeleteClickHandler(this._handleDeleteClick);
     this._eventEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     if (prevEventComponent === null ||
@@ -118,38 +125,6 @@ export default class TripEvent {
     }
   }
 
-  // Значения по умолчанию для события при создании события
-  _getDefaultEvent() {
-    const tmpCities = Array.from(cities.keys());
-    const evt = {
-      eventType: eventTypes[EMPTY_EVENT_INDEX],
-      city: tmpCities[EMPTY_EVENT_INDEX],
-      offers: [],
-      destination: cities.get(tmpCities[EMPTY_EVENT_INDEX]),
-      isFavorite: false,
-      price: 0
-    };
-
-    const date = new Date();
-    date.setHours(0, 0, 0);
-
-    evt.timeInterval = {
-      leftLimitDate: date,
-      rightLimitDate: date
-    };
-
-    const offers = getOffers(evt.eventType);
-    for (let i = 0; i < offers.length; i++) {
-      evt.offers[i] = {
-        name: offers[i].name,
-        price: offers[i].price,
-        isAccepted: false
-      };
-    }
-
-    return evt;
-  }
-
   _renderReadOnlyEvent(evt) {
     this._eventComponent = new ReadingEventContentView(evt);
 
@@ -164,37 +139,20 @@ export default class TripEvent {
     );
   }
 
-  _renderEditableEvent(evt, isNewEvent) {
-    this._eventEditComponent = new BaseEventView(evt, isNewEvent, this.init);
+  _changeOffersListHandler() {
+    const offerElements = this._eventEditComponent.getElement()
+      .querySelectorAll(`.event__offer-checkbox`);
+    for (let i = 0; i < offerElements.length; ++i) {
+      this._offers[i] = offerElements[i].checked;
+    }
+  }
 
-    const eventDetailsView = new EventDetailsView();
+  _renderEditableEvent(evt) {
+    this._eventEditComponent = new BaseEventView(evt, false, this._offersModel, this.init);
 
-    render(
-        this._eventEditComponent,
-        eventDetailsView,
-        AddedComponentPosition.BEFORE_END
-    );
-
-    // Оферы и места
-    if (evt.offers.length > 0 || evt.destination !== null) {
-      if (evt.offers.length > 0) {
-        render(
-            eventDetailsView,
-            new OffersContainerView(evt.offers),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-
-      const destination = cities.get(evt.city);
-      if (destination !== null) {
-        render(
-            eventDetailsView,
-            new DestinationView(destination),
-            AddedComponentPosition.BEFORE_END
-        );
-      }
-    } else {
-      eventDetailsView.remove();
+    const offersContainerView = renderEventsOptions(this._eventEditComponent, evt);
+    if (offersContainerView !== null) {
+      offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
   }
 
@@ -221,8 +179,19 @@ export default class TripEvent {
 
   _handleFormSubmit(evt) {
     this._event = evt;
+
+    for (let i = 0; i < this._offers.length; ++i) {
+      this._event.offers[i].isAccepted = this._offers[i];
+    }
+
     this.init(this._event);
     this._replaceFormToEvent();
+
+    this._pointsModel.updatePoint(this._event);
+  }
+
+  _handleDeleteClick(evt) {
+    this._changeData(UserAction.DELETE_EVENT, evt);
   }
 
   _escKeyDownHandler(evt) {
