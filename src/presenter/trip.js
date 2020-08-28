@@ -18,11 +18,12 @@ const getDifference = function (timeInterval) {
 };
 
 export default class Trip {
-  constructor(tripEventsContainer, pointsModel, offersModel, filterModel) {
+  constructor(tripEventsContainer, pointsModel, offersModel, filterModel, siteMenuModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
     this._filterModel = filterModel;
+    this._siteMenuModel = siteMenuModel;
 
     this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
@@ -37,9 +38,11 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleFilterChanged = this._handleFilterChanged.bind(this);
     this._handleModelChange = this._handleModelChange.bind(this);
+    this._renderSort = this._renderSort.bind(this);
 
     this._filterModel.addObserver(this._handleFilterChanged);
     this._pointsModel.addObserver(this._handleModelChange);
+    this._siteMenuModel.addObserver(this._renderSort);
     this._eventNewPresenter = new EventNewPresenter(
         this._tripEventsContainer,
         this._offersModel,
@@ -50,6 +53,10 @@ export default class Trip {
 
   get planDateEventsMap() {
     return this._planDateEventsMap;
+  }
+
+  set currentSortType(sortType) {
+    this._currentSortType = sortType;
   }
 
   createEvent() {
@@ -74,6 +81,21 @@ export default class Trip {
   init() {
     this._planDateEventsMap = this._getMapDates();
     this._renderEventsPlan(false);
+  }
+
+  reload() {
+    this._filterModel.addObserver(this._handleFilterChanged);
+    this._pointsModel.addObserver(this._handleModelChange);
+    this.init();
+  }
+
+  destroy() {
+    this._eventNewPresenter.destroy();
+    remove(this._sortingView);
+    remove(this._eventsPlanContainerView);
+
+    this._filterModel.removeObserver(this._handleFilterChanged);
+    this._pointsModel.removeObserver(this._handleModelChange);
   }
 
   _getPoints(filterType) {

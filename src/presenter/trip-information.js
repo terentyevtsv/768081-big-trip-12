@@ -37,4 +37,14 @@ export default class TripInformation {
         AddedComponentPosition.AFTER_BEGIN
     );
   }
+
+  unload() {
+    this._filterModel.removeObserver(this.init);
+    this._pointsModel.removeObserver(this.init);
+  }
+
+  load() {
+    this._filterModel.addObserver(this.init);
+    this._pointsModel.addObserver(this.init);
+  }
 }
