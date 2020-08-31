@@ -25,9 +25,7 @@ export default class EventNew {
     this._offers = [];
 
     for (const offer of this._event.offers) {
-      this._offers.push({
-        isAccepted: offer.isAccepted
-      });
+      this._offers.push(offer.isAccepted);
     }
   }
 
@@ -102,6 +100,11 @@ export default class EventNew {
   _initBaseEvent(data) {
     const prevEventEditComponent = this._eventEditComponent;
 
+    this._offers = [];
+    for (let i = 0; i < data.offers.length; i++) {
+      this._offers[i] = false;
+    }
+
     this._renderNewEvent(data);
     this._eventEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._eventEditComponent.setDeleteClickHandler(this._handleCancelClick);
@@ -116,7 +119,7 @@ export default class EventNew {
     const offerElements = this._eventEditComponent.getElement()
       .querySelectorAll(`.event__offer-checkbox`);
     for (let i = 0; i < offerElements.length; ++i) {
-      this._offers[i].isAccepted = offerElements[i].checked;
+      this._offers[i] = offerElements[i].checked;
     }
   }
 

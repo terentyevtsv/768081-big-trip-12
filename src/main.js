@@ -1,6 +1,6 @@
 import SiteMenuView from "./view/site-menu.js";
 import SiteMenuHeaderView from "./view/site-menu-header.js";
-import {AddedComponentPosition, render} from "./utils/render.js";
+import {AddedComponentPosition, render, remove} from "./utils/render.js";
 import {generateEvent, typeOffers} from "./mock/event.js";
 import TripPresenter from "./presenter/trip.js";
 import PointsModel from "./model/points.js";
@@ -8,6 +8,9 @@ import OffersModel from "./model/offers.js";
 import FilterPresenter from "./presenter/filter.js";
 import FilterModel from "./model/filter.js";
 import TripInformationPresenter from "./presenter/trip-information.js";
+import StatisticsView from "./view/statistics.js";
+import {MenuItem, SortType} from "./const.js";
+import SiteMenuModel from "./model/site-menu.js";
 
 const EVENTS_COUNT = 20;
 
@@ -28,9 +31,11 @@ const pageBodyElement = document.querySelector(`.page-body`);
 const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
 
 // Отрисовка меню и фильтров
+const siteMenuModel = new SiteMenuModel();
+const siteMenuView = new SiteMenuView(siteMenuModel);
 const mainTripComponents = [
   new SiteMenuHeaderView(),
-  new SiteMenuView()
+  siteMenuView
 ];
 const tripMainTripControlElement = tripMainElement
   .querySelector(`.trip-main__trip-controls`);
@@ -50,7 +55,13 @@ filterPresenter.init();
 const tripEventsElement = pageBodyElement
     .querySelector(`.trip-events`);
 
-const tripPresenter = new TripPresenter(tripEventsElement, pointsModel, offersModel, filterModel);
+const tripPresenter = new TripPresenter(
+    tripEventsElement,
+    pointsModel,
+    offersModel,
+    filterModel,
+    siteMenuModel
+);
 tripPresenter.init();
 
 const getPlanDateEventMap = () => tripPresenter.planDateEventsMap;
@@ -63,3 +74,30 @@ document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (e
   tripPresenter.createEvent();
   filterPresenter.init();
 });
+
+let statisticsView = null;
+
+const mainPageBodyContainerElement = document
+  .querySelector(`.page-body__page-main .page-body__container`);
+const handleSiteMenuClick = (menuItem) => {
+  tripPresenter.currentSortType = SortType.EVENT;
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      remove(statisticsView);
+
+      // Показать таблицу
+      tripPresenter.reload();
+      tripInformationPresenter.load();
+      break;
+    case MenuItem.STATS:
+      tripPresenter.destroy();
+      tripInformationPresenter.unload();
+
+      // Показать статистику
+      statisticsView = new StatisticsView(pointsModel.getPoints());
+      render(mainPageBodyContainerElement, statisticsView, AddedComponentPosition.BEFORE_END);
+      break;
+  }
+};
+siteMenuView.setMenuClickHandler(handleSiteMenuClick);
+
