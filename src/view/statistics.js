@@ -49,7 +49,7 @@ export default class Statistics extends AbstractView {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        labels: Array.from(eventTypeMoneyMap.keys()),
+        labels: Array.from(eventTypeMoneyMap.keys()).map((name) => name.toUpperCase()),
         datasets: [{
           data: Array.from(eventTypeMoneyMap.values()),
           backgroundColor: `#ffffff`,
@@ -123,7 +123,7 @@ export default class Statistics extends AbstractView {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        labels: Array.from(transportUsageMap.keys()),
+        labels: Array.from(transportUsageMap.keys()).map((name) => name.toUpperCase()),
         datasets: [{
           data: Array.from(transportUsageMap.values()),
           backgroundColor: `#ffffff`,
@@ -191,8 +191,7 @@ export default class Statistics extends AbstractView {
     const timeSpentMap = getTimeSpentMap(this._points);
     const timeSpentCtx = this.getElement().querySelector(`.statistics__chart--time`);
     timeSpentCtx.height = BAR_HEIGHT * timeSpentMap.size;
-    const tmpLabels = Array.from(timeSpentMap.keys())
-      .map((eventType) => `<label class="event__type-label  event__type-label--${eventType.value}">${eventType.name}</label>`);
+    const tmpLabels = Array.from(timeSpentMap.keys()).map((name) => name.toUpperCase());
 
     const timeSpentChart = new Chart(timeSpentCtx, {
       plugins: [ChartDataLabels],

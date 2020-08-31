@@ -39,13 +39,13 @@ export const getTimeSpentMap = (points) => {
 
   // Подсчет количества времени для каждого типа точки маршрута
   for (const point of points) {
-    if (!tmpTimeSpentMap.has(point.eventType)) {
-      tmpTimeSpentMap.set(point.eventType, 0);
+    if (!tmpTimeSpentMap.has(point.eventType.name)) {
+      tmpTimeSpentMap.set(point.eventType.name, 0);
     }
 
-    const value = tmpTimeSpentMap.get(point.eventType);
+    const value = tmpTimeSpentMap.get(point.eventType.name);
     const difValue = point.timeInterval.rightLimitDate - point.timeInterval.leftLimitDate;
-    tmpTimeSpentMap.set(point.eventType, value + difValue);
+    tmpTimeSpentMap.set(point.eventType.name, value + difValue);
   }
 
   return tmpTimeSpentMap;
