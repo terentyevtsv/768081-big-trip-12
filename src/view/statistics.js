@@ -25,10 +25,9 @@ const createStatisticsTemplate = () =>
   </section>`;
 
 export default class Statistics extends AbstractView {
-  constructor(eventTypes, points) {
+  constructor(points) {
     super();
 
-    this._eventTypes = eventTypes;
     this._points = points;
 
     this._moneyChart = this._renderMoneyChart();
@@ -41,7 +40,7 @@ export default class Statistics extends AbstractView {
   }
 
   _renderMoneyChart() {
-    const eventTypeMoneyMap = getEventTypeMoneyMap(this._eventTypes, this._points);
+    const eventTypeMoneyMap = getEventTypeMoneyMap(this._points);
 
     const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
     moneyCtx.height = BAR_HEIGHT * eventTypeMoneyMap.size;
@@ -115,7 +114,7 @@ export default class Statistics extends AbstractView {
   }
 
   _renderTransportChart() {
-    const transportUsageMap = getTransportUsageMap(this._eventTypes, this._points);
+    const transportUsageMap = getTransportUsageMap(this._points);
 
     const transportCtx = this.getElement().querySelector(`.statistics__chart--transport`);
     transportCtx.height = BAR_HEIGHT * transportUsageMap.size;

@@ -94,7 +94,7 @@ const handleSiteMenuClick = (menuItem) => {
       tripInformationPresenter.unload();
 
       // Показать статистику
-      statisticsView = new StatisticsView(offersModel.eventTypes, pointsModel.getPoints());
+      statisticsView = new StatisticsView(pointsModel.getPoints());
       render(mainPageBodyContainerElement, statisticsView, AddedComponentPosition.BEFORE_END);
       break;
   }
