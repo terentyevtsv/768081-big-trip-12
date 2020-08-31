@@ -39,9 +39,7 @@ export default class TripEvent {
     this._offers = [];
 
     for (const offer of this._event.offers) {
-      this._offers.push({
-        isAccepted: offer.isAccepted
-      });
+      this._offers.push(offer.isAccepted);
     }
   }
 
@@ -49,6 +47,11 @@ export default class TripEvent {
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
+
+    this._offers = [];
+    for (let i = 0; i < evt.offers.length; i++) {
+      this._offers[i] = false;
+    }
 
     // Собранные (не подключенные к DOM) пара текущих компонентов с новой моделью
     this._renderReadOnlyEvent(evt);
