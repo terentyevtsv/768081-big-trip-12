@@ -1,7 +1,7 @@
 import BaseEventView from "../view/base-event.js";
 import {renderEventsOptions} from "../utils/editable-event.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
-import {generateId} from "../mock/event.js";
+import {generateId} from "../utils/common.js";
 import {UserAction} from "../const.js";
 
 const EMPTY_EVENT_INDEX = 0;
