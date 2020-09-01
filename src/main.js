@@ -11,8 +11,11 @@ import TripInformationPresenter from "./presenter/trip-information.js";
 import StatisticsView from "./view/statistics.js";
 import {MenuItem, SortType} from "./const.js";
 import SiteMenuModel from "./model/site-menu.js";
+import Api from "./api.js";
 
 const EVENTS_COUNT = 20;
+const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
+const AUTHORIZATION = `Basic mokrajbalka`;
 
 // Инициализация модели предложений
 const offersModel = new OffersModel();
@@ -20,6 +23,11 @@ offersModel.setOffers(typeOffers);
 
 const events = new Array(EVENTS_COUNT).fill()
   .map(() => generateEvent(offersModel));
+
+const api = new Api(END_POINT, AUTHORIZATION);
+api.getPoints().then((points) => {
+  console.log(points);
+});
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
