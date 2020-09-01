@@ -1,7 +1,6 @@
 import SiteMenuView from "./view/site-menu.js";
 import SiteMenuHeaderView from "./view/site-menu-header.js";
 import {AddedComponentPosition, render, remove} from "./utils/render.js";
-import {generateEvent, typeOffers} from "./mock/event.js";
 import TripPresenter from "./presenter/trip.js";
 import PointsModel from "./model/points.js";
 import OffersModel from "./model/offers.js";
@@ -12,26 +11,74 @@ import StatisticsView from "./view/statistics.js";
 import {MenuItem, SortType} from "./const.js";
 import SiteMenuModel from "./model/site-menu.js";
 import Api from "./api.js";
+import CitiesModel from "./model/cities.js";
 
-const EVENTS_COUNT = 20;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 const AUTHORIZATION = `Basic mokrajbalka`;
 
+const api = new Api(END_POINT, AUTHORIZATION);
+
+const typeOffers = new Map(); // Все возможные значения предложений для каждого типа события
+const eventTypesMap = new Map(); // Тип события по его названию
+const citiesMap = new Map(); // Города с общим описанием, фото и описанием фото
+
 // Инициализация модели предложений
 const offersModel = new OffersModel();
-offersModel.setOffers(typeOffers);
 
-const events = new Array(EVENTS_COUNT).fill()
-  .map(() => generateEvent(offersModel));
-
-const api = new Api(END_POINT, AUTHORIZATION);
-api.getPoints().then((points) => {
-  console.log(points);
-});
+// Инициализация модели городов
+const citiesModel = new CitiesModel();
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
-pointsModel.setPoints(events);
+
+api.getEventTypesOffers()
+  .then((eventTypesOffers) => {
+    typeOffers.clear();
+    eventTypesMap.clear();
+
+    eventTypesOffers.forEach((eventTypesOffer) => {
+      const eventType = OffersModel.adaptEventTypeToClient(eventTypesOffer);
+
+      if (!typeOffers.has(eventType)) {
+        typeOffers.set(eventType, []);
+        eventTypesMap.set(eventTypesOffer.type, eventType);
+      }
+
+      eventTypesOffer.offers.forEach((offer) => {
+        const currentOffer = OffersModel.adaptOfferToClient(offer);
+        typeOffers.get(eventType).push(currentOffer);
+      });
+
+    });
+
+    offersModel.setOffers(typeOffers);
+  })
+  .then(() => {
+    return api.getDestinations();
+  })
+  .then((destinations) => {
+    citiesMap.clear();
+    destinations.forEach((destination) => {
+      const currentDestination = CitiesModel.adaptDestinationToClient(destination);
+      citiesMap.set(destination.name, currentDestination);
+    });
+    citiesModel.setCities(citiesMap);
+  })
+  .then(() => {
+    return api.getPoints();
+  })
+  .then((points) => {
+    const tmpPoints = [];
+    points.forEach((point) => {
+      const eventType = eventTypesMap.get(point.type);
+      const maskOffers = offersModel.getOffers(eventType);
+
+      const tmpPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
+      tmpPoints.push(tmpPoint);
+    });
+
+    pointsModel.setPoints(tmpPoints);
+  });
 
 const pageBodyElement = document.querySelector(`.page-body`);
 
@@ -68,7 +115,8 @@ const tripPresenter = new TripPresenter(
     pointsModel,
     offersModel,
     filterModel,
-    siteMenuModel
+    siteMenuModel,
+    citiesModel
 );
 tripPresenter.init();
 

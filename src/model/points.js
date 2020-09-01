@@ -55,4 +55,42 @@ export default class Points extends Observer {
 
     this._notify(update);
   }
+
+  static adaptToClient(point, eventType, maskOffers) {
+    const offers = [];
+    const checkedOffersSet = new Set(point.offers.map((offer) => offer.title));
+    maskOffers.forEach((offer) => {
+      offers.push({
+        name: offer.name,
+        price: offer.price,
+        label: offer.label,
+        isAccepted: checkedOffersSet.has(offer.name)
+      });
+    });
+
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          eventType,
+          city: point.destination.name,
+          offers,
+          isFavorite: point.is_favorite,
+          price: point.base_price,
+          timeInterval: {
+            leftLimitDate: new Date(point.date_from),
+            rightLimitDate: new Date(point.date_to)
+          }
+        }
+    );
+
+    delete adaptedPoint.base_price;
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.destination;
+    delete adaptedPoint.is_favorite;
+    delete adaptedPoint.type;
+
+    return adaptedPoint;
+  }
 }

@@ -65,9 +65,15 @@ const getRandomDestinationsDescription = () => {
   let fullDescription = ``;
   const photos = [];
   for (let i = 0; i < sentenceCount; i++) {
+    const currentDescription = destinationDescriptions[
+      getRandomInteger(0, destinationDescriptions.length - 1)
+    ];
     fullDescription +=
-      ` ${destinationDescriptions[getRandomInteger(0, destinationDescriptions.length - 1)]}`;
-    photos[i] = `http://picsum.photos/248/152?r=${Math.random()}`;
+      ` ${currentDescription}`;
+    photos[i] = {
+      source: `http://picsum.photos/248/152?r=${Math.random()}`,
+      description: currentDescription
+    };
   }
 
   return {
@@ -207,8 +213,8 @@ const getRandomEventType = (eventTypes) => {
 
 export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
-export const generateEvent = (offersModel) => {
-  const tmpCities = Array.from(cities.keys());
+export const generateEvent = (offersModel, citiesModel) => {
+  const tmpCities = citiesModel.cities;
   const evt = {
     id: generateId(),
     eventType: getRandomEventType(offersModel.eventTypes),

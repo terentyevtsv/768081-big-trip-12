@@ -10,8 +10,8 @@ const createDestinationTemplate = (destination) =>
         ${destination.photos
           .map((photo) => `<img
                             class="event__photo"
-                            src="${photo}"
-                            alt="Event photo"
+                            src="${photo.source}"
+                            alt="${photo.description}"
                           >`)
           .join(``)}
       </div>

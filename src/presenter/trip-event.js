@@ -15,11 +15,20 @@ const Mode = {
 };
 
 export default class TripEvent {
-  constructor(evt, eventListContainer, pointsModel, offersModel, changeData, changeMode) {
+  constructor(
+      evt,
+      eventListContainer,
+      pointsModel,
+      offersModel,
+      citiesModel,
+      changeData,
+      changeMode
+  ) {
     this._event = evt;
     this._eventListContainer = eventListContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
+    this._citiesModel = citiesModel;
 
     this._changeData = changeData;
     this._changeMode = changeMode;
@@ -151,9 +160,19 @@ export default class TripEvent {
   }
 
   _renderEditableEvent(evt) {
-    this._eventEditComponent = new BaseEventView(evt, false, this._offersModel, this.init);
+    this._eventEditComponent = new BaseEventView(
+        evt,
+        false,
+        this._offersModel,
+        this._citiesModel,
+        this.init
+    );
 
-    const offersContainerView = renderEventsOptions(this._eventEditComponent, evt);
+    const offersContainerView = renderEventsOptions(
+        this._eventEditComponent,
+        evt,
+        this._citiesModel
+    );
     if (offersContainerView !== null) {
       offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
