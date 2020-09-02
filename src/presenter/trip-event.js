@@ -44,12 +44,6 @@ export default class TripEvent {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
     this.init = this.init.bind(this);
-
-    this._offers = [];
-
-    for (const offer of this._event.offers) {
-      this._offers.push(offer.isAccepted);
-    }
   }
 
   init(evt) {
@@ -149,9 +143,12 @@ export default class TripEvent {
   _changeOffersListHandler() {
     const offerElements = this._eventEditComponent.getElement()
       .querySelectorAll(`.event__offer-checkbox`);
+    const offers = [];
     for (let i = 0; i < offerElements.length; ++i) {
-      this._offers[i] = offerElements[i].checked;
+      offers[i] = offerElements[i].checked;
     }
+
+    this._eventEditComponent.updateOffers(offers);
   }
 
   _renderEditableEvent(evt) {
@@ -196,10 +193,6 @@ export default class TripEvent {
 
   _handleFormSubmit(evt) {
     this._event = evt;
-
-    for (let i = 0; i < this._offers.length; ++i) {
-      this._event.offers[i].isAccepted = this._offers[i];
-    }
 
     this.init(this._event);
     this._replaceFormToEvent();

@@ -225,6 +225,20 @@ export default class BaseEvent extends SmartView {
     this._callback.favoriteClick();
   }
 
+  updateOffers(offers) {
+    const tmpOffers = [];
+    for (let i = 0; i < this._data.offers.length; ++i) {
+      tmpOffers[i] = {
+        isAccepted: offers[i],
+        name: this._data.offers[i].name,
+        price: this._data.offers[i].price,
+        label: this._data.offers[i].label,
+      };
+    }
+
+    this.updateData({offers: tmpOffers}, true);
+  }
+
   // метод для установки обработчика клика для звёздочки.
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
