@@ -139,6 +139,8 @@ export default class Trip {
       remove(this._errorLoadingView);
       this._errorLoadingView = null;
     }
+
+    remove(this._noEventView);
   }
 
   _getPoints(filterType) {
