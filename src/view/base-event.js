@@ -216,6 +216,12 @@ export default class BaseEvent extends SmartView {
   // обработчик клика для звёздочки.
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+
+    this.updateData({
+      isFavorite: !this._data.isFavorite
+    }, true);
+
+    this._init(this._data);
     this._callback.favoriteClick();
   }
 

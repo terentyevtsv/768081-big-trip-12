@@ -57,11 +57,6 @@ export default class TripEvent {
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
 
-    this._offers = [];
-    for (let i = 0; i < evt.offers.length; i++) {
-      this._offers[i] = false;
-    }
-
     // Собранные (не подключенные к DOM) пара текущих компонентов с новой моделью
     this._renderReadOnlyEvent(evt);
     this._renderEditableEvent(evt);
@@ -226,9 +221,5 @@ export default class TripEvent {
 
   _handleFavoriteClick() {
     this._event.isFavorite = !this._event.isFavorite;
-    this._eventEditComponent.updateData({
-      isFavorite: this._event.isFavorite
-    }, true);
-    this.init(this._event);
   }
 }
