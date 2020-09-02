@@ -43,6 +43,10 @@ export default class SiteMenu extends SmartView {
     this.getElement().addEventListener(`click`, this._menuClickHandler);
   }
 
+  removeMenuClickHandler() {
+    this.getElement().removeEventListener(`click`, this._menuClickHandler);
+  }
+
   restoreHandlers() {
     this.getElement().addEventListener(`click`, this._menuClickHandler);
   }
