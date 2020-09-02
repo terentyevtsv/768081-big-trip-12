@@ -28,12 +28,16 @@ export default class SiteMenu extends SmartView {
     return createSiteMenuTemplate(this._siteMenuModel.getMenuItem());
   }
 
+  updateSiteMenu(menu) {
+    this._siteMenuModel.setMenuItem(menu);
+    this._data = this._siteMenuModel.getMenuItem();
+    this.updateData(this._data);
+  }
+
   _menuClickHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName === `A`) {
-      this._siteMenuModel.setMenuItem(evt.target.dataset.menu);
-      this._data = this._siteMenuModel.getMenuItem();
-      this.updateData(this._data);
+      this.updateSiteMenu(evt.target.dataset.menu);
       this._callback.menuClick(evt.target.dataset.menu);
     }
   }

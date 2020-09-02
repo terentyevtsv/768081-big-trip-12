@@ -25,7 +25,8 @@ export default class Trip {
       offersModel,
       filterModel,
       siteMenuModel,
-      citiesModel
+      citiesModel,
+      newEventButtonView
   ) {
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
@@ -33,6 +34,7 @@ export default class Trip {
     this._filterModel = filterModel;
     this._siteMenuModel = siteMenuModel;
     this._citiesModel = citiesModel;
+    this._newEventButtonView = newEventButtonView;
 
     this._isLoading = true;
     this._loadingView = new LoadingView();
@@ -68,8 +70,6 @@ export default class Trip {
   }
 
   createEvent() {
-    this._eventNewPresenter.destroy();
-
     this._filterModel.setFilter(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
     this._planDateEventsMap = this._getMapDates();
@@ -82,6 +82,7 @@ export default class Trip {
   }
 
   _handleFilterChanged() {
+    remove(this._noEventView);
     this._currentSortType = SortType.EVENT;
     this.init(false);
   }
@@ -99,6 +100,7 @@ export default class Trip {
           this._tripEventsContainer,
           this._offersModel,
           this._citiesModel,
+          this._newEventButtonView,
           this._handleViewAction,
           this._handleModeChange
       );

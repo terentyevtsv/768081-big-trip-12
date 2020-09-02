@@ -12,6 +12,7 @@ import {MenuItem, SortType} from "./const.js";
 import SiteMenuModel from "./model/site-menu.js";
 import Api from "./api.js";
 import CitiesModel from "./model/cities.js";
+import NewEventButtonView from "./view/new-event-button.js";
 
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 const AUTHORIZATION = `Basic mokrajbalka`;
@@ -51,14 +52,17 @@ const filterModel = new FilterModel();
 // Инициализация модели меню
 const siteMenuModel = new SiteMenuModel();
 
+const newEventButtonView = new NewEventButtonView(true);
 const tripPresenter = new TripPresenter(
     tripEventsElement,
     pointsModel,
     offersModel,
     filterModel,
     siteMenuModel,
-    citiesModel
+    citiesModel,
+    newEventButtonView
 );
+
 tripPresenter.renderEventsPlan(false);
 
 const getPlanDateEventMap = () => tripPresenter.planDateEventsMap;
@@ -73,6 +77,41 @@ const errorMessagesObject = {
 let errorValuesCount = Object.values(errorMessagesObject).length;
 
 const siteMenuView = new SiteMenuView(siteMenuModel);
+
+const filterPresenter = new FilterPresenter(tripMainTripControlElement, filterModel);
+
+const renderEventsAfterLoading = (points) => {
+  // Отрисовка меню и фильтров
+  const mainTripComponents = [
+    new SiteMenuHeaderView(),
+    siteMenuView
+  ];
+
+  for (let i = 0; i < mainTripComponents.length; ++i) {
+    render(
+        tripMainTripControlElement,
+        mainTripComponents[i],
+        AddedComponentPosition.BEFORE_END
+    );
+  }
+
+  filterPresenter.init();
+
+  const tmpPoints = [];
+  points.forEach((point) => {
+    const eventType = eventTypesMap.get(point.type);
+    const maskOffers = offersModel.getOffers(eventType);
+
+    const tmpPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
+    tmpPoints.push(tmpPoint);
+  });
+
+  pointsModel.setPoints(tmpPoints);
+
+  // Формирование дерева плана путешествия
+  tripPresenter.init(true);
+  tripInformationPresenter.init();
+};
 
 api.getEventTypesOffers()
   .then((eventTypesOffers) => {
@@ -122,62 +161,36 @@ api.getEventTypesOffers()
     if (errorValuesCount > 0) {
       return [];
     }
+
     return api.getPoints();
   })
   .then((points) => {
     if (errorValuesCount > 0) {
-      tripInformationPresenter.init();
       return;
     }
-    const tmpPoints = [];
-    points.forEach((point) => {
-      const eventType = eventTypesMap.get(point.type);
-      const maskOffers = offersModel.getOffers(eventType);
 
-      const tmpPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
-      tmpPoints.push(tmpPoint);
-    });
-
-    pointsModel.setPoints(tmpPoints);
-
-    // Формирование дерева плана путешествия
-    tripPresenter.init(true);
-    tripInformationPresenter.init();
+    render(tripMainElement, newEventButtonView, AddedComponentPosition.BEFORE_END);
+    renderEventsAfterLoading(points);
   })
   .catch(() => {
     if (errorValuesCount > 0) {
       return;
     }
 
-    pointsModel.setPoints([]);
+    render(tripMainElement, newEventButtonView, AddedComponentPosition.BEFORE_END);
 
-    // Формирование дерева плана путешествия
-    tripPresenter.init(true);
-    tripInformationPresenter.init();
+    pointsModel.setPoints([]);
+    renderEventsAfterLoading(pointsModel.getPoints());
   });
 
-// Отрисовка меню и фильтров
-const mainTripComponents = [
-  new SiteMenuHeaderView(),
-  siteMenuView
-];
-
-for (let i = 0; i < mainTripComponents.length; ++i) {
-  render(
-      tripMainTripControlElement,
-      mainTripComponents[i],
-      AddedComponentPosition.BEFORE_END
-  );
-}
-
-const filterPresenter = new FilterPresenter(tripMainTripControlElement, filterModel);
-filterPresenter.init();
-
-document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
+newEventButtonView.setButtonClickHandler((evt) => {
   evt.preventDefault();
-  if (errorValuesCount > 0) {
-    return;
+
+  if (siteMenuModel.getMenuItem() !== MenuItem.TABLE) {
+    siteMenuView.updateSiteMenu(MenuItem.TABLE);
+    handleSiteMenuClick(MenuItem.TABLE);
   }
+
   tripPresenter.createEvent();
   filterPresenter.init();
 });
@@ -191,9 +204,7 @@ const handleSiteMenuClick = (menuItem) => {
       remove(statisticsView);
 
       // Показать таблицу
-      if (errorValuesCount === 0) {
-        tripPresenter.reload();
-      }
+      tripPresenter.reload();
 
       break;
     case MenuItem.STATS:

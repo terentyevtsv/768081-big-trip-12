@@ -7,12 +7,20 @@ import {UserAction} from "../const.js";
 const EMPTY_EVENT_INDEX = 0;
 
 export default class EventNew {
-  constructor(eventListContainer, offersModel, citiesModel, changeData, changeMode) {
+  constructor(
+      eventListContainer,
+      offersModel,
+      citiesModel,
+      newEventButtonView,
+      changeData,
+      changeMode
+  ) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
+    this._newEventButtonView = newEventButtonView;
 
     this._eventEditComponent = null;
 
@@ -35,6 +43,7 @@ export default class EventNew {
       return;
     }
 
+    this._newEventButtonView.inverseEnabled();
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
 
