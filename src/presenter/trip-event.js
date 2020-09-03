@@ -209,7 +209,10 @@ export default class TripEvent {
   }
 
   _handleDeleteClick(evt) {
-    this._changeData(UserAction.DELETE_EVENT, evt);
+    this._api.deletePoint(evt)
+      .then(() => {
+        this._changeData(UserAction.DELETE_EVENT, evt);
+      });
   }
 
   _escKeyDownHandler(evt) {

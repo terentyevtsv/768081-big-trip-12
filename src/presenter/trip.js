@@ -102,9 +102,11 @@ export default class Trip {
           this._tripEventsContainer,
           this._offersModel,
           this._citiesModel,
+          this._pointsModel,
           this._newEventButtonView,
           this._handleViewAction,
-          this._handleModeChange
+          this._handleModeChange,
+          this._api
       );
     }
 
