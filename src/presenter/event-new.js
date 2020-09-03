@@ -1,7 +1,6 @@
 import BaseEventView from "../view/base-event.js";
 import {renderEventsOptions} from "../utils/editable-event.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
-import {generateId} from "../utils/common.js";
 import {UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 

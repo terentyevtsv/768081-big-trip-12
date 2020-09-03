@@ -1,5 +1,3 @@
-export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
 const isAlpha = (ch) => {
   return typeof ch === `string` && ch.length === 1 && /[A-Za-z]/.test(ch);
 };
