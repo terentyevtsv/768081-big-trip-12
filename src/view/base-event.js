@@ -4,7 +4,12 @@ import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
+const createEmptyEventTemplate = (
+    evt,
+    isNewEvent,
+    eventTypes,
+    cities
+) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -22,6 +27,7 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
           class="event__type-toggle  visually-hidden"
           id="event-type-toggle-1"
           type="checkbox"
+          ${evt.isDisabled ? `disabled` : ``}
         >
 
         <div class="event__type-list">
@@ -84,6 +90,7 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
           name="event-destination"
           value="${evt.city}"
           list="destination-list-1"
+          ${evt.isDisabled ? `disabled` : ``}
         >
         <datalist id="destination-list-1">
           ${cities.map((city) => `<option value="${city}"></option>`).join(``)}
@@ -100,6 +107,7 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
           type="text"
           name="event-start-time"
           value="${shortYearDateToString(evt.timeInterval.leftLimitDate)}"
+          ${evt.isDisabled ? `disabled` : ``}
         >
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">
@@ -111,6 +119,7 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
           type="text"
           name="event-end-time"
           value="${shortYearDateToString(evt.timeInterval.rightLimitDate)}"
+          ${evt.isDisabled ? `disabled` : ``}
         >
       </div>
 
@@ -125,13 +134,31 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
           type="number"
           name="event-price"
           value="${evt.price}"
+          ${evt.isDisabled ? `disabled` : ``}
         >
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+      <button
+        class="event__save-btn  btn  btn--blue"
+        type="submit"
+        ${evt.isDisabled ? `disabled` : ``}
+      >
+        ${evt.isSaving ? `Saving` : `Save`}
+      </button>
       ${isNewEvent
-    ? `<button class="event__reset-btn" type="reset">Cancel</button>`
-    : `<button class="event__reset-btn" type="reset">Delete</button>
+    ? `<button
+        class="event__reset-btn" type="reset"
+        ${evt.isDisabled ? `disabled` : ``}
+      >
+        Cancel
+      </button>`
+    : `<button
+        class="event__reset-btn"
+        type="reset"
+        ${evt.isDisabled ? `disabled` : ``}
+      >
+        ${evt.isDeleting ? `Deleting` : `Delete`}
+      </button>
 
       <input
         id="event-favorite-1"
@@ -139,6 +166,7 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
         type="checkbox"
         name="event-favorite"
         ${evt.isFavorite ? `checked` : ``}
+        ${evt.isDisabled ? `disabled` : ``}
       >
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
@@ -147,7 +175,11 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
         </svg>
       </label>
 
-      <button class="event__rollup-btn" type="button">
+      <button
+        class="event__rollup-btn"
+        type="button"
+        ${evt.isDisabled ? `disabled` : ``}
+      >
         <span class="visually-hidden">Open event</span>
       </button>`}
     </header>
@@ -390,7 +422,12 @@ export default class BaseEvent extends SmartView {
   static parseEventToData(evt) {
     return Object.assign(
         {},
-        evt
+        evt,
+        {
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        }
     );
   }
 }

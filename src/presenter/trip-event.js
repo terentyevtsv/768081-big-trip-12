@@ -163,13 +163,13 @@ export default class TripEvent {
         this.init
     );
 
-    const offersContainerView = renderEventsOptions(
+    this._offersContainerView = renderEventsOptions(
         this._eventEditComponent,
         evt,
         this._citiesModel
     );
-    if (offersContainerView !== null) {
-      offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+    if (this._offersContainerView !== null) {
+      this._offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
   }
 

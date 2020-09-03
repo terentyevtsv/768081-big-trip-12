@@ -153,13 +153,13 @@ export default class EventNew {
         this._initBaseEvent
     );
 
-    const offersContainerView = renderEventsOptions(
+    this._offersContainerView = renderEventsOptions(
         this._eventEditComponent,
         evt,
         this._citiesModel
     );
-    if (offersContainerView !== null) {
-      offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+    if (this._offersContainerView !== null) {
+      this._offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
 
     render(
