@@ -62,6 +62,10 @@ export default class EventNew {
   }
 
   _handleFormSubmit(evt) {
+    this._eventEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    }, false);
     for (let i = 0; i < this._offers.length; ++i) {
       evt.offers[i].isAccepted = this._offers[i];
     }
@@ -71,6 +75,11 @@ export default class EventNew {
 
     this._api.createPoint(point)
       .then((response) => {
+        this._eventEditComponent.updateData({
+          isDisabled: false,
+          isSaving: false
+        }, false);
+
         this._changeData(
             UserAction.ADD_EVENT,
             // Пока у нас нет сервера, который бы после сохранения
