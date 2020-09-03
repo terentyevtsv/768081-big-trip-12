@@ -37,8 +37,11 @@ export default class SiteMenu extends SmartView {
   _menuClickHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName === `A`) {
-      this.updateSiteMenu(evt.target.dataset.menu);
-      this._callback.menuClick(evt.target.dataset.menu);
+      const currentMenu = evt.target.dataset.menu;
+      if (currentMenu !== this._siteMenuModel.getMenuItem()) {
+        this.updateSiteMenu(currentMenu);
+        this._callback.menuClick(currentMenu);
+      }
     }
   }
 
