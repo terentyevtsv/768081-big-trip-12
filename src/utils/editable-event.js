@@ -1,10 +1,9 @@
 import EventDetailsView from "../view/event-details.js";
-import {cities} from "../mock/event.js";
 import OffersContainerView from "../view/offers.js";
 import DestinationView from "../view/destination.js";
 import {AddedComponentPosition, render} from "./render.js";
 
-export const renderEventsOptions = (eventEditComponent, evt) => {
+export const renderEventsOptions = (eventEditComponent, evt, citiesModel) => {
   const eventDetailsView = new EventDetailsView();
 
   render(
@@ -26,7 +25,7 @@ export const renderEventsOptions = (eventEditComponent, evt) => {
       );
     }
 
-    const destination = cities.get(evt.city);
+    const destination = citiesModel.getDestination(evt.city);
     if (destination !== null) {
       render(
           eventDetailsView,

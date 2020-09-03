@@ -6,6 +6,20 @@ export default class Points extends Observer {
     this._points = [];
   }
 
+  getCitiesMap() {
+    return this._citiesMap;
+  }
+
+  setСitiesMap(value) {
+    this._citiesMap = value;
+  }
+
+  getDestinationInfo(city) {
+    return this._citiesMap.has(city)
+      ? this._citiesMap.get(city)
+      : null;
+  }
+
   getPoints() {
     return this._points;
   }
@@ -54,5 +68,85 @@ export default class Points extends Observer {
     ];
 
     this._notify(update);
+  }
+
+  static adaptToClient(point, eventType, maskOffers) {
+    const offers = [];
+    const checkedOffersSet = new Set(point.offers.map((offer) => offer.title));
+    maskOffers.forEach((offer) => {
+      offers.push({
+        name: offer.name,
+        price: offer.price,
+        label: offer.label,
+        isAccepted: checkedOffersSet.has(offer.name)
+      });
+    });
+
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          eventType,
+          city: point.destination.name,
+          offers,
+          isFavorite: point.is_favorite,
+          price: point.base_price,
+          timeInterval: {
+            leftLimitDate: new Date(point.date_from),
+            rightLimitDate: new Date(point.date_to)
+          }
+        }
+    );
+
+    delete adaptedPoint.base_price;
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.destination;
+    delete adaptedPoint.is_favorite;
+    delete adaptedPoint.type;
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point, destinationInfo) {
+    const tmpOffers = point.offers
+      .filter((offer) => offer.isAccepted);
+    const offers = [];
+    tmpOffers.forEach((offer) => offers.push({
+      price: offer.price,
+      title: offer.name
+    }));
+
+    const destination = {
+      description: destinationInfo.description,
+      name: point.city,
+      pictures: []
+    };
+
+    destinationInfo.photos.forEach((photo) => destination.pictures.push({
+      src: photo.source,
+      description: photo.description
+    }));
+
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          "base_price": point.price,
+          "date_from": point.timeInterval.leftLimitDate.toISOString(),
+          "date_to": point.timeInterval.rightLimitDate.toISOString(),
+          "is_favorite": point.isFavorite,
+          offers,
+          destination,
+          "type": point.eventType.value
+        }
+    );
+
+    delete adaptedPoint.city;
+    delete adaptedPoint.eventType;
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.timeInterval;
+
+    return adaptedPoint;
   }
 }

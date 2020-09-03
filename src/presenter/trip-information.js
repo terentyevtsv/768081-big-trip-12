@@ -13,8 +13,8 @@ export default class TripInformation {
 
     this.init = this.init.bind(this);
 
-    this._filterModel.addObserver(this.init);
     this._pointsModel.addObserver(this.init);
+    this._filterModel.addObserver(this.init);
   }
 
   init() {
@@ -36,15 +36,5 @@ export default class TripInformation {
         this._tripInformationContainer,
         AddedComponentPosition.AFTER_BEGIN
     );
-  }
-
-  unload() {
-    this._filterModel.removeObserver(this.init);
-    this._pointsModel.removeObserver(this.init);
-  }
-
-  load() {
-    this._filterModel.addObserver(this.init);
-    this._pointsModel.addObserver(this.init);
   }
 }

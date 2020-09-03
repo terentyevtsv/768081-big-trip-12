@@ -1,14 +1,15 @@
-import {render, AddedComponentPosition, remove} from "../utils/render.js";
+import {render, AddedComponentPosition, remove, replace} from "../utils/render.js";
 import NoEventView from "../view/no-event.js";
 import SortingView from "../view/sorting.js";
 import EventsPlanContainerView from "../view/events-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
 import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
-import {SortType, FilterType, UserAction} from "../const.js";
+import {SortType, FilterType, UserAction, MenuItem} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
 import {filter} from "../utils/filter.js";
 import EventNewPresenter from "./event-new.js";
+import LoadingView from "../view/loading.js";
 
 const getDifference = function (timeInterval) {
   return (
@@ -18,12 +19,28 @@ const getDifference = function (timeInterval) {
 };
 
 export default class Trip {
-  constructor(tripEventsContainer, pointsModel, offersModel, filterModel, siteMenuModel) {
+  constructor(
+      tripEventsContainer,
+      pointsModel,
+      offersModel,
+      filterModel,
+      siteMenuModel,
+      citiesModel,
+      newEventButtonView,
+      api
+  ) {
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
     this._filterModel = filterModel;
     this._siteMenuModel = siteMenuModel;
+    this._citiesModel = citiesModel;
+    this._newEventButtonView = newEventButtonView;
+    this._api = api;
+
+    this._isLoading = true;
+    this._loadingView = new LoadingView();
+    this._errorLoadingView = null;
 
     this._currentSortType = SortType.EVENT;
     this._noEventView = new NoEventView();
@@ -43,12 +60,7 @@ export default class Trip {
     this._filterModel.addObserver(this._handleFilterChanged);
     this._pointsModel.addObserver(this._handleModelChange);
     this._siteMenuModel.addObserver(this._renderSort);
-    this._eventNewPresenter = new EventNewPresenter(
-        this._tripEventsContainer,
-        this._offersModel,
-        this._handleViewAction,
-        this._handleModeChange
-    );
+    this._eventNewPresenter = null;
   }
 
   get planDateEventsMap() {
@@ -60,42 +72,79 @@ export default class Trip {
   }
 
   createEvent() {
-    this._eventNewPresenter.destroy();
-
     this._filterModel.setFilter(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
     this._planDateEventsMap = this._getMapDates();
-    this._renderEventsPlan(true);
+    this.renderEventsPlan(true);
   }
 
   _handleModelChange() {
     this._planDateEventsMap = this._getMapDates();
-    this._renderEventsPlan(false);
+    this.renderEventsPlan(false);
   }
 
   _handleFilterChanged() {
+    remove(this._noEventView);
     this._currentSortType = SortType.EVENT;
-    this.init();
+    this.init(false);
   }
 
-  init() {
+  _renderLoading() {
+    render(this._tripEventsContainer, this._loadingView, AddedComponentPosition.BEFORE_END);
+  }
+
+  init(isFirstLoading) {
+    if (isFirstLoading) {
+      this._isLoading = false;
+      remove(this._loadingView);
+
+      this._eventNewPresenter = new EventNewPresenter(
+          this._tripEventsContainer,
+          this._offersModel,
+          this._citiesModel,
+          this._newEventButtonView,
+          this._handleViewAction,
+          this._handleModeChange
+      );
+    }
+
     this._planDateEventsMap = this._getMapDates();
-    this._renderEventsPlan(false);
+    if (this._siteMenuModel.getMenuItem() === MenuItem.TABLE) {
+      this.renderEventsPlan(false);
+    }
+  }
+
+  renderError(messageObject) {
+    const fullMessage = `Не загружены ${Object.values(messageObject).join(` и `)}`;
+    this._errorLoadingView = new LoadingView(fullMessage);
+    replace(this._errorLoadingView, this._loadingView);
+
+    this._filterModel.removeObserver(this._handleFilterChanged);
+    this._siteMenuModel.removeObserver(this._renderSort);
   }
 
   reload() {
-    this._filterModel.addObserver(this._handleFilterChanged);
-    this._pointsModel.addObserver(this._handleModelChange);
-    this.init();
+    this._siteMenuModel.addObserver(this._renderSort);
+    this.init(false);
   }
 
   destroy() {
-    this._eventNewPresenter.destroy();
-    remove(this._sortingView);
-    remove(this._eventsPlanContainerView);
+    this._isLoading = false;
+    if (this._eventNewPresenter !== null) {
+      this._eventNewPresenter.destroy();
+    }
 
-    this._filterModel.removeObserver(this._handleFilterChanged);
-    this._pointsModel.removeObserver(this._handleModelChange);
+    if (this._sortingView !== null) {
+      remove(this._sortingView);
+    }
+
+    remove(this._eventsPlanContainerView);
+    if (this._errorLoadingView !== null) {
+      remove(this._errorLoadingView);
+      this._errorLoadingView = null;
+    }
+
+    remove(this._noEventView);
   }
 
   _getPoints(filterType) {
@@ -222,8 +271,10 @@ export default class Trip {
         tripEventsItemView,
         this._pointsModel,
         this._offersModel,
+        this._citiesModel,
         this._handleViewAction,
-        this._handleModeChange
+        this._handleModeChange,
+        this._api
     );
     tripEventPresenter.init(evt);
     this._eventPresenter[evt.id] = tripEventPresenter;
@@ -284,7 +335,11 @@ export default class Trip {
     );
   }
 
-  _renderEventsPlan(renderNewEventFlag) {
+  renderEventsPlan(renderNewEventFlag) {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
 
     const points = this._getPoints(this._filterModel.getFilter());
     if (points.length === 0) {

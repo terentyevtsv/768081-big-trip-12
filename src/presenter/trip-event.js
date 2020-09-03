@@ -6,6 +6,7 @@ import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenEventButtonView from "../view/open-event-button.js";
 import {UserAction} from "../const.js";
+import PointsModel from "../model/points.js";
 
 const MAX_OFFERS_COUNT = 3;
 
@@ -15,11 +16,22 @@ const Mode = {
 };
 
 export default class TripEvent {
-  constructor(evt, eventListContainer, pointsModel, offersModel, changeData, changeMode) {
+  constructor(
+      evt,
+      eventListContainer,
+      pointsModel,
+      offersModel,
+      citiesModel,
+      changeData,
+      changeMode,
+      api
+  ) {
     this._event = evt;
     this._eventListContainer = eventListContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
+    this._citiesModel = citiesModel;
+    this._api = api;
 
     this._changeData = changeData;
     this._changeMode = changeMode;
@@ -35,23 +47,12 @@ export default class TripEvent {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
     this.init = this.init.bind(this);
-
-    this._offers = [];
-
-    for (const offer of this._event.offers) {
-      this._offers.push(offer.isAccepted);
-    }
   }
 
   init(evt) {
     // Предыдущие редактируемый и компонент для чтения у точки маршрута
     const prevEventComponent = this._eventComponent;
     const prevEventEditComponent = this._eventEditComponent;
-
-    this._offers = [];
-    for (let i = 0; i < evt.offers.length; i++) {
-      this._offers[i] = false;
-    }
 
     // Собранные (не подключенные к DOM) пара текущих компонентов с новой моделью
     this._renderReadOnlyEvent(evt);
@@ -145,15 +146,28 @@ export default class TripEvent {
   _changeOffersListHandler() {
     const offerElements = this._eventEditComponent.getElement()
       .querySelectorAll(`.event__offer-checkbox`);
+    const offers = [];
     for (let i = 0; i < offerElements.length; ++i) {
-      this._offers[i] = offerElements[i].checked;
+      offers[i] = offerElements[i].checked;
     }
+
+    this._eventEditComponent.updateOffers(offers);
   }
 
   _renderEditableEvent(evt) {
-    this._eventEditComponent = new BaseEventView(evt, false, this._offersModel, this.init);
+    this._eventEditComponent = new BaseEventView(
+        evt,
+        false,
+        this._offersModel,
+        this._citiesModel,
+        this.init
+    );
 
-    const offersContainerView = renderEventsOptions(this._eventEditComponent, evt);
+    const offersContainerView = renderEventsOptions(
+        this._eventEditComponent,
+        evt,
+        this._citiesModel
+    );
     if (offersContainerView !== null) {
       offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
@@ -181,16 +195,17 @@ export default class TripEvent {
   }
 
   _handleFormSubmit(evt) {
-    this._event = evt;
+    const destinationInfo = this._pointsModel.getDestinationInfo(evt.city);
+    const point = PointsModel.adaptToServer(evt, destinationInfo);
+    this._api.updatePoint(point)
+      .then(() => {
+        this._event = evt;
 
-    for (let i = 0; i < this._offers.length; ++i) {
-      this._event.offers[i].isAccepted = this._offers[i];
-    }
+        this.init(this._event);
+        this._replaceFormToEvent();
 
-    this.init(this._event);
-    this._replaceFormToEvent();
-
-    this._pointsModel.updatePoint(this._event);
+        this._pointsModel.updatePoint(this._event);
+      });
   }
 
   _handleDeleteClick(evt) {
@@ -207,9 +222,5 @@ export default class TripEvent {
 
   _handleFavoriteClick() {
     this._event.isFavorite = !this._event.isFavorite;
-    this._eventEditComponent.updateData({
-      isFavorite: this._event.isFavorite
-    }, true);
-    this.init(this._event);
   }
 }

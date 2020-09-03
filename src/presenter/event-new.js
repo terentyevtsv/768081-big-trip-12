@@ -1,17 +1,26 @@
 import BaseEventView from "../view/base-event.js";
 import {renderEventsOptions} from "../utils/editable-event.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
-import {cities, generateId} from "../mock/event.js";
+import {generateId} from "../utils/common.js";
 import {UserAction} from "../const.js";
 
 const EMPTY_EVENT_INDEX = 0;
 
 export default class EventNew {
-  constructor(eventListContainer, offersModel, changeData, changeMode) {
+  constructor(
+      eventListContainer,
+      offersModel,
+      citiesModel,
+      newEventButtonView,
+      changeData,
+      changeMode
+  ) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._offersModel = offersModel;
+    this._citiesModel = citiesModel;
+    this._newEventButtonView = newEventButtonView;
 
     this._eventEditComponent = null;
 
@@ -34,6 +43,7 @@ export default class EventNew {
       return;
     }
 
+    this._newEventButtonView.inverseEnabled();
     remove(this._eventEditComponent);
     this._eventEditComponent = null;
 
@@ -66,12 +76,12 @@ export default class EventNew {
 
   // Значения по умолчанию для события при создании события
   _getDefaultEvent() {
-    const tmpCities = Array.from(cities.keys());
+    const tmpCities = this._citiesModel.cities;
     const evt = {
       eventType: this._offersModel.eventTypes[EMPTY_EVENT_INDEX],
       city: tmpCities[EMPTY_EVENT_INDEX],
       offers: [],
-      destination: cities.get(tmpCities[EMPTY_EVENT_INDEX]),
+      destination: this._citiesModel.getDestination(tmpCities[EMPTY_EVENT_INDEX]),
       isFavorite: false,
       price: 0
     };
@@ -128,10 +138,15 @@ export default class EventNew {
         evt,
         true,
         this._offersModel,
+        this._citiesModel,
         this._initBaseEvent
     );
 
-    const offersContainerView = renderEventsOptions(this._eventEditComponent, evt);
+    const offersContainerView = renderEventsOptions(
+        this._eventEditComponent,
+        evt,
+        this._citiesModel
+    );
     if (offersContainerView !== null) {
       offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }

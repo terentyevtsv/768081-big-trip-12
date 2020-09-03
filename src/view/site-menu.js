@@ -28,19 +28,30 @@ export default class SiteMenu extends SmartView {
     return createSiteMenuTemplate(this._siteMenuModel.getMenuItem());
   }
 
+  updateSiteMenu(menu) {
+    this._siteMenuModel.setMenuItem(menu);
+    this._data = this._siteMenuModel.getMenuItem();
+    this.updateData(this._data);
+  }
+
   _menuClickHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName === `A`) {
-      this._siteMenuModel.setMenuItem(evt.target.dataset.menu);
-      this._data = this._siteMenuModel.getMenuItem();
-      this.updateData(this._data);
-      this._callback.menuClick(evt.target.dataset.menu);
+      const currentMenu = evt.target.dataset.menu;
+      if (currentMenu !== this._siteMenuModel.getMenuItem()) {
+        this.updateSiteMenu(currentMenu);
+        this._callback.menuClick(currentMenu);
+      }
     }
   }
 
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().addEventListener(`click`, this._menuClickHandler);
+  }
+
+  removeMenuClickHandler() {
+    this.getElement().removeEventListener(`click`, this._menuClickHandler);
   }
 
   restoreHandlers() {

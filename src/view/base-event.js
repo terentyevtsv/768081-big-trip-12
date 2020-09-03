@@ -1,13 +1,10 @@
 import {shortYearDateToString} from "../utils/formats.js";
 import {EventGroup} from "../const.js";
-import {cities} from "../mock/event.js";
 import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-const cityNames = new Set(cities.keys());
-
-const createEmptyEventTemplate = (evt, isNewEvent, eventTypes) =>
+const createEmptyEventTemplate = (evt, isNewEvent, eventTypes, cities) =>
   `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -89,7 +86,7 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes) =>
           list="destination-list-1"
         >
         <datalist id="destination-list-1">
-          ${Array.from(cities.keys()).map((city) => `<option value="${city}"></option>`).join(``)}
+          ${cities.map((city) => `<option value="${city}"></option>`).join(``)}
         </datalist>
       </div>
 
@@ -157,10 +154,13 @@ const createEmptyEventTemplate = (evt, isNewEvent, eventTypes) =>
   </form>`;
 
 export default class BaseEvent extends SmartView {
-  constructor(evt, isNewEvent, offersModel, init) {
+  constructor(evt, isNewEvent, offersModel, citiesModel, init) {
     super();
 
     this._offersModel = offersModel;
+
+    this._citiesModel = citiesModel;
+    this._cityNames = new Set(this._citiesModel.cities);
 
     this._fromDatepicker = null;
     this._toDatepicker = null;
@@ -184,7 +184,12 @@ export default class BaseEvent extends SmartView {
   }
 
   getTemplate() {
-    return createEmptyEventTemplate(this._data, this._isNewEvent, this._offersModel.eventTypes);
+    return createEmptyEventTemplate(
+        this._data,
+        this._isNewEvent,
+        this._offersModel.eventTypes,
+        this._citiesModel.cities
+    );
   }
 
   _formSubmitHandler(evt) {
@@ -211,7 +216,27 @@ export default class BaseEvent extends SmartView {
   // обработчик клика для звёздочки.
   _favoriteClickHandler(evt) {
     evt.preventDefault();
+
+    this.updateData({
+      isFavorite: !this._data.isFavorite
+    }, true);
+
+    this._init(this._data);
     this._callback.favoriteClick();
+  }
+
+  updateOffers(offers) {
+    const tmpOffers = [];
+    for (let i = 0; i < this._data.offers.length; ++i) {
+      tmpOffers[i] = {
+        isAccepted: offers[i],
+        name: this._data.offers[i].name,
+        price: this._data.offers[i].price,
+        label: this._data.offers[i].label,
+      };
+    }
+
+    this.updateData({offers: tmpOffers}, true);
   }
 
   // метод для установки обработчика клика для звёздочки.
@@ -237,7 +262,7 @@ export default class BaseEvent extends SmartView {
 
   _cityChangeHandler(evt) {
     evt.preventDefault();
-    if (cityNames.has(evt.target.value)) {
+    if (this._cityNames.has(evt.target.value)) {
       this.updateData({
         city: evt.target.value
       },
