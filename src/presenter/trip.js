@@ -26,7 +26,8 @@ export default class Trip {
       filterModel,
       siteMenuModel,
       citiesModel,
-      newEventButtonView
+      newEventButtonView,
+      api
   ) {
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
@@ -35,6 +36,7 @@ export default class Trip {
     this._siteMenuModel = siteMenuModel;
     this._citiesModel = citiesModel;
     this._newEventButtonView = newEventButtonView;
+    this._api = api;
 
     this._isLoading = true;
     this._loadingView = new LoadingView();
@@ -271,7 +273,8 @@ export default class Trip {
         this._offersModel,
         this._citiesModel,
         this._handleViewAction,
-        this._handleModeChange
+        this._handleModeChange,
+        this._api
     );
     tripEventPresenter.init(evt);
     this._eventPresenter[evt.id] = tripEventPresenter;

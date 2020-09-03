@@ -6,6 +6,7 @@ import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenEventButtonView from "../view/open-event-button.js";
 import {UserAction} from "../const.js";
+import PointsModel from "../model/points.js";
 
 const MAX_OFFERS_COUNT = 3;
 
@@ -22,13 +23,15 @@ export default class TripEvent {
       offersModel,
       citiesModel,
       changeData,
-      changeMode
+      changeMode,
+      api
   ) {
     this._event = evt;
     this._eventListContainer = eventListContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
+    this._api = api;
 
     this._changeData = changeData;
     this._changeMode = changeMode;
@@ -192,12 +195,17 @@ export default class TripEvent {
   }
 
   _handleFormSubmit(evt) {
-    this._event = evt;
+    const destinationInfo = this._pointsModel.getDestinationInfo(evt.city);
+    const point = PointsModel.adaptToServer(evt, destinationInfo);
+    this._api.updatePoint(point)
+      .then(() => {
+        this._event = evt;
 
-    this.init(this._event);
-    this._replaceFormToEvent();
+        this.init(this._event);
+        this._replaceFormToEvent();
 
-    this._pointsModel.updatePoint(this._event);
+        this._pointsModel.updatePoint(this._event);
+      });
   }
 
   _handleDeleteClick(evt) {

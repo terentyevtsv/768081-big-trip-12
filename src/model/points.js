@@ -6,6 +6,20 @@ export default class Points extends Observer {
     this._points = [];
   }
 
+  getCitiesMap() {
+    return this._citiesMap;
+  }
+
+  setСitiesMap(value) {
+    this._citiesMap = value;
+  }
+
+  getDestinationInfo(city) {
+    return this._citiesMap.has(city)
+      ? this._citiesMap.get(city)
+      : null;
+  }
+
   getPoints() {
     return this._points;
   }
@@ -90,6 +104,48 @@ export default class Points extends Observer {
     delete adaptedPoint.destination;
     delete adaptedPoint.is_favorite;
     delete adaptedPoint.type;
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point, destinationInfo) {
+    const tmpOffers = point.offers
+      .filter((offer) => offer.isAccepted);
+    const offers = [];
+    tmpOffers.forEach((offer) => offers.push({
+      price: offer.price,
+      title: offer.name
+    }));
+
+    const destination = {
+      description: destinationInfo.description,
+      name: point.city,
+      pictures: []
+    };
+
+    destinationInfo.photos.forEach((photo) => destination.pictures.push({
+      src: photo.source,
+      description: photo.description
+    }));
+
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          "base_price": point.price,
+          "date_from": point.timeInterval.leftLimitDate.toISOString(),
+          "date_to": point.timeInterval.rightLimitDate.toISOString(),
+          "is_favorite": point.isFavorite,
+          offers,
+          destination,
+          "type": point.eventType.value
+        }
+    );
+
+    delete adaptedPoint.city;
+    delete adaptedPoint.eventType;
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.timeInterval;
 
     return adaptedPoint;
   }

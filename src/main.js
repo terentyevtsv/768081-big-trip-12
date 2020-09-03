@@ -35,7 +35,6 @@ const api = new Api(END_POINT, AUTHORIZATION);
 
 const typeOffers = new Map(); // Все возможные значения предложений для каждого типа события
 const eventTypesMap = new Map(); // Тип события по его названию
-const citiesMap = new Map(); // Города с общим описанием, фото и описанием фото
 
 // Инициализация модели предложений
 const offersModel = new OffersModel();
@@ -45,6 +44,7 @@ const citiesModel = new CitiesModel();
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
+pointsModel.setСitiesMap(new Map()); // Города с общим описанием, фото и описанием фото
 
 // Инициализация модели фильтра
 const filterModel = new FilterModel();
@@ -60,7 +60,8 @@ const tripPresenter = new TripPresenter(
     filterModel,
     siteMenuModel,
     citiesModel,
-    newEventButtonView
+    newEventButtonView,
+    api
 );
 
 tripPresenter.renderEventsPlan(false);
@@ -143,12 +144,12 @@ api.getEventTypesOffers()
   .then((destinations) => {
     delete errorMessagesObject.citiesTaskMessage;
 
-    citiesMap.clear();
+    pointsModel.getCitiesMap().clear();
     destinations.forEach((destination) => {
       const currentDestination = CitiesModel.adaptDestinationToClient(destination);
-      citiesMap.set(destination.name, currentDestination);
+      pointsModel.getCitiesMap().set(destination.name, currentDestination);
     });
-    citiesModel.setCities(citiesMap);
+    citiesModel.setCities(pointsModel.getCitiesMap());
   })
   .catch(() => {
     // отображение ошибки загрузки доп. данных
