@@ -1,8 +1,9 @@
 import BaseEventView from "../view/base-event.js";
-import {renderEventsOptions} from "../utils/editable-event.js";
+import {renderEventsOptions, renderFormState} from "../utils/editable-event.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
-import {generateId} from "../utils/common.js";
 import {UserAction} from "../const.js";
+import PointsModel from "../model/points.js";
+import EventDetailsView from "../view/event-details.js";
 
 const EMPTY_EVENT_INDEX = 0;
 
@@ -11,16 +12,20 @@ export default class EventNew {
       eventListContainer,
       offersModel,
       citiesModel,
+      pointsModel,
       newEventButtonView,
       changeData,
-      changeMode
+      changeMode,
+      api
   ) {
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
+    this._pointsModel = pointsModel;
     this._newEventButtonView = newEventButtonView;
+    this._api = api;
 
     this._eventEditComponent = null;
 
@@ -58,16 +63,51 @@ export default class EventNew {
   }
 
   _handleFormSubmit(evt) {
+    renderFormState(
+        this._eventEditComponent,
+        this._offersContainerView,
+        this._eventDetailsView, {
+          isDisabled: true,
+          isSaving: true
+        });
     for (let i = 0; i < this._offers.length; ++i) {
       evt.offers[i].isAccepted = this._offers[i];
     }
-    this._changeData(
-        UserAction.ADD_EVENT,
-        // Пока у нас нет сервера, который бы после сохранения
-        // выдывал честный id задачи, нам нужно позаботиться об этом самим
-        Object.assign({id: generateId()}, evt)
-    );
-    this.destroy();
+
+    const destinationInfo = this._pointsModel.getDestinationInfo(evt.city);
+    const point = PointsModel.adaptToServer(evt, destinationInfo);
+
+    this._api.createPoint(point)
+      .then((response) => {
+        renderFormState(
+            this._eventEditComponent,
+            this._offersContainerView,
+            this._eventDetailsView, {
+              isDisabled: false,
+              isSaving: false
+            }
+        );
+
+        this._changeData(
+            UserAction.ADD_EVENT,
+            // Пока у нас нет сервера, который бы после сохранения
+            // выдывал честный id задачи, нам нужно позаботиться об этом самим
+            Object.assign({id: response.id}, evt)
+        );
+        this.destroy();
+      })
+      .catch(() => {
+        this._eventEditComponent.shake(() => {
+          renderFormState(
+              this._eventEditComponent,
+              this._offersContainerView,
+              this._eventDetailsView, {
+                isDisabled: false,
+                isSaving: false
+              }
+          );
+        });
+      });
   }
 
   _handleCancelClick() {
@@ -139,16 +179,23 @@ export default class EventNew {
         true,
         this._offersModel,
         this._citiesModel,
-        this._initBaseEvent
+        this._initBaseEvent,
+        () => render(
+            this._eventEditComponent,
+            this._eventDetailsView,
+            AddedComponentPosition.BEFORE_END
+        )
     );
 
-    const offersContainerView = renderEventsOptions(
+    this._eventDetailsView = new EventDetailsView();
+    this._offersContainerView = renderEventsOptions(
+        this._eventDetailsView,
         this._eventEditComponent,
         evt,
         this._citiesModel
     );
-    if (offersContainerView !== null) {
-      offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+    if (this._offersContainerView !== null) {
+      this._offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
 
     render(

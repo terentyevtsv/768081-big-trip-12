@@ -1,12 +1,13 @@
 import ReadingEventContentView from "../view/reading-event-content.js";
 import BaseEventView from "../view/base-event.js";
-import {renderEventsOptions} from "../utils/editable-event.js";
+import {renderEventsOptions, renderFormState} from "../utils/editable-event.js";
 import {render, replace, remove, AddedComponentPosition} from "../utils/render.js";
 import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenEventButtonView from "../view/open-event-button.js";
 import {UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
+import EventDetailsView from "../view/event-details.js";
 
 const MAX_OFFERS_COUNT = 3;
 
@@ -160,16 +161,23 @@ export default class TripEvent {
         false,
         this._offersModel,
         this._citiesModel,
-        this.init
+        this.init,
+        () => render(
+            this._eventEditComponent,
+            this._eventDetailsView,
+            AddedComponentPosition.BEFORE_END
+        )
     );
 
-    const offersContainerView = renderEventsOptions(
+    this._eventDetailsView = new EventDetailsView();
+    this._offersContainerView = renderEventsOptions(
+        this._eventDetailsView,
         this._eventEditComponent,
         evt,
         this._citiesModel
     );
-    if (offersContainerView !== null) {
-      offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+    if (this._offersContainerView !== null) {
+      this._offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
     }
   }
 
@@ -195,21 +203,80 @@ export default class TripEvent {
   }
 
   _handleFormSubmit(evt) {
+    renderFormState(
+        this._eventEditComponent,
+        this._offersContainerView,
+        this._eventDetailsView, {
+          isDisabled: true,
+          isSaving: true
+        });
     const destinationInfo = this._pointsModel.getDestinationInfo(evt.city);
     const point = PointsModel.adaptToServer(evt, destinationInfo);
     this._api.updatePoint(point)
       .then(() => {
+        renderFormState(
+            this._eventEditComponent,
+            this._offersContainerView,
+            this._eventDetailsView, {
+              isDisabled: false,
+              isSaving: false
+            }
+        );
+
         this._event = evt;
 
         this.init(this._event);
         this._replaceFormToEvent();
 
         this._pointsModel.updatePoint(this._event);
+      })
+      .catch(() => {
+        this._eventEditComponent.shake(() => {
+          renderFormState(
+              this._eventEditComponent,
+              this._offersContainerView,
+              this._eventDetailsView, {
+                isDisabled: false,
+                isSaving: false
+              }
+          );
+        });
       });
   }
 
   _handleDeleteClick(evt) {
-    this._changeData(UserAction.DELETE_EVENT, evt);
+    renderFormState(
+        this._eventEditComponent,
+        this._offersContainerView,
+        this._eventDetailsView, {
+          isDisabled: true,
+          isDeleting: true
+        }
+    );
+    this._api.deletePoint(evt)
+      .then(() => {
+        renderFormState(
+            this._eventEditComponent,
+            this._offersContainerView,
+            this._eventDetailsView, {
+              isDisabled: false,
+              isDeleting: false
+            }
+        );
+        this._changeData(UserAction.DELETE_EVENT, evt);
+      })
+      .catch(() => {
+        this._eventEditComponent.shake(() => {
+          renderFormState(
+              this._eventEditComponent,
+              this._offersContainerView,
+              this._eventDetailsView, {
+                isDisabled: false,
+                isDeleting: false
+              }
+          );
+        });
+      });
   }
 
   _escKeyDownHandler(evt) {
