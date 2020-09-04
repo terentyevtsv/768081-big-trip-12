@@ -186,7 +186,7 @@ const createEmptyEventTemplate = (
   </form>`;
 
 export default class BaseEvent extends SmartView {
-  constructor(evt, isNewEvent, offersModel, citiesModel, init) {
+  constructor(evt, isNewEvent, offersModel, citiesModel, init, renderEventDetails) {
     super();
 
     this._offersModel = offersModel;
@@ -196,6 +196,7 @@ export default class BaseEvent extends SmartView {
 
     this._fromDatepicker = null;
     this._toDatepicker = null;
+    this._renderEventDetails = renderEventDetails;
 
     this._data = BaseEvent.parseEventToData(evt);
     this._isNewEvent = isNewEvent;
@@ -342,34 +343,51 @@ export default class BaseEvent extends SmartView {
     this._setToDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this._setPriceChangeHandler();
   }
 
   _leftDateTimeChangeHandler(selectedDates) {
     const selectedDate = selectedDates[0];
 
-    const tmpTimeInterval = {
-      leftLimitDate: selectedDate,
-      rightLimitDate: this._data.timeInterval.rightLimitDate
-    };
+    let tmpTimeInterval = null;
+    if (selectedDate > this._data.timeInterval.rightLimitDate) {
+      tmpTimeInterval = {
+        leftLimitDate: selectedDate,
+        rightLimitDate: selectedDate
+      };
+    } else {
+      tmpTimeInterval = {
+        leftLimitDate: selectedDate,
+        rightLimitDate: this._data.timeInterval.rightLimitDate
+      };
+    }
+
     this.updateData({
       timeInterval: tmpTimeInterval
-    }, true);
-
-    this._toDatepicker.config.minDate = selectedDate;
+    }, false);
+    this._renderEventDetails();
   }
 
   _rightDateTimeChangeHandler(selectedDates) {
     const selectedDate = selectedDates[0];
 
-    const tmpTimeInterval = {
-      leftLimitDate: this._data.timeInterval.leftLimitDate,
-      rightLimitDate: selectedDate
-    };
+    let tmpTimeInterval = null;
+    if (selectedDate < this._data.timeInterval.leftLimitDate) {
+      tmpTimeInterval = {
+        leftLimitDate: selectedDate,
+        rightLimitDate: selectedDate
+      };
+    } else {
+      tmpTimeInterval = {
+        leftLimitDate: this._data.timeInterval.leftLimitDate,
+        rightLimitDate: selectedDate
+      };
+    }
+
     this.updateData({
       timeInterval: tmpTimeInterval
-    }, true);
-
-    this._fromDatepicker.config.maxDate = selectedDate;
+    }, false);
+    this._renderEventDetails();
   }
 
   _setFromDatepicker() {
@@ -385,7 +403,6 @@ export default class BaseEvent extends SmartView {
     this._fromDatepicker = flatpickr(
         this.getElement().querySelector(`#event-start-time-1`),
         {
-          maxDate: this._data.timeInterval.rightLimitDate,
           enableTime: true,
           // eslint-disable-next-line camelcase
           time_24hr: true,
@@ -409,7 +426,6 @@ export default class BaseEvent extends SmartView {
     this._toDatepicker = flatpickr(
         this.getElement().querySelector(`#event-end-time-1`),
         {
-          minDate: this._data.timeInterval.leftLimitDate,
           enableTime: true,
           // eslint-disable-next-line camelcase
           time_24hr: true,

@@ -179,7 +179,12 @@ export default class EventNew {
         true,
         this._offersModel,
         this._citiesModel,
-        this._initBaseEvent
+        this._initBaseEvent,
+        () => render(
+            this._eventEditComponent,
+            this._eventDetailsView,
+            AddedComponentPosition.BEFORE_END
+        )
     );
 
     this._eventDetailsView = new EventDetailsView();

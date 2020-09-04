@@ -161,7 +161,12 @@ export default class TripEvent {
         false,
         this._offersModel,
         this._citiesModel,
-        this.init
+        this.init,
+        () => render(
+            this._eventEditComponent,
+            this._eventDetailsView,
+            AddedComponentPosition.BEFORE_END
+        )
     );
 
     this._eventDetailsView = new EventDetailsView();
