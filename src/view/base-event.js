@@ -341,6 +341,7 @@ export default class BaseEvent extends SmartView {
     this._setFromDatepicker();
     this._setToDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   _leftDateTimeChangeHandler(selectedDates) {

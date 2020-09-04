@@ -1,8 +1,9 @@
 import BaseEventView from "../view/base-event.js";
-import {renderEventsOptions} from "../utils/editable-event.js";
+import {renderEventsOptions, renderFormState} from "../utils/editable-event.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
 import {UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
+import EventDetailsView from "../view/event-details.js";
 
 const EMPTY_EVENT_INDEX = 0;
 
@@ -62,10 +63,13 @@ export default class EventNew {
   }
 
   _handleFormSubmit(evt) {
-    this._eventEditComponent.updateData({
-      isDisabled: true,
-      isSaving: true
-    }, false);
+    renderFormState(
+        this._eventEditComponent,
+        this._offersContainerView,
+        this._eventDetailsView, {
+          isDisabled: true,
+          isSaving: true
+        });
     for (let i = 0; i < this._offers.length; ++i) {
       evt.offers[i].isAccepted = this._offers[i];
     }
@@ -75,10 +79,14 @@ export default class EventNew {
 
     this._api.createPoint(point)
       .then((response) => {
-        this._eventEditComponent.updateData({
-          isDisabled: false,
-          isSaving: false
-        }, false);
+        renderFormState(
+            this._eventEditComponent,
+            this._offersContainerView,
+            this._eventDetailsView, {
+              isDisabled: false,
+              isSaving: false
+            }
+        );
 
         this._changeData(
             UserAction.ADD_EVENT,
@@ -87,6 +95,18 @@ export default class EventNew {
             Object.assign({id: response.id}, evt)
         );
         this.destroy();
+      })
+      .catch(() => {
+        this._eventEditComponent.shake(() => {
+          renderFormState(
+              this._eventEditComponent,
+              this._offersContainerView,
+              this._eventDetailsView, {
+                isDisabled: false,
+                isSaving: false
+              }
+          );
+        });
       });
   }
 
@@ -162,7 +182,9 @@ export default class EventNew {
         this._initBaseEvent
     );
 
+    this._eventDetailsView = new EventDetailsView();
     this._offersContainerView = renderEventsOptions(
+        this._eventDetailsView,
         this._eventEditComponent,
         evt,
         this._citiesModel

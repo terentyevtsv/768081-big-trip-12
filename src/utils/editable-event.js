@@ -1,11 +1,8 @@
-import EventDetailsView from "../view/event-details.js";
 import OffersContainerView from "../view/offers.js";
 import DestinationView from "../view/destination.js";
-import {AddedComponentPosition, render} from "./render.js";
+import {AddedComponentPosition, render, remove} from "./render.js";
 
-export const renderEventsOptions = (eventEditComponent, evt, citiesModel) => {
-  const eventDetailsView = new EventDetailsView();
-
+export const renderEventsOptions = (eventDetailsView, eventEditComponent, evt, citiesModel) => {
   render(
       eventEditComponent,
       eventDetailsView,
@@ -34,8 +31,20 @@ export const renderEventsOptions = (eventEditComponent, evt, citiesModel) => {
       );
     }
   } else {
-    eventDetailsView.remove();
+    remove(eventDetailsView);
   }
 
   return offersContainerView;
+};
+
+export const renderFormState = (eventEditComponent, offersContainerView, eventDetailsView, state) => {
+  if (offersContainerView !== null) {
+    offersContainerView.updateData({isDisabled: state.isDisabled});
+  }
+  eventEditComponent.updateData(state, false);
+  render(
+      eventEditComponent,
+      eventDetailsView,
+      AddedComponentPosition.BEFORE_END
+  );
 };

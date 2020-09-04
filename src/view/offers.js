@@ -1,4 +1,4 @@
-import SmartView from "./abstract.js";
+import SmartView from "./smart.js";
 
 const createOffersTemplate = (offers, isDisabled) =>
   `<section class="event__section  event__section--offers">
@@ -26,13 +26,15 @@ const createOffersTemplate = (offers, isDisabled) =>
 export default class OffersContainer extends SmartView {
   constructor(offers) {
     super();
-    this._data = OffersContainer.parseOffersToData(offers);
+
+    this._offers = offers;
+    this._data = OffersContainer.parseOffersToData();
 
     this._checkOffersHandler = this._checkOffersHandler.bind(this);
   }
 
   getTemplate() {
-    return createOffersTemplate(this._data.offers, this._data.isDisabled);
+    return createOffersTemplate(this._offers, this._data.isDisabled);
   }
 
   _checkOffersHandler(evt) {
@@ -51,10 +53,9 @@ export default class OffersContainer extends SmartView {
     this.getElement().addEventListener(`change`, this._checkOffersHandler);
   }
 
-  static parseOffersToData(offers) {
+  static parseOffersToData() {
     return Object.assign(
         {},
-        offers,
         {
           isDisabled: false
         }
