@@ -10,9 +10,15 @@ import TripInformationPresenter from "./presenter/trip-information.js";
 import StatisticsView from "./view/statistics.js";
 import {MenuItem, SortType} from "./const.js";
 import SiteMenuModel from "./model/site-menu.js";
-import Api from "./api.js";
+import Api from "./api/api.js";
 import CitiesModel from "./model/cities.js";
 import NewEventButtonView from "./view/new-event-button.js";
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
+
+const STORE_PREFIX = `bigtrip-localstorage`;
+const STORE_VER = `v12`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 const AUTHORIZATION = `Basic mokrajbalka`;
@@ -32,6 +38,8 @@ const mainPageBodyContainerElement = document
   .querySelector(`.page-body__page-main .page-body__container`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const typeOffers = new Map(); // Все возможные значения предложений для каждого типа события
 const eventTypesMap = new Map(); // Тип события по его названию
@@ -219,3 +227,13 @@ const handleSiteMenuClick = (menuItem) => {
 };
 siteMenuView.setMenuClickHandler(handleSiteMenuClick);
 
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {
+      // Действие, в случае успешной регистрации ServiceWorker
+      console.log(`ServiceWorker available`); // eslint-disable-line
+    }).catch(() => {
+      // Действие, в случае ошибки при регистрации ServiceWorker
+      console.error(`ServiceWorker isn't available`); // eslint-disable-line
+    });
+});
