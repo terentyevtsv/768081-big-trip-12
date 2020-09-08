@@ -37,15 +37,15 @@ const tripEventsElement = pageBodyElement
 const mainPageBodyContainerElement = document
   .querySelector(`.page-body__page-main .page-body__container`);
 
-const api = new Api(END_POINT, AUTHORIZATION);
-const store = new Store(STORE_NAME, window.localStorage);
-const apiWithProvider = new Provider(api, store);
-
 const typeOffers = new Map(); // Все возможные значения предложений для каждого типа события
 const eventTypesMap = new Map(); // Тип события по его названию
 
 // Инициализация модели предложений
 const offersModel = new OffersModel();
+
+const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 // Инициализация модели городов
 const citiesModel = new CitiesModel();
@@ -69,7 +69,7 @@ const tripPresenter = new TripPresenter(
     siteMenuModel,
     citiesModel,
     newEventButtonView,
-    api
+    apiWithProvider
 );
 
 tripPresenter.renderEventsPlan(false);
@@ -122,7 +122,7 @@ const renderEventsAfterLoading = (points) => {
   tripInformationPresenter.init();
 };
 
-api.getEventTypesOffers()
+apiWithProvider.getEventTypesOffers()
   .then((eventTypesOffers) => {
     delete errorMessagesObject.offersTaskMessage;
 
@@ -147,7 +147,7 @@ api.getEventTypesOffers()
     offersModel.setOffers(typeOffers);
   })
   .then(() => {
-    return api.getDestinations();
+    return apiWithProvider.getDestinations();
   })
   .then((destinations) => {
     delete errorMessagesObject.citiesTaskMessage;
@@ -171,7 +171,7 @@ api.getEventTypesOffers()
       return [];
     }
 
-    return api.getPoints();
+    return apiWithProvider.getPoints();
   })
   .then((points) => {
     if (errorValuesCount > 0) {

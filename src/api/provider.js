@@ -1,5 +1,7 @@
-const createStoreStructure = (items) => {
-  return items.reduce((acc, current) => {
+import {nanoid} from "nanoid";
+
+const createPointsStructure = (points) => {
+  return points.reduce((acc, current) => {
     return Object.assign({}, acc, {
       [current.id]: current,
     });
@@ -7,33 +9,101 @@ const createStoreStructure = (items) => {
 };
 
 export default class Provider {
-  constructor(api, storage) {
+  constructor(api, store) {
     this._api = api;
-    this._storage = storage;
+    this._store = store;
   }
 
   getPoints() {
-    return this._api.getPoints();
+    if (this._isOnLine()) {
+      return this._api
+        .getPoints()
+        .then((points) => {
+          const pointsObject = createPointsStructure(points);
+          this._store.setPoints(pointsObject);
+          return points;
+        });
+    }
+
+    const pointsObject = this._store.getPointsObject();
+    const tmpPoints = Object.values(pointsObject);
+    return Promise.resolve(tmpPoints);
   }
 
   getEventTypesOffers() {
-    return this._api.getEventTypesOffers();
+    if (this._isOnLine()) {
+      return this._api
+        .getEventTypesOffers()
+        .then((serverEventTypes) => {
+          this._store.setEventTypes(serverEventTypes);
+          return serverEventTypes;
+        });
+    }
+
+    const eventTypesOffers = this._store.getEventTypesOffers();
+    return Promise.resolve(eventTypesOffers);
   }
 
   getDestinations() {
-    return this._api.getDestinations();
+    if (this._isOnLine()) {
+      return this._api
+        .getDestinations()
+        .then((serverDestinations) => {
+          this._store.setCities(serverDestinations);
+          return serverDestinations;
+        });
+    }
+
+    const destinations = this._store.getCities();
+    return Promise.resolve(destinations);
   }
 
   updatePoint(point) {
-    return this._api.updatePoint(point);
+    if (this._isOnLine()) {
+      return this._api
+        .updatePoint(point)
+        .then((updatedPoint) => {
+          this._store.setPoint(updatedPoint.id, updatedPoint);
+          return updatedPoint;
+        });
+    }
+
+    this._store.setPoint(point.id, point);
+    return Promise.resolve(point);
   }
 
   createPoint(point) {
-    return this._api.createPoint(point);
+    if (this._isOnLine()) {
+      return this._api
+        .createPoint(point)
+        .then((response) => {
+          this._store.setPoint(response.id, response);
+          return response;
+        });
+    }
+
+    // На случай локального создания данных мы должны сами создать `id`.
+    // Иначе наша модель будет не полной, и это может привнести баги
+    const localNewPointId = nanoid();
+    const localNewPoint = Object.assign({}, point, {id: localNewPointId});
+
+    this._store.setPoint(localNewPoint.id, localNewPoint);
+
+    return Promise.resolve(localNewPoint);
   }
 
   deletePoint(point) {
-    return this._api.deletePoint(point);
+    if (this._isOnLine()) {
+      return this._api
+        .deletePoint(point)
+        .then(() => {
+          this._store.removePoint(point.id);
+        });
+    }
+
+    this._store.removePoint(point.id);
+
+    return Promise.resolve();
   }
 
   sync(data) {

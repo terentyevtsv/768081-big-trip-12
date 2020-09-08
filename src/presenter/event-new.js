@@ -90,8 +90,6 @@ export default class EventNew {
 
         this._changeData(
             UserAction.ADD_EVENT,
-            // Пока у нас нет сервера, который бы после сохранения
-            // выдывал честный id задачи, нам нужно позаботиться об этом самим
             Object.assign({id: response.id}, evt)
         );
         this.destroy();

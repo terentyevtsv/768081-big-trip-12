@@ -48,15 +48,15 @@ export default class Offers {
     return adaptedOffer;
   }
 
-  static adaptEventTypeToClient(eventType) {
+  static adaptEventTypeToClient(serverEventType) {
     const adaptedEventType = Object.assign(
         {},
-        eventType,
+        serverEventType,
         {
-          name: getCapitalizedWord(eventType.type),
-          image: `img/icons/${eventType.type}.png`,
-          eventGroup: eventGroups[eventType.type],
-          value: eventType.type
+          name: getCapitalizedWord(serverEventType.type),
+          image: `img/icons/${serverEventType.type}.png`,
+          eventGroup: eventGroups[serverEventType.type],
+          value: serverEventType.type
         }
     );
 
