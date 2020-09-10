@@ -85,6 +85,24 @@ export default class Store {
     this.setPoints(tmpPoints);
   }
 
+  updateCreatedPoints(points) {
+    const pointsObject = this.getPointsObject();
+    let resultedPointsObject = pointsObject;
+    points.forEach((point) => {
+      resultedPointsObject = Object.assign(
+          {},
+          resultedPointsObject,
+          {
+            [point.id]: point
+          }
+      );
+      delete resultedPointsObject[point.tempId];
+      delete resultedPointsObject[point.id].tempId;
+    });
+
+    this.setPoints(resultedPointsObject);
+  }
+
   removePoint(key) {
     const points = this.getPointsObject();
 

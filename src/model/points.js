@@ -147,6 +147,10 @@ export default class Points extends Observer {
     delete adaptedPoint.isFavorite;
     delete adaptedPoint.timeInterval;
 
+    delete adaptedPoint.isDeleting;
+    delete adaptedPoint.isSaving;
+    delete adaptedPoint.isDisabled;
+
     return adaptedPoint;
   }
 }

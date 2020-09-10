@@ -21,7 +21,7 @@ const STORE_VER = `v12`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
-const AUTHORIZATION = `Basic mokrajbalka`;
+const AUTHORIZATION = `Basic mokrajbalka1`;
 
 const pageBodyElement = document.querySelector(`.page-body`);
 
@@ -174,6 +174,7 @@ apiWithProvider.getEventTypesOffers()
     return apiWithProvider.getPoints();
   })
   .then((points) => {
+    console.log(points);
     if (errorValuesCount > 0) {
       return;
     }
@@ -236,4 +237,15 @@ window.addEventListener(`load`, () => {
       // Действие, в случае ошибки при регистрации ServiceWorker
       console.error(`ServiceWorker isn't available`); // eslint-disable-line
     });
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  if (apiWithProvider.shouldSynchronize) {
+    apiWithProvider.sync();
+  }
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });

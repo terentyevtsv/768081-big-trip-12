@@ -2,6 +2,9 @@ import {nanoid} from "nanoid";
 
 const createPointsStructure = (points) => {
   return points.reduce((acc, current) => {
+    delete current.isDeleting;
+    delete current.isSaving;
+    delete current.isDisabled;
     return Object.assign({}, acc, {
       [current.id]: current,
     });
@@ -12,6 +15,11 @@ export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
+    this._shouldSynchronize = false;
+  }
+
+  get shouldSynchronize() {
+    return this._shouldSynchronize;
   }
 
   getPoints() {
@@ -68,6 +76,7 @@ export default class Provider {
         });
     }
 
+    this._shouldSynchronize = true;
     this._store.setPoint(point.id, point);
     return Promise.resolve(point);
   }
@@ -82,10 +91,19 @@ export default class Provider {
         });
     }
 
+    this._shouldSynchronize = true;
+
     // На случай локального создания данных мы должны сами создать `id`.
     // Иначе наша модель будет не полной, и это может привнести баги
     const localNewPointId = nanoid();
-    const localNewPoint = Object.assign({}, point, {id: localNewPointId});
+    const localNewPoint = Object.assign(
+        {},
+        point,
+        {
+          id: localNewPointId,
+          tempId: localNewPointId
+        }
+    );
 
     this._store.setPoint(localNewPoint.id, localNewPoint);
 
@@ -101,13 +119,28 @@ export default class Provider {
         });
     }
 
+    this._shouldSynchronize = true;
+
     this._store.removePoint(point.id);
 
     return Promise.resolve();
   }
 
-  sync(data) {
-    return this._api.sync(data);
+  sync() {
+    if (this._isOnLine()) {
+      const storePoints = Object.values(this._store.getPointsObject());
+
+      return this._api.sync(storePoints)
+        .then((response) => {
+          if (response.created.length > 0) {
+            this._store.updateCreatedPoints(response.created);
+          }
+
+          this._shouldSynchronize = false;
+        });
+    }
+
+    return Promise.reject(new Error(`Sync data failed`));
   }
 
   _isOnLine() {
