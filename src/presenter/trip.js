@@ -7,7 +7,7 @@ import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
 import {SortType, FilterType, UserAction, MenuItem} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
-import {filter} from "../utils/filter.js";
+import EventsFiltration from "../utils/filter.js";
 import EventNewPresenter from "./event-new.js";
 import LoadingView from "../view/loading.js";
 
@@ -150,7 +150,8 @@ export default class Trip {
   }
 
   _getPoints(filterType) {
-    return filter[filterType](this._pointsModel.getPoints());
+    const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
+    return eventsFiltration.getEvents(filterType);
   }
 
   _handleModeChange() {
