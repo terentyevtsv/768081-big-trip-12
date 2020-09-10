@@ -174,7 +174,6 @@ apiWithProvider.getEventTypesOffers()
     return apiWithProvider.getPoints();
   })
   .then((points) => {
-    console.log(points);
     if (errorValuesCount > 0) {
       return;
     }
