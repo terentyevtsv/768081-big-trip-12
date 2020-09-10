@@ -86,19 +86,39 @@ export default class Store {
   }
 
   updateCreatedPoints(points) {
+    // Точки в локальном хранилище
     const pointsObject = this.getPointsObject();
-    let resultedPointsObject = pointsObject;
+
+    // Раскидал созданные точки по временным id
     points.forEach((point) => {
-      resultedPointsObject = Object.assign(
-          {},
-          resultedPointsObject,
-          {
-            [point.id]: point
-          }
-      );
-      delete resultedPointsObject[point.tempId];
-      delete resultedPointsObject[point.id].tempId;
+      pointsObject[point.tempId] = point;
     });
+
+    let initPointsObject = null;
+    const resultedPointsObject = Object.values(pointsObject)
+      .reduce((acc, current) => {
+        if (initPointsObject === null) {
+          initPointsObject = Object.assign(
+              {},
+              {
+                [acc.id]: acc
+              },
+              {
+                [current.id]: current
+              }
+          );
+
+          return initPointsObject;
+        }
+
+        return Object.assign(
+            {},
+            acc,
+            {
+              [current.id]: current
+            }
+        );
+      });
 
     this.setPoints(resultedPointsObject);
   }
