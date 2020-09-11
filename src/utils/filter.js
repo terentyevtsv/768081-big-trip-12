@@ -21,4 +21,16 @@ export default class EventsFiltration {
         throw new Error(`Неизвестный тип фильтра!`);
     }
   }
+
+  setFilterDisabledFlags(filterModel) {
+    const isEverythingDisabled = this.getEvents(FilterType.EVERYTHING).length === 0;
+    const isFutureDisabled = this.getEvents(FilterType.FUTURE).length === 0;
+    const isPastDisabled = this.getEvents(FilterType.PAST).length === 0;
+
+    filterModel.setFilterDisabledFlags(
+        isEverythingDisabled,
+        isFutureDisabled,
+        isPastDisabled
+    );
+  }
 }

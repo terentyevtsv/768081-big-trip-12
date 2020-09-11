@@ -8,6 +8,7 @@ import OpenEventButtonView from "../view/open-event-button.js";
 import {UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import EventDetailsView from "../view/event-details.js";
+import EventsFiltration from "../utils/filter.js";
 
 const MAX_OFFERS_COUNT = 3;
 
@@ -19,19 +20,23 @@ const Mode = {
 export default class TripEvent {
   constructor(
       evt,
+      filterPresenter,
       eventListContainer,
       pointsModel,
       offersModel,
       citiesModel,
+      filterModel,
       changeData,
       changeMode,
       api
   ) {
     this._event = evt;
+    this._filterPresenter = filterPresenter;
     this._eventListContainer = eventListContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
+    this._filterModel = filterModel;
     this._api = api;
 
     this._changeData = changeData;
@@ -229,6 +234,10 @@ export default class TripEvent {
         this._replaceFormToEvent();
 
         this._pointsModel.updatePoint(this._event);
+
+        const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
+        eventsFiltration.setFilterDisabledFlags(this._filterModel);
+        this._filterPresenter.updateFiltersAccessibilityStatus();
       })
       .catch(() => {
         this._eventEditComponent.shake(() => {
@@ -264,6 +273,10 @@ export default class TripEvent {
             }
         );
         this._changeData(UserAction.DELETE_EVENT, evt);
+
+        const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
+        eventsFiltration.setFilterDisabledFlags(this._filterModel);
+        this._filterPresenter.updateFiltersAccessibilityStatus();
       })
       .catch(() => {
         this._eventEditComponent.shake(() => {
