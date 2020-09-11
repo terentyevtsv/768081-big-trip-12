@@ -178,6 +178,7 @@ export default class EventNew {
     for (let i = 0; i < offerElements.length; ++i) {
       this._offers[i] = offerElements[i].checked;
     }
+    this._eventEditComponent.updateOffers(this._offers);
   }
 
   _renderNewEvent(evt) {
