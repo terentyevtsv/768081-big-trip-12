@@ -87,6 +87,10 @@ export default class Trip {
 
   _handleFilterChanged() {
     remove(this._noEventView);
+    if (this._eventNewPresenter !== null) {
+      this._eventNewPresenter.destroy();
+    }
+
     this._currentSortType = SortType.EVENT;
     this.init(false);
   }
