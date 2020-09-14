@@ -135,6 +135,7 @@ const createEmptyEventTemplate = (
           name="event-price"
           value="${evt.price}"
           ${evt.isDisabled ? `disabled` : ``}
+          required
         >
       </div>
 
@@ -302,7 +303,11 @@ export default class BaseEvent extends SmartView {
       true);
 
       this._init(this._data);
+
+      return;
     }
+
+    evt.target.setCustomValidity(`Не найден город!`);
   }
 
   // обработчик изменения цены.
@@ -350,6 +355,20 @@ export default class BaseEvent extends SmartView {
     const selectedDate = selectedDates[0];
 
     let tmpTimeInterval = null;
+    if (selectedDate === undefined) {
+      tmpTimeInterval = {
+        leftLimitDate: this._data.timeInterval.leftLimitDate,
+        rightLimitDate: this._data.timeInterval.rightLimitDate
+      };
+
+      this.updateData({
+        timeInterval: tmpTimeInterval
+      }, false);
+      this._renderEventDetails();
+
+      return;
+    }
+
     if (selectedDate > this._data.timeInterval.rightLimitDate) {
       tmpTimeInterval = {
         leftLimitDate: selectedDate,
@@ -372,6 +391,20 @@ export default class BaseEvent extends SmartView {
     const selectedDate = selectedDates[0];
 
     let tmpTimeInterval = null;
+    if (selectedDate === undefined) {
+      tmpTimeInterval = {
+        leftLimitDate: this._data.timeInterval.leftLimitDate,
+        rightLimitDate: this._data.timeInterval.rightLimitDate
+      };
+
+      this.updateData({
+        timeInterval: tmpTimeInterval
+      }, false);
+      this._renderEventDetails();
+
+      return;
+    }
+
     if (selectedDate < this._data.timeInterval.leftLimitDate) {
       tmpTimeInterval = {
         leftLimitDate: selectedDate,
@@ -407,7 +440,7 @@ export default class BaseEvent extends SmartView {
           // eslint-disable-next-line camelcase
           time_24hr: true,
           allowInput: false,
-          dateFormat: `d/m/y H:i`,
+          dateFormat: `d/m/Y H:i`,
           onChange: this._leftDateTimeChangeHandler
         }
     );
@@ -430,7 +463,7 @@ export default class BaseEvent extends SmartView {
           // eslint-disable-next-line camelcase
           time_24hr: true,
           allowInput: false,
-          dateFormat: `d/m/y H:i`,
+          dateFormat: `d/m/Y H:i`,
           onChange: this._rightDateTimeChangeHandler
         }
     );

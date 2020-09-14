@@ -41,7 +41,7 @@ export const shortYearDateToString = (date) => {
   // для формы редактирования
   const day = zeroBasedFormat(date.getDate());
   const month = zeroBasedFormat(date.getMonth() + 1);
-  const year = zeroBasedFormat(date.getFullYear() % 100);
+  const year = zeroBasedFormat(date.getFullYear());
   const hours = zeroBasedFormat(date.getHours());
   const minutes = zeroBasedFormat(date.getMinutes());
 
@@ -70,9 +70,7 @@ export const getDeltaTimeFormat = (days, hours, minutes) => {
     delta += `${zeroBasedFormat(hours)}H `;
   }
 
-  if (minutes > 0) {
-    delta += `${zeroBasedFormat(minutes)}M`;
-  }
+  delta += `${zeroBasedFormat(minutes)}M`;
 
   delta = delta.trimRight();
 
