@@ -49,30 +49,13 @@ export const shortYearDateToString = (date) => {
 };
 
 export const getDeltaDateObject = (date1, date2) => {
-  let a = moment([
-    date1.getFullYear(), date1.getMonth(), date1.getDate(),
-    date1.getHours(), date1.getMinutes(), date1.getSeconds()
-  ]);
-  const b = moment([
-    date2.getFullYear(), date2.getMonth(), date2.getDate(),
-    date2.getHours(), date2.getMinutes(), date2.getSeconds()
-  ]);
-
-  let duration = moment.duration(b.diff(a));
-  const days = Math.floor(duration.asDays());
-  a = a.add(days, `days`);
-
-  duration = moment.duration(b.diff(a));
-  const hours = Math.floor(duration.asHours());
-
-  a = a.add(hours, `hours`);
-  duration = moment.duration(b.diff(a));
-  const minutes = Math.floor(duration.asMinutes());
+  const dateDifference = date2 - date1;
+  const duration = moment.duration(dateDifference);
 
   return {
-    days,
-    hours,
-    minutes
+    days: duration.days(),
+    hours: duration.hours(),
+    minutes: duration.minutes()
   };
 };
 
