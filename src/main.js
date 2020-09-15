@@ -15,6 +15,7 @@ import CitiesModel from "./model/cities.js";
 import NewEventButtonView from "./view/new-event-button.js";
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
+import EventsFiltration from "./utils/filter.js";
 
 const STORE_PREFIX = `bigtrip-localstorage`;
 const STORE_VER = `v12`;
@@ -61,7 +62,11 @@ const filterModel = new FilterModel();
 const siteMenuModel = new SiteMenuModel();
 
 const newEventButtonView = new NewEventButtonView(true);
+
+const filterPresenter = new FilterPresenter(tripMainTripControlElement, filterModel);
+
 const tripPresenter = new TripPresenter(
+    filterPresenter,
     tripEventsElement,
     pointsModel,
     offersModel,
@@ -87,9 +92,21 @@ let errorValuesCount = Object.values(errorMessagesObject).length;
 
 const siteMenuView = new SiteMenuView(siteMenuModel);
 
-const filterPresenter = new FilterPresenter(tripMainTripControlElement, filterModel);
-
 const renderEventsAfterLoading = (points) => {
+  const tmpPoints = [];
+  points.forEach((point) => {
+    const eventType = eventTypesMap.get(point.type);
+    const maskOffers = offersModel.getOffers(eventType);
+
+    const tmpPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
+    tmpPoints.push(tmpPoint);
+  });
+
+  pointsModel.setPoints(tmpPoints);
+
+  const eventsFiltration = new EventsFiltration(tmpPoints);
+  eventsFiltration.setFilterDisabledFlags(filterModel);
+
   // Отрисовка меню и фильтров
   const mainTripComponents = [
     new SiteMenuHeaderView(),
@@ -105,17 +122,6 @@ const renderEventsAfterLoading = (points) => {
   }
 
   filterPresenter.init();
-
-  const tmpPoints = [];
-  points.forEach((point) => {
-    const eventType = eventTypesMap.get(point.type);
-    const maskOffers = offersModel.getOffers(eventType);
-
-    const tmpPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
-    tmpPoints.push(tmpPoint);
-  });
-
-  pointsModel.setPoints(tmpPoints);
 
   // Формирование дерева плана путешествия
   tripPresenter.init(true);

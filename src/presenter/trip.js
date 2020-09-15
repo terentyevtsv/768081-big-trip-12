@@ -7,7 +7,7 @@ import EventsListView from "../view/events-list.js";
 import TripEventsItemView from "../view/trip-events-item.js";
 import {SortType, FilterType, UserAction, MenuItem} from "../const.js";
 import TripEventPresenter from "./trip-event.js";
-import {filter} from "../utils/filter.js";
+import EventsFiltration from "../utils/filter.js";
 import EventNewPresenter from "./event-new.js";
 import LoadingView from "../view/loading.js";
 
@@ -20,6 +20,7 @@ const getDifference = function (timeInterval) {
 
 export default class Trip {
   constructor(
+      filterPresenter,
       tripEventsContainer,
       pointsModel,
       offersModel,
@@ -29,6 +30,7 @@ export default class Trip {
       newEventButtonView,
       api
   ) {
+    this._filterPresenter = filterPresenter;
     this._tripEventsContainer = tripEventsContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
@@ -85,6 +87,10 @@ export default class Trip {
 
   _handleFilterChanged() {
     remove(this._noEventView);
+    if (this._eventNewPresenter !== null) {
+      this._eventNewPresenter.destroy();
+    }
+
     this._currentSortType = SortType.EVENT;
     this.init(false);
   }
@@ -99,10 +105,12 @@ export default class Trip {
       remove(this._loadingView);
 
       this._eventNewPresenter = new EventNewPresenter(
+          this._filterPresenter,
           this._tripEventsContainer,
           this._offersModel,
           this._citiesModel,
           this._pointsModel,
+          this._filterModel,
           this._newEventButtonView,
           this._handleViewAction,
           this._handleModeChange,
@@ -150,7 +158,8 @@ export default class Trip {
   }
 
   _getPoints(filterType) {
-    return filter[filterType](this._pointsModel.getPoints());
+    const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
+    return eventsFiltration.getEvents(filterType);
   }
 
   _handleModeChange() {
@@ -270,10 +279,12 @@ export default class Trip {
 
     const tripEventPresenter = new TripEventPresenter(
         evt,
+        this._filterPresenter,
         tripEventsItemView,
         this._pointsModel,
         this._offersModel,
         this._citiesModel,
+        this._filterModel,
         this._handleViewAction,
         this._handleModeChange,
         this._api

@@ -4,26 +4,31 @@ import {render, AddedComponentPosition, replace, remove} from "../utils/render.j
 import {UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import EventDetailsView from "../view/event-details.js";
+import EventsFiltration from "../utils/filter.js";
 
 const EMPTY_EVENT_INDEX = 0;
 
 export default class EventNew {
   constructor(
+      filterPresenter,
       eventListContainer,
       offersModel,
       citiesModel,
       pointsModel,
+      filterModel,
       newEventButtonView,
       changeData,
       changeMode,
       api
   ) {
+    this._filterPresenter = filterPresenter;
     this._eventListContainer = eventListContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
     this._pointsModel = pointsModel;
+    this._filterModel = filterModel;
     this._newEventButtonView = newEventButtonView;
     this._api = api;
 
@@ -93,6 +98,10 @@ export default class EventNew {
             Object.assign({id: response.id}, evt)
         );
         this.destroy();
+
+        const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
+        eventsFiltration.setFilterDisabledFlags(this._filterModel);
+        this._filterPresenter.updateFiltersAccessibilityStatus();
       })
       .catch(() => {
         this._eventEditComponent.shake(() => {
@@ -169,6 +178,7 @@ export default class EventNew {
     for (let i = 0; i < offerElements.length; ++i) {
       this._offers[i] = offerElements[i].checked;
     }
+    this._eventEditComponent.updateOffers(this._offers);
   }
 
   _renderNewEvent(evt) {
