@@ -1,4 +1,4 @@
-import {EventGroup} from "../const.js";
+import {PointGroup} from "../const.js";
 
 export const getEventTypeMoneyMap = (points) => {
   const resultMap = new Map();
@@ -19,7 +19,7 @@ export const getTransportUsageMap = (points) => {
   const resultMap = new Map();
 
   for (const point of points) {
-    if (point.eventType.eventGroup !== EventGroup.MOVEMENT) {
+    if (point.eventType.pointGroup !== PointGroup.MOVEMENT) {
       continue;
     }
 
@@ -35,18 +35,18 @@ export const getTransportUsageMap = (points) => {
 };
 
 export const getTimeSpentMap = (points) => {
-  const tmpTimeSpentMap = new Map();
+  const tempTimeSpentMap = new Map();
 
   // Подсчет количества времени для каждого типа точки маршрута
   for (const point of points) {
-    if (!tmpTimeSpentMap.has(point.eventType.name)) {
-      tmpTimeSpentMap.set(point.eventType.name, 0);
+    if (!tempTimeSpentMap.has(point.eventType.name)) {
+      tempTimeSpentMap.set(point.eventType.name, 0);
     }
 
-    const value = tmpTimeSpentMap.get(point.eventType.name);
-    const difValue = point.timeInterval.rightLimitDate - point.timeInterval.leftLimitDate;
-    tmpTimeSpentMap.set(point.eventType.name, value + difValue);
+    const value = tempTimeSpentMap.get(point.eventType.name);
+    const differenceValue = point.timeInterval.rightLimitDate - point.timeInterval.leftLimitDate;
+    tempTimeSpentMap.set(point.eventType.name, value + differenceValue);
   }
 
-  return tmpTimeSpentMap;
+  return tempTimeSpentMap;
 };

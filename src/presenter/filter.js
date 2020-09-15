@@ -22,7 +22,7 @@ export default class Filter {
     this._updateFiltersAccessibilityStatus = this.updateFiltersAccessibilityStatus.bind(this);
   }
 
-  init() {
+  initialize() {
     render(
         this._tripMainTripControlElement,
         this._filterHeaderView,

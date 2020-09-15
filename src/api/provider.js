@@ -1,12 +1,12 @@
 import {nanoid} from "nanoid";
 
 const createPointsStructure = (points) => {
-  return points.reduce((acc, current) => {
-    delete current.isDeleting;
-    delete current.isSaving;
-    delete current.isDisabled;
-    return Object.assign({}, acc, {
-      [current.id]: current,
+  return points.reduce((accumulator, currentPoint) => {
+    delete currentPoint.isDeleting;
+    delete currentPoint.isSaving;
+    delete currentPoint.isDisabled;
+    return Object.assign({}, accumulator, {
+      [currentPoint.id]: currentPoint,
     });
   }, {});
 };
@@ -34,8 +34,8 @@ export default class Provider {
     }
 
     const pointsObject = this._store.getPointsObject();
-    const tmpPoints = Object.values(pointsObject);
-    return Promise.resolve(tmpPoints);
+    const tempPoints = Object.values(pointsObject);
+    return Promise.resolve(tempPoints);
   }
 
   getEventTypesOffers() {
@@ -85,9 +85,9 @@ export default class Provider {
     if (this._isOnLine()) {
       return this._api
         .createPoint(point)
-        .then((response) => {
-          this._store.setPoint(response.id, response);
-          return response;
+        .then((responsePoint) => {
+          this._store.setPoint(responsePoint.id, responsePoint);
+          return responsePoint;
         });
     }
 
@@ -126,11 +126,11 @@ export default class Provider {
     return Promise.resolve();
   }
 
-  sync() {
+  synchronize() {
     if (this._isOnLine()) {
       const storePoints = Object.values(this._store.getPointsObject());
 
-      return this._api.sync(storePoints)
+      return this._api.synchronize(storePoints)
         .then((response) => {
           if (response.created.length > 0) {
             this._store.updateCreatedPoints(response.created);

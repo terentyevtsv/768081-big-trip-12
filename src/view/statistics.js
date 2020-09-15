@@ -42,10 +42,10 @@ export default class Statistics extends AbstractView {
   _renderMoneyChart() {
     const eventTypeMoneyMap = getEventTypeMoneyMap(this._points);
 
-    const moneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
-    moneyCtx.height = BAR_HEIGHT * eventTypeMoneyMap.size;
+    const moneyContextElement = this.getElement().querySelector(`.statistics__chart--money`);
+    moneyContextElement.height = BAR_HEIGHT * eventTypeMoneyMap.size;
 
-    const moneyChart = new Chart(moneyCtx, {
+    const moneyChart = new Chart(moneyContextElement, {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
@@ -116,10 +116,10 @@ export default class Statistics extends AbstractView {
   _renderTransportChart() {
     const transportUsageMap = getTransportUsageMap(this._points);
 
-    const transportCtx = this.getElement().querySelector(`.statistics__chart--transport`);
-    transportCtx.height = BAR_HEIGHT * transportUsageMap.size;
+    const transportContextElement = this.getElement().querySelector(`.statistics__chart--transport`);
+    transportContextElement.height = BAR_HEIGHT * transportUsageMap.size;
 
-    const transportChart = new Chart(transportCtx, {
+    const transportChart = new Chart(transportContextElement, {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
@@ -189,11 +189,11 @@ export default class Statistics extends AbstractView {
 
   _renderTimeSpentChart() {
     const timeSpentMap = getTimeSpentMap(this._points);
-    const timeSpentCtx = this.getElement().querySelector(`.statistics__chart--time`);
-    timeSpentCtx.height = BAR_HEIGHT * timeSpentMap.size;
+    const timeSpentContextElement = this.getElement().querySelector(`.statistics__chart--time`);
+    timeSpentContextElement.height = BAR_HEIGHT * timeSpentMap.size;
     const tmpLabels = Array.from(timeSpentMap.keys()).map((name) => name.toUpperCase());
 
-    const timeSpentChart = new Chart(timeSpentCtx, {
+    const timeSpentChart = new Chart(timeSpentContextElement, {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {

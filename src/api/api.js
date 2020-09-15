@@ -6,8 +6,8 @@ const Method = {
 };
 
 const SuccessHTTPStatusRange = {
-  MIN: 200,
-  MAX: 299
+  MINIMUM: 200,
+  MAXIMUM: 299
 };
 
 export default class Api {
@@ -59,11 +59,11 @@ export default class Api {
     });
   }
 
-  sync(data) {
+  synchronize(points) {
     return this._load({
       url: `points/sync`,
       method: Method.POST,
-      body: JSON.stringify(data),
+      body: JSON.stringify(points),
       headers: new Headers({"Content-Type": `application/json`})
     })
       .then(Api.toJSON);
@@ -86,8 +86,8 @@ export default class Api {
   }
 
   static checkStatus(response) {
-    if (response.status < SuccessHTTPStatusRange.MIN ||
-        response.status > SuccessHTTPStatusRange.MAX) {
+    if (response.status < SuccessHTTPStatusRange.MINIMUM ||
+        response.status > SuccessHTTPStatusRange.MAXIMUM) {
       throw new Error(`${response.status}: ${response.text}`);
     }
 

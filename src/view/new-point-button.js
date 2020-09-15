@@ -1,6 +1,6 @@
 import SmartView from "./smart.js";
 
-const createNewEventButtonTemplate = (isEnabled) =>
+const createNewPointButtonTemplate = (isEnabled) =>
   `<button
     class="trip-main__event-add-btn  btn  btn--big  btn--yellow"
     type="button"
@@ -9,30 +9,30 @@ const createNewEventButtonTemplate = (isEnabled) =>
     New event
   </button>`;
 
-export default class NewEventButton extends SmartView {
+export default class NewPointButton extends SmartView {
   constructor(isEnabled) {
     super();
 
     this._data.isEnabled = isEnabled;
-    this._clickNewEventButtonHandler = this._clickNewEventButtonHandler.bind(this);
+    this._clickNewPointButtonHandler = this._clickNewPointButtonHandler.bind(this);
   }
 
   getTemplate() {
-    return createNewEventButtonTemplate(this._data.isEnabled);
+    return createNewPointButtonTemplate(this._data.isEnabled);
   }
 
-  _clickNewEventButtonHandler(evt) {
-    this._callback.newEventClick(evt);
+  _clickNewPointButtonHandler(evt) {
+    this._callback.newPointClick(evt);
     this.updateData({isEnabled: !this._data.isEnabled}, false);
   }
 
   restoreHandlers() {
-    this.getElement().addEventListener(`click`, this._clickNewEventButtonHandler);
+    this.getElement().addEventListener(`click`, this._clickNewPointButtonHandler);
   }
 
   setButtonClickHandler(callback) {
-    this._callback.newEventClick = callback;
-    this.getElement().addEventListener(`click`, this._clickNewEventButtonHandler);
+    this._callback.newPointClick = callback;
+    this.getElement().addEventListener(`click`, this._clickNewPointButtonHandler);
   }
 
   inverseEnabled() {

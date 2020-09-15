@@ -1,16 +1,16 @@
-const isAlpha = (ch) => {
-  return typeof ch === `string` && ch.length === 1 && /[A-Za-z]/.test(ch);
+const isAlphabetsCharacter = (character) => {
+  return typeof character === `string` && character.length === 1 && /[A-Za-z]/.test(character);
 };
 
-export const getSnakeCaseString = (str) => {
-  let alphaString = ``;
-  for (let i = 0; i < str.length; ++i) {
-    if (isAlpha(str[i]) || str[i] === ` `) {
-      alphaString += str[i];
+export const getSnakeCaseString = (inputString) => {
+  let alphabetString = ``;
+  for (let i = 0; i < inputString.length; ++i) {
+    if (isAlphabetsCharacter(inputString[i]) || inputString[i] === ` `) {
+      alphabetString += inputString[i];
     }
   }
 
-  const resultString = alphaString
+  const resultString = alphabetString
     .split(` `)
     .map((part) => part.toLowerCase())
     .join(`-`);

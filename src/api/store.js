@@ -16,7 +16,7 @@ export default class Store {
     }
   }
 
-  _getStruct(key) {
+  _getStructure(key) {
     const cachedObject = this._getCachedObject();
     if (cachedObject.hasOwnProperty(key)) {
       return cachedObject[key];
@@ -26,11 +26,11 @@ export default class Store {
   }
 
   getEventTypesOffers() {
-    return this._getStruct(EVENT_TYPES_NAME);
+    return this._getStructure(EVENT_TYPES_NAME);
   }
 
   getCities() {
-    return this._getStruct(CITIES_NAME);
+    return this._getStructure(CITIES_NAME);
   }
 
   getPointsObject() {
@@ -74,7 +74,7 @@ export default class Store {
 
   setPoint(key, value) {
     const points = this.getPointsObject();
-    const tmpPoints = Object.assign(
+    const tempPoints = Object.assign(
         {},
         points,
         {
@@ -82,7 +82,7 @@ export default class Store {
         }
     );
 
-    this.setPoints(tmpPoints);
+    this.setPoints(tempPoints);
   }
 
   updateCreatedPoints(points) {
@@ -94,28 +94,28 @@ export default class Store {
       pointsObject[point.tempId] = point;
     });
 
-    let initPointsObject = null;
+    let tempPointsObject = null;
     const resultedPointsObject = Object.values(pointsObject)
-      .reduce((acc, current) => {
-        if (initPointsObject === null) {
-          initPointsObject = Object.assign(
+      .reduce((accumulator, currentPoint) => {
+        if (tempPointsObject === null) {
+          tempPointsObject = Object.assign(
               {},
               {
-                [acc.id]: acc
+                [accumulator.id]: accumulator
               },
               {
-                [current.id]: current
+                [currentPoint.id]: currentPoint
               }
           );
 
-          return initPointsObject;
+          return tempPointsObject;
         }
 
         return Object.assign(
             {},
-            acc,
+            accumulator,
             {
-              [current.id]: current
+              [currentPoint.id]: currentPoint
             }
         );
       });

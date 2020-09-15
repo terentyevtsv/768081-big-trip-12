@@ -12,14 +12,14 @@ import {MenuItem, SortType} from "./const.js";
 import SiteMenuModel from "./model/site-menu.js";
 import Api from "./api/api.js";
 import CitiesModel from "./model/cities.js";
-import NewEventButtonView from "./view/new-event-button.js";
+import NewPointButtonView from "./view/new-point-button.js";
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
-import EventsFiltration from "./utils/filter.js";
+import PointsFiltration from "./utils/filter.js";
 
 const STORE_PREFIX = `bigtrip-localstorage`;
-const STORE_VER = `v12`;
-const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+const STORE_VERSION = `v12`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VERSION}`;
 
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 const AUTHORIZATION = `Basic mokrajbalka1`;
@@ -32,7 +32,7 @@ const tripMainElement = pageBodyElement.querySelector(`.trip-main`);
 const tripMainTripControlElement = tripMainElement
   .querySelector(`.trip-main__trip-controls`);
 
-const tripEventsElement = pageBodyElement
+const tripPointsElement = pageBodyElement
   .querySelector(`.trip-events`);
 
 const mainPageBodyContainerElement = document
@@ -61,27 +61,27 @@ const filterModel = new FilterModel();
 // Инициализация модели меню
 const siteMenuModel = new SiteMenuModel();
 
-const newEventButtonView = new NewEventButtonView(true);
+const newPointButtonView = new NewPointButtonView(true);
 
 const filterPresenter = new FilterPresenter(tripMainTripControlElement, filterModel);
 
 const tripPresenter = new TripPresenter(
     filterPresenter,
-    tripEventsElement,
+    tripPointsElement,
     pointsModel,
     offersModel,
     filterModel,
     siteMenuModel,
     citiesModel,
-    newEventButtonView,
+    newPointButtonView,
     apiWithProvider
 );
 
-tripPresenter.renderEventsPlan(false);
+tripPresenter.renderPointsPlan(false);
 
-const getPlanDateEventMap = () => tripPresenter.planDateEventsMap;
+const getPlanDatePointMap = () => tripPresenter.planDatePointsMap;
 const tripInformationPresenter = new TripInformationPresenter(tripMainElement,
-    filterModel, pointsModel, getPlanDateEventMap);
+    filterModel, pointsModel, getPlanDatePointMap);
 
 const errorMessagesObject = {
   offersTaskMessage: `типы точек маршрута`,
@@ -92,20 +92,20 @@ let errorValuesCount = Object.values(errorMessagesObject).length;
 
 const siteMenuView = new SiteMenuView(siteMenuModel);
 
-const renderEventsAfterLoading = (points) => {
-  const tmpPoints = [];
+const renderPointsAfterLoading = (points) => {
+  const tempPoints = [];
   points.forEach((point) => {
     const eventType = eventTypesMap.get(point.type);
     const maskOffers = offersModel.getOffers(eventType);
 
-    const tmpPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
-    tmpPoints.push(tmpPoint);
+    const tempPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
+    tempPoints.push(tempPoint);
   });
 
-  pointsModel.setPoints(tmpPoints);
+  pointsModel.setPoints(tempPoints);
 
-  const eventsFiltration = new EventsFiltration(tmpPoints);
-  eventsFiltration.setFilterDisabledFlags(filterModel);
+  const pointsFiltration = new PointsFiltration(tempPoints);
+  pointsFiltration.setFilterDisabledFlags(filterModel);
 
   // Отрисовка меню и фильтров
   const mainTripComponents = [
@@ -121,11 +121,11 @@ const renderEventsAfterLoading = (points) => {
     );
   }
 
-  filterPresenter.init();
+  filterPresenter.initialize();
 
   // Формирование дерева плана путешествия
-  tripPresenter.init(true);
-  tripInformationPresenter.init();
+  tripPresenter.initialize(true);
+  tripInformationPresenter.initialize();
 };
 
 apiWithProvider.getEventTypesOffers()
@@ -168,7 +168,7 @@ apiWithProvider.getEventTypesOffers()
   .catch(() => {
     // отображение ошибки загрузки доп. данных
     tripPresenter.renderError(errorMessagesObject);
-    filterModel.removeObserver(tripInformationPresenter.init);
+    filterModel.removeObserver(tripInformationPresenter.initialize);
     siteMenuView.removeMenuClickHandler();
   })
   .then(() => {
@@ -184,21 +184,21 @@ apiWithProvider.getEventTypesOffers()
       return;
     }
 
-    render(tripMainElement, newEventButtonView, AddedComponentPosition.BEFORE_END);
-    renderEventsAfterLoading(points);
+    render(tripMainElement, newPointButtonView, AddedComponentPosition.BEFORE_END);
+    renderPointsAfterLoading(points);
   })
   .catch(() => {
     if (errorValuesCount > 0) {
       return;
     }
 
-    render(tripMainElement, newEventButtonView, AddedComponentPosition.BEFORE_END);
+    render(tripMainElement, newPointButtonView, AddedComponentPosition.BEFORE_END);
 
     pointsModel.setPoints([]);
-    renderEventsAfterLoading(pointsModel.getPoints());
+    renderPointsAfterLoading(pointsModel.getPoints());
   });
 
-newEventButtonView.setButtonClickHandler((evt) => {
+newPointButtonView.setButtonClickHandler((evt) => {
   evt.preventDefault();
 
   if (siteMenuModel.getMenuItem() !== MenuItem.TABLE) {
@@ -206,8 +206,8 @@ newEventButtonView.setButtonClickHandler((evt) => {
     handleSiteMenuClick(MenuItem.TABLE);
   }
 
-  tripPresenter.createEvent();
-  filterPresenter.init();
+  tripPresenter.createPoint();
+  filterPresenter.initialize();
 });
 
 let statisticsView = null;
@@ -247,7 +247,7 @@ window.addEventListener(`load`, () => {
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
   if (apiWithProvider.shouldSynchronize) {
-    apiWithProvider.sync();
+    apiWithProvider.synchronize();
   }
 });
 

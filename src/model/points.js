@@ -14,7 +14,7 @@ export default class Points extends Observer {
     this._citiesMap = value;
   }
 
-  getDestinationInfo(city) {
+  getDestinationsInformation(city) {
     return this._citiesMap.has(city)
       ? this._citiesMap.get(city)
       : null;
@@ -46,17 +46,17 @@ export default class Points extends Observer {
     this._notify(point);
   }
 
-  addPoint(update) {
+  addPoint(addedPoint) {
     this._points = [
-      update,
+      addedPoint,
       ...this._points
     ];
 
-    this._notify(update);
+    this._notify(addedPoint);
   }
 
-  deletePoint(update) {
-    const index = this._points.findIndex((point) => point.id === update.id);
+  deletePoint(deletedPoint) {
+    const index = this._points.findIndex((point) => point.id === deletedPoint.id);
 
     if (index === -1) {
       throw new Error(`Can't delete unexisting task`);
@@ -67,7 +67,7 @@ export default class Points extends Observer {
       ...this._points.slice(index + 1)
     ];
 
-    this._notify(update);
+    this._notify(deletedPoint);
   }
 
   static adaptToClient(point, eventType, maskOffers) {
@@ -108,7 +108,7 @@ export default class Points extends Observer {
     return adaptedPoint;
   }
 
-  static adaptToServer(point, destinationInfo) {
+  static adaptToServer(point, destinationsInformation) {
     const tmpOffers = point.offers
       .filter((offer) => offer.isAccepted);
     const offers = [];
@@ -118,12 +118,12 @@ export default class Points extends Observer {
     }));
 
     const destination = {
-      description: destinationInfo.description,
+      description: destinationsInformation.description,
       name: point.city,
       pictures: []
     };
 
-    destinationInfo.photos.forEach((photo) => destination.pictures.push({
+    destinationsInformation.photos.forEach((photo) => destination.pictures.push({
       src: photo.source,
       description: photo.description
     }));

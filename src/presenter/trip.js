@@ -1,17 +1,17 @@
 import {render, AddedComponentPosition, remove, replace} from "../utils/render.js";
-import NoEventView from "../view/no-event.js";
+import NoPointsView from "../view/no-points.js";
 import SortingView from "../view/sorting.js";
-import EventsPlanContainerView from "../view/events-plan-container.js";
+import PointsPlanContainerView from "../view/points-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
-import EventsListView from "../view/events-list.js";
-import TripEventsItemView from "../view/trip-events-item.js";
+import PointsListView from "../view/points-list.js";
+import TripPointsItemView from "../view/trip-points-item.js";
 import {SortType, FilterType, UserAction, MenuItem} from "../const.js";
-import TripEventPresenter from "./trip-event.js";
-import EventsFiltration from "../utils/filter.js";
-import EventNewPresenter from "./event-new.js";
+import TripPointPresenter from "./trip-point.js";
+import PointsFiltration from "../utils/filter.js";
+import NewPointPresenter from "./new-point.js";
 import LoadingView from "../view/loading.js";
 
-const getDifference = function (timeInterval) {
+const getTimeIntervalsDifference = function (timeInterval) {
   return (
     timeInterval.rightLimitDate.getTime() -
     timeInterval.leftLimitDate.getTime()
@@ -21,23 +21,23 @@ const getDifference = function (timeInterval) {
 export default class Trip {
   constructor(
       filterPresenter,
-      tripEventsContainer,
+      tripPointsContainer,
       pointsModel,
       offersModel,
       filterModel,
       siteMenuModel,
       citiesModel,
-      newEventButtonView,
+      newPointButtonView,
       api
   ) {
     this._filterPresenter = filterPresenter;
-    this._tripEventsContainer = tripEventsContainer;
+    this._tripPointsContainer = tripPointsContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
     this._filterModel = filterModel;
     this._siteMenuModel = siteMenuModel;
     this._citiesModel = citiesModel;
-    this._newEventButtonView = newEventButtonView;
+    this._newPointButtonView = newPointButtonView;
     this._api = api;
 
     this._isLoading = true;
@@ -45,11 +45,11 @@ export default class Trip {
     this._errorLoadingView = null;
 
     this._currentSortType = SortType.EVENT;
-    this._noEventView = new NoEventView();
+    this._noPointsView = new NoPointsView();
     this._sortingView = null;
-    this._eventsPlanContainerView = new EventsPlanContainerView();
+    this._pointsPlanContainerView = new PointsPlanContainerView();
 
-    this._eventPresenter = {};
+    this._pointPresenter = {};
     this._dateContainers = [];
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -62,65 +62,65 @@ export default class Trip {
     this._filterModel.addObserver(this._handleFilterChanged);
     this._pointsModel.addObserver(this._handleModelChange);
     this._siteMenuModel.addObserver(this._renderSort);
-    this._eventNewPresenter = null;
+    this._newPointPresenter = null;
   }
 
-  get planDateEventsMap() {
-    return this._planDateEventsMap;
+  get planDatePointsMap() {
+    return this._planDatePointsMap;
   }
 
   set currentSortType(sortType) {
     this._currentSortType = sortType;
   }
 
-  createEvent() {
+  createPoint() {
     this._filterModel.setFilter(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
-    this._planDateEventsMap = this._getMapDates();
-    this.renderEventsPlan(true);
+    this._planDatePointsMap = this._getMapDates();
+    this.renderPointsPlan(true);
   }
 
   _handleModelChange() {
-    this._planDateEventsMap = this._getMapDates();
-    this.renderEventsPlan(false);
+    this._planDatePointsMap = this._getMapDates();
+    this.renderPointsPlan(false);
   }
 
   _handleFilterChanged() {
-    remove(this._noEventView);
-    if (this._eventNewPresenter !== null) {
-      this._eventNewPresenter.destroy();
+    remove(this._noPointsView);
+    if (this._newPointPresenter !== null) {
+      this._newPointPresenter.destroy();
     }
 
     this._currentSortType = SortType.EVENT;
-    this.init(false);
+    this.initialize(false);
   }
 
   _renderLoading() {
-    render(this._tripEventsContainer, this._loadingView, AddedComponentPosition.BEFORE_END);
+    render(this._tripPointsContainer, this._loadingView, AddedComponentPosition.BEFORE_END);
   }
 
-  init(isFirstLoading) {
+  initialize(isFirstLoading) {
     if (isFirstLoading) {
       this._isLoading = false;
       remove(this._loadingView);
 
-      this._eventNewPresenter = new EventNewPresenter(
+      this._newPointPresenter = new NewPointPresenter(
           this._filterPresenter,
-          this._tripEventsContainer,
+          this._tripPointsContainer,
           this._offersModel,
           this._citiesModel,
           this._pointsModel,
           this._filterModel,
-          this._newEventButtonView,
+          this._newPointButtonView,
           this._handleViewAction,
           this._handleModeChange,
           this._api
       );
     }
 
-    this._planDateEventsMap = this._getMapDates();
+    this._planDatePointsMap = this._getMapDates();
     if (this._siteMenuModel.getMenuItem() === MenuItem.TABLE) {
-      this.renderEventsPlan(false);
+      this.renderPointsPlan(false);
     }
   }
 
@@ -135,50 +135,50 @@ export default class Trip {
 
   reload() {
     this._siteMenuModel.addObserver(this._renderSort);
-    this.init(false);
+    this.initialize(false);
   }
 
   destroy() {
     this._isLoading = false;
-    if (this._eventNewPresenter !== null) {
-      this._eventNewPresenter.destroy();
+    if (this._newPointPresenter !== null) {
+      this._newPointPresenter.destroy();
     }
 
     if (this._sortingView !== null) {
       remove(this._sortingView);
     }
 
-    remove(this._eventsPlanContainerView);
+    remove(this._pointsPlanContainerView);
     if (this._errorLoadingView !== null) {
       remove(this._errorLoadingView);
       this._errorLoadingView = null;
     }
 
-    remove(this._noEventView);
+    remove(this._noPointsView);
   }
 
   _getPoints(filterType) {
-    const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
-    return eventsFiltration.getEvents(filterType);
+    const pointsFiltration = new PointsFiltration(this._pointsModel.getPoints());
+    return pointsFiltration.getPoints(filterType);
   }
 
   _handleModeChange() {
-    this._eventNewPresenter.destroy();
+    this._newPointPresenter.destroy();
     Object
-      .values(this._eventPresenter)
+      .values(this._pointPresenter)
       .forEach((presenter) => presenter.resetView());
   }
 
-  // Обновление мока и отрисовка согласно обновлению точки марщрута
+  // Обновление точки маршрута
   _handleViewAction(actionType, update) {
     switch (actionType) {
-      case UserAction.UPDATE_EVENT:
+      case UserAction.UPDATE_POINT:
         this._pointsModel.updatePoint(update);
         break;
-      case UserAction.ADD_EVENT:
+      case UserAction.ADD_POINT:
         this._pointsModel.addPoint(update);
         break;
-      case UserAction.DELETE_EVENT:
+      case UserAction.DELETE_POINT:
         this._pointsModel.deletePoint(update);
         break;
     }
@@ -190,7 +190,7 @@ export default class Trip {
     }
     this._currentSortType = sortType;
     const mapDates = this._getMapDates();
-    this._renderEvents(mapDates);
+    this._renderPoints(mapDates);
   }
 
   // Формирование структуры событий по датам
@@ -203,8 +203,8 @@ export default class Trip {
       const datesSet = new Set();
 
       // Формируем список дат, по которым будут группироваться события
-      points.forEach((evt) => {
-        const date = new Date(evt.timeInterval.leftLimitDate);
+      points.forEach((point) => {
+        const date = new Date(point.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
         datesSet.add(date.getTime());
@@ -217,11 +217,11 @@ export default class Trip {
       // Раскидываем события по датам
       dates.forEach((date) => mapDates.set(date, []));
 
-      points.forEach((evt) => {
-        const date = new Date(evt.timeInterval.leftLimitDate);
+      points.forEach((point) => {
+        const date = new Date(point.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
-        mapDates.get(date.getTime()).push(evt);
+        mapDates.get(date.getTime()).push(point);
       });
 
       Array.from(mapDates.keys()).forEach((mapDateKey) => mapDates.get(mapDateKey)
@@ -231,20 +231,20 @@ export default class Trip {
       return mapDates;
     }
 
-    const tmpDate = new Date();
-    const events = points.slice();
+    const tempDate = new Date();
+    const copyPoints = points.slice();
     if (this._currentSortType === SortType.TIME) {
-      // Порядок с сортировкой по времени события
-      events.sort((evt1, evt2) => getDifference(evt2.timeInterval) -
-                                  getDifference(evt1.timeInterval));
-      mapDates.set(tmpDate, events);
+      // Порядок с сортировкой по времени точки маршрута
+      copyPoints.sort((point1, point2) => getTimeIntervalsDifference(point2.timeInterval) -
+                                  getTimeIntervalsDifference(point1.timeInterval));
+      mapDates.set(tempDate, copyPoints);
 
       return mapDates;
     }
 
     // Порядок с сортировкой по цене
-    events.sort((evt1, evt2) => evt2.price - evt1.price);
-    mapDates.set(tmpDate, events);
+    copyPoints.sort((point1, point2) => point2.price - point1.price);
+    mapDates.set(tempDate, copyPoints);
 
     return mapDates;
   }
@@ -260,7 +260,7 @@ export default class Trip {
     // Метод для рендеринга сортировки
     // Сортировка
     render(
-        this._tripEventsContainer,
+        this._tripPointsContainer,
         this._sortingView,
         AddedComponentPosition.BEFORE_END
     );
@@ -268,19 +268,19 @@ export default class Trip {
     this._sortingView.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
-  _renderEvent(evt, eventsListView) {
+  _renderPoint(point, pointsListView) {
     // Контейнер события
-    const tripEventsItemView = new TripEventsItemView();
+    const tripPointsItemView = new TripPointsItemView();
     render(
-        eventsListView,
-        tripEventsItemView,
+        pointsListView,
+        tripPointsItemView,
         AddedComponentPosition.BEFORE_END
     );
 
-    const tripEventPresenter = new TripEventPresenter(
-        evt,
+    const tripPointPresenter = new TripPointPresenter(
+        point,
         this._filterPresenter,
-        tripEventsItemView,
+        tripPointsItemView,
         this._pointsModel,
         this._offersModel,
         this._citiesModel,
@@ -289,16 +289,16 @@ export default class Trip {
         this._handleModeChange,
         this._api
     );
-    tripEventPresenter.init(evt);
-    this._eventPresenter[evt.id] = tripEventPresenter;
+    tripPointPresenter.initialize(point);
+    this._pointPresenter[point.id] = tripPointPresenter;
   }
 
-  _renderEvents(mapDates) {
-    Object.values(this._eventPresenter)
+  _renderPoints(mapDates) {
+    Object.values(this._pointPresenter)
         .forEach((presenter) => presenter.destroy());
     this._dateContainers.forEach((d) => remove(d));
 
-    this._eventPresenter = {};
+    this._pointPresenter = {};
     this._dateContainers = [];
 
     let index = 0;
@@ -309,46 +309,46 @@ export default class Trip {
       // Отрисовка очередной даты
       const tripDaysItemView = new TripDaysItemView(date, index, this._currentSortType);
       render(
-          this._eventsPlanContainerView,
+          this._pointsPlanContainerView,
           tripDaysItemView,
           AddedComponentPosition.BEFORE_END
       );
 
-      const eventsListView = new EventsListView();
+      const pointsListView = new PointsListView();
       render(
           tripDaysItemView,
-          eventsListView,
+          pointsListView,
           AddedComponentPosition.BEFORE_END
       );
 
       this._dateContainers[index++] = tripDaysItemView;
 
-      // события даты сортируем по дате начала
-      const tmpEvents = mapDates.get(mapDateKey);
-      // Цикл по всем событиям данной даты
-      for (let j = 0; j < tmpEvents.length; ++j) {
-        this._renderEvent(tmpEvents[j], eventsListView);
+      // точки маршрута даты сортируем по дате начала
+      const tempPoints = mapDates.get(mapDateKey);
+      // Цикл по всем точкам маршрута данной даты
+      for (let j = 0; j < tempPoints.length; ++j) {
+        this._renderPoint(tempPoints[j], pointsListView);
       }
     }
   }
 
-  _renderNoEvents() {
+  _renderNoPoints() {
     if (this._sortingView !== null) {
       remove(this._sortingView);
       this._sortingView = null;
     }
 
-    remove(this._eventsPlanContainerView);
+    remove(this._pointsPlanContainerView);
 
     // Метод для рендеринга заглушки
     render(
-        this._tripEventsContainer,
-        this._noEventView,
+        this._tripPointsContainer,
+        this._noPointsView,
         AddedComponentPosition.BEFORE_END
     );
   }
 
-  renderEventsPlan(renderNewEventFlag) {
+  renderPointsPlan(renderNewPointFlag) {
     if (this._isLoading) {
       this._renderLoading();
       return;
@@ -356,26 +356,26 @@ export default class Trip {
 
     const points = this._getPoints(this._filterModel.getFilter());
     if (points.length === 0) {
-      if (renderNewEventFlag) {
-        remove(this._noEventView);
-        this._eventNewPresenter.init();
+      if (renderNewPointFlag) {
+        remove(this._noPointsView);
+        this._newPointPresenter.initialize();
         return;
       }
-      this._renderNoEvents();
+      this._renderNoPoints();
       return;
     }
 
     this._renderSort();
 
-    if (renderNewEventFlag) {
-      this._eventNewPresenter.init();
+    if (renderNewPointFlag) {
+      this._newPointPresenter.initialize();
     }
 
     render(
-        this._tripEventsContainer,
-        this._eventsPlanContainerView,
+        this._tripPointsContainer,
+        this._pointsPlanContainerView,
         AddedComponentPosition.BEFORE_END
     );
-    this._renderEvents(this._planDateEventsMap);
+    this._renderPoints(this._planDatePointsMap);
   }
 }
