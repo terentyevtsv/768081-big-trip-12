@@ -24,8 +24,8 @@ export const monthDayToString = (date) => {
 };
 
 export const timeToString = (date) => {
-  let hours = zeroBasedFormat(date.getHours());
-  let minutes = zeroBasedFormat(date.getMinutes());
+  const hours = zeroBasedFormat(date.getHours());
+  const minutes = zeroBasedFormat(date.getMinutes());
 
   return `${hours}:${minutes}`;
 };
@@ -81,7 +81,7 @@ export const getDatesDelta = (date1, date2) => {
   const {days, hours, minutes} = getDeltaDateInformation(date1, date2);
 
   // 01D 02H 30M
-  let delta = getDeltaTimeFormat(days, hours, minutes);
+  const delta = getDeltaTimeFormat(days, hours, minutes);
 
   return delta;
 };
