@@ -4,7 +4,6 @@ const LOWERCASE_FIRST_CHARACTER_INDEX = 1;
 
 const isAlphabetsCharacter = (text) => {
   return (
-    typeof text === `string` &&
     text.length === ONE_CHARACTER_LENGTH &&
     /[A-Za-z]/.test(text)
   );

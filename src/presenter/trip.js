@@ -280,8 +280,8 @@ export default class Trip {
       // точки маршрута даты сортируем по дате начала
       const tempPoints = datePointsStructure.get(dateKey);
       // Цикл по всем точкам маршрута данной даты
-      for (let j = 0; j < tempPoints.length; ++j) {
-        this._renderPoint(tempPoints[j], pointsListView);
+      for (const tempPoint of tempPoints) {
+        this._renderPoint(tempPoint, pointsListView);
       }
     }
   }

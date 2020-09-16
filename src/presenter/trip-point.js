@@ -119,8 +119,8 @@ export default class TripPoint {
 
     // Заполнение контейнера предложений текущего события
     let count = 0; // счетчик предложений для короткой записи события
-    for (let k = 0; k < point.offers.length; ++k) {
-      if (point.offers[k].isAccepted) {
+    for (const offer of point.offers) {
+      if (offer.isAccepted) {
         ++count;
         if (count > MAXIMUM_OFFERS_COUNT) {
           break;
@@ -128,7 +128,7 @@ export default class TripPoint {
 
         render(
             selectedOffersContainer,
-            new OfferItemView(point.offers[k]),
+            new OfferItemView(offer),
             AddedComponentPosition.BEFORE_END
         );
       }
