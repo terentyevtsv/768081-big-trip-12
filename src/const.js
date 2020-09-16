@@ -1,3 +1,5 @@
+export const NO_POINTS_LENGTH = 0;
+
 export const PointGroup = {
   MOVEMENT: `to`,
   PLACE: `in`
@@ -24,4 +26,14 @@ export const UserAction = {
 export const MenuItem = {
   TABLE: `Table`,
   STATS: `Stats`
+};
+
+export const Key = {
+  ESC: `Esc`,
+  ESCAPE: `Escape`
+};
+
+export const Tag = {
+  INPUT: `INPUT`,
+  REFERENCE: `A`
 };

@@ -5,7 +5,7 @@ import {render, replace, remove, AddedComponentPosition} from "../utils/render.j
 import SelectedOffersContainerView from "../view/selected-offers-container.js";
 import OfferItemView from "../view/offer-item.js";
 import OpenPointButtonView from "../view/open-point-button.js";
-import {UserAction} from "../const.js";
+import {Key, UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import PointDetailsView from "../view/point-details.js";
 import PointsFiltration from "../utils/filter.js";
@@ -293,7 +293,7 @@ export default class TripPoint {
   }
 
   _escapeKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
       evt.preventDefault();
       this.initialize(this._point);
       this._replaceFormToPoint();

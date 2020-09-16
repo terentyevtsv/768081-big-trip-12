@@ -1,3 +1,4 @@
+import {Tag} from "../const.js";
 import SmartView from "./smart.js";
 
 const createOffersTemplate = (offers, isDisabled) =>
@@ -39,7 +40,7 @@ export default class OffersContainer extends SmartView {
 
   _checkOffersHandler(evt) {
     evt.preventDefault();
-    if (evt.target.tagName === `INPUT`) {
+    if (evt.target.tagName === Tag.INPUT) {
       this._callback.checkOffers();
     }
   }

@@ -1,4 +1,4 @@
-import {FilterType} from "../const.js";
+import {FilterType, NO_POINTS_LENGTH} from "../const.js";
 
 export default class PointsFiltration {
   constructor(points) {
@@ -23,9 +23,9 @@ export default class PointsFiltration {
   }
 
   setFilterDisabledFlags(filterModel) {
-    const isEverythingDisabled = this.getPoints(FilterType.EVERYTHING).length === 0;
-    const isFutureDisabled = this.getPoints(FilterType.FUTURE).length === 0;
-    const isPastDisabled = this.getPoints(FilterType.PAST).length === 0;
+    const isEverythingDisabled = this.getPoints(FilterType.EVERYTHING).length === NO_POINTS_LENGTH;
+    const isFutureDisabled = this.getPoints(FilterType.FUTURE).length === NO_POINTS_LENGTH;
+    const isPastDisabled = this.getPoints(FilterType.PAST).length === NO_POINTS_LENGTH;
 
     filterModel.setFilterDisabledFlags(
         isEverythingDisabled,

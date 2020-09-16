@@ -1,5 +1,13 @@
-const isAlphabetsCharacter = (character) => {
-  return typeof character === `string` && character.length === 1 && /[A-Za-z]/.test(character);
+const ONE_CHARACTER_LENGTH = 1;
+const UPPERCASE_CHARACTER_INDEX = 0;
+const LOWERCASE_FIRST_CHARACTER_INDEX = 1;
+
+const isAlphabetsCharacter = (text) => {
+  return (
+    typeof text === `string` &&
+    text.length === ONE_CHARACTER_LENGTH &&
+    /[A-Za-z]/.test(text)
+  );
 };
 
 export const getSnakeCaseText = (inputText) => {
@@ -19,4 +27,4 @@ export const getSnakeCaseText = (inputText) => {
 };
 
 export const getCapitalizedWord = (word) =>
-  `${word[0].toUpperCase()}${word.slice(1)}`;
+  `${word[UPPERCASE_CHARACTER_INDEX].toUpperCase()}${word.slice(LOWERCASE_FIRST_CHARACTER_INDEX)}`;

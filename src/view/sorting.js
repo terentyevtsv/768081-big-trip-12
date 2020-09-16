@@ -1,5 +1,5 @@
 import AbstractView from "./abstract.js";
-import {SortType} from "../const.js";
+import {SortType, Tag} from "../const.js";
 
 const createSortingTemplate = (sortType) =>
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -66,7 +66,7 @@ export default class Sorting extends AbstractView {
   }
 
   _sortTypeChangeHandler(evt) {
-    if (evt.target.tagName !== `INPUT`) {
+    if (evt.target.tagName !== Tag.INPUT) {
       return;
     }
 

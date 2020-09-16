@@ -1,5 +1,5 @@
 import SmartView from "./smart.js";
-import {MenuItem} from "../const.js";
+import {MenuItem, Tag} from "../const.js";
 
 const createSiteMenuTemplate = (activeMenuItem) =>
   `<nav class="trip-controls__trip-tabs  trip-tabs">
@@ -36,7 +36,7 @@ export default class SiteMenu extends SmartView {
 
   _menuClickHandler(evt) {
     evt.preventDefault();
-    if (evt.target.tagName === `A`) {
+    if (evt.target.tagName === Tag.REFERENCE) {
       const currentMenu = evt.target.dataset.menu;
       if (currentMenu !== this._siteMenuModel.getMenuItem()) {
         this.updateSiteMenu(currentMenu);

@@ -1,7 +1,7 @@
 import BasePointView from "../view/base-point.js";
 import {renderPointsOptions, renderFormState} from "../utils/editable-point.js";
 import {render, AddedComponentPosition, replace, remove} from "../utils/render.js";
-import {UserAction} from "../const.js";
+import {Key, UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import PointDetailsView from "../view/point-details.js";
 import PointsFiltration from "../utils/filter.js";
@@ -61,7 +61,7 @@ export default class NewPoint {
   }
 
   _escapeKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
       evt.preventDefault();
       this.destroy();
     }

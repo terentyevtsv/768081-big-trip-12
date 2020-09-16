@@ -6,9 +6,9 @@ import AbstractView from "./abstract.js";
 const MAXIMUM_CITIES_COUNT = 3;
 
 const RouteIndex = {
-  FIRST_CITY_INDEX: 0,
-  SECOND_CITY_INDEX: 1,
-  LAST_CITY_INDEX: 2,
+  FIRST_CITY: 0,
+  SECOND_CITY: 1,
+  LAST_CITY: 2,
 };
 
 const getRoute = (cities) => {
@@ -18,15 +18,15 @@ const getRoute = (cities) => {
       break;
     }
     switch (i) {
-      case RouteIndex.FIRST_CITY_INDEX:
+      case RouteIndex.FIRST_CITY:
         route = `${cities[i]}`;
         break;
 
-      case RouteIndex.SECOND_CITY_INDEX:
+      case RouteIndex.SECOND_CITY:
         route = `${route} &mdash; ${cities.length > MAXIMUM_CITIES_COUNT ? `...` : cities[i]}`;
         break;
 
-      case RouteIndex.LAST_CITY_INDEX:
+      case RouteIndex.LAST_CITY:
         route = `${route} &mdash; ${cities[cities.length - 1]}`;
         break;
     }

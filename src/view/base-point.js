@@ -4,6 +4,8 @@ import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
+const RADIX = 10;
+
 const createEmptyPointTemplate = (
     point,
     isNewPoint,
@@ -314,7 +316,7 @@ export default class BasePoint extends SmartView {
   _priceChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      price: parseInt(evt.target.value, 10)
+      price: parseInt(evt.target.value, RADIX)
     },
     true);
   }

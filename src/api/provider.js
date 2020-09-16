@@ -1,4 +1,5 @@
 import {nanoid} from "nanoid";
+import {NO_POINTS_LENGTH} from "../const.js";
 
 const createPointsStructure = (points) => {
   return points.reduce((accumulator, currentPoint) => {
@@ -132,7 +133,7 @@ export default class Provider {
 
       return this._api.synchronize(storePoints)
         .then((response) => {
-          if (response.created.length > 0) {
+          if (response.created.length > NO_POINTS_LENGTH) {
             this._store.updateCreatedPoints(response.created);
           }
 
