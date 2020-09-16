@@ -11,7 +11,7 @@ import PointsFiltration from "../utils/filter.js";
 import NewPointPresenter from "./new-point.js";
 import LoadingView from "../view/loading.js";
 
-const getTimeIntervalsDifference = function (timeInterval) {
+const getTimeIntervalsDifference = (timeInterval) => {
   return (
     timeInterval.rightLimitDate.getTime() -
     timeInterval.leftLimitDate.getTime()
