@@ -51,7 +51,7 @@ export default class TripPoint {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escapeKeyDownHandler = this._escapeKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-    this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
+    this._changeOffersListHandler = this._offersListChangeHandler.bind(this);
     this.initialize = this.initialize.bind(this);
   }
 
@@ -149,7 +149,7 @@ export default class TripPoint {
     );
   }
 
-  _changeOffersListHandler() {
+  _offersListChangeHandler() {
     const offerElements = this._pointEditComponent.getElement()
       .querySelectorAll(`.event__offer-checkbox`);
     const offers = [];
@@ -182,7 +182,7 @@ export default class TripPoint {
         this._citiesModel
     );
     if (this._offersContainerView !== null) {
-      this._offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+      this._offersContainerView.setOffersCheckHandler(this._offersListChangeHandler);
     }
   }
 

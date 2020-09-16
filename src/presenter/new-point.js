@@ -38,7 +38,7 @@ export default class NewPoint {
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._escapeKeyDownHandler = this._escapeKeyDownHandler.bind(this);
     this._initializeBasePoint = this._initializeBasePoint.bind(this);
-    this._changeOffersListHandler = this._changeOffersListHandler.bind(this);
+    this._offersListChangeHandler = this._offersListChangeHandler.bind(this);
     this._point = this._getDefaultPoint();
 
     this._offers = [];
@@ -172,7 +172,7 @@ export default class NewPoint {
     remove(previousPointEditComponent);
   }
 
-  _changeOffersListHandler() {
+  _offersListChangeHandler() {
     const offerElements = this._pointEditComponent.getElement()
       .querySelectorAll(`.event__offer-checkbox`);
     for (let i = 0; i < offerElements.length; ++i) {
@@ -203,7 +203,7 @@ export default class NewPoint {
         this._citiesModel
     );
     if (this._offersContainerView !== null) {
-      this._offersContainerView.setCheckOffersHandler(this._changeOffersListHandler);
+      this._offersContainerView.setOffersCheckHandler(this._offersListChangeHandler);
     }
 
     render(

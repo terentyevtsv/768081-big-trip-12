@@ -31,27 +31,27 @@ export default class OffersContainer extends SmartView {
     this._offers = offers;
     this._data = OffersContainer.parseOffersToData();
 
-    this._checkOffersHandler = this._checkOffersHandler.bind(this);
+    this._offersCheckHandler = this._offersCheckHandler.bind(this);
   }
 
   getTemplate() {
     return createOffersTemplate(this._offers, this._data.isDisabled);
   }
 
-  _checkOffersHandler(evt) {
+  _offersCheckHandler(evt) {
     evt.preventDefault();
     if (evt.target.tagName === Tag.INPUT) {
       this._callback.checkOffers();
     }
   }
 
-  setCheckOffersHandler(callback) {
+  setOffersCheckHandler(callback) {
     this._callback.checkOffers = callback;
-    this.getElement().addEventListener(`change`, this._checkOffersHandler);
+    this.getElement().addEventListener(`change`, this._offersCheckHandler);
   }
 
   restoreHandlers() {
-    this.getElement().addEventListener(`change`, this._checkOffersHandler);
+    this.getElement().addEventListener(`change`, this._offersCheckHandler);
   }
 
   static parseOffersToData() {
