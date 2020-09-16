@@ -272,7 +272,7 @@ export default class TripPoint {
               isDeleting: false
             }
         );
-        this._changePoint(UserAction.DELETE_POINT, point);
+        this._changePoint(UserAction.POINT_REMOVAL, point);
 
         const pointsFiltration = new PointsFiltration(this._pointsModel.getPoints());
         pointsFiltration.setFilterDisabledFlags(this._filterModel);

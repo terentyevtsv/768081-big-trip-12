@@ -32,23 +32,23 @@ const getRoute = (cities) => {
   return route;
 };
 
-const createTripInformationContainerTemplate = (planDatePointsMap) => {
-  const dates = Array.from(planDatePointsMap.keys());
+const createTripInformationContainerTemplate = (datePointsPlan) => {
+  const dates = Array.from(datePointsPlan.keys());
   if (dates.length === 0) {
     return `<section class="trip-main__trip-info  trip-info"></section>`;
   }
 
   // Берем дату начала первого события в первой дате
-  const leftLimitDate = planDatePointsMap.get(dates[0])[0].timeInterval.leftLimitDate;
+  const leftLimitDate = datePointsPlan.get(dates[0])[0].timeInterval.leftLimitDate;
 
-  const lastDatePoints = planDatePointsMap.get(dates[dates.length - 1]);
+  const lastDatePoints = datePointsPlan.get(dates[dates.length - 1]);
   const rightLimitDate = lastDatePoints[lastDatePoints.length - 1].timeInterval.rightLimitDate;
 
   const cities = [];
   let index = 0;
   let lastCity = ``;
   for (const date of dates) {
-    for (const point of planDatePointsMap.get(date)) {
+    for (const point of datePointsPlan.get(date)) {
       if (cities.length === 0) {
         lastCity = point.city;
         cities[index] = point.city;
@@ -73,19 +73,19 @@ const createTripInformationContainerTemplate = (planDatePointsMap) => {
 };
 
 export default class TripInformationContainer extends AbstractView {
-  constructor(planDatePointsMap) {
+  constructor(datePointsPlan) {
     super();
-    this._planDatePointsMap = planDatePointsMap;
+    this._datePointsPlan = datePointsPlan;
   }
 
   getTemplate() {
-    return createTripInformationContainerTemplate(this._planDatePointsMap);
+    return createTripInformationContainerTemplate(this._datePointsPlan);
   }
 
   fillPrice() {
     render(
         this,
-        new TripPriceView(this._planDatePointsMap),
+        new TripPriceView(this._datePointsPlan),
         AddedComponentPosition.BEFORE_END
     );
   }

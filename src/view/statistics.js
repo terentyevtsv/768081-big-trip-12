@@ -1,7 +1,7 @@
 import AbstractView from "./abstract.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getEventTypeMoneyMap, getTransportUsageMap, getTimeSpentMap} from "../utils/statistics.js";
+import {getEventTypeMoneyStructure, getTransportUsageStructure, getTimeSpentStructure} from "../utils/statistics.js";
 import {getDeltaTimeFormat} from "../utils/formats.js";
 import moment from "moment";
 
@@ -40,18 +40,18 @@ export default class Statistics extends AbstractView {
   }
 
   _renderMoneyChart() {
-    const eventTypeMoneyMap = getEventTypeMoneyMap(this._points);
+    const eventTypeMoneyStructure = getEventTypeMoneyStructure(this._points);
 
     const moneyContextElement = this.getElement().querySelector(`.statistics__chart--money`);
-    moneyContextElement.height = BAR_HEIGHT * eventTypeMoneyMap.size;
+    moneyContextElement.height = BAR_HEIGHT * eventTypeMoneyStructure.size;
 
     const moneyChart = new Chart(moneyContextElement, {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        labels: Array.from(eventTypeMoneyMap.keys()).map((name) => name.toUpperCase()),
+        labels: Array.from(eventTypeMoneyStructure.keys()).map((name) => name.toUpperCase()),
         datasets: [{
-          data: Array.from(eventTypeMoneyMap.values()),
+          data: Array.from(eventTypeMoneyStructure.values()),
           backgroundColor: `#ffffff`,
           hoverBackgroundColor: `#ffffff`,
           anchor: `start`
@@ -114,18 +114,18 @@ export default class Statistics extends AbstractView {
   }
 
   _renderTransportChart() {
-    const transportUsageMap = getTransportUsageMap(this._points);
+    const transportUsageStructure = getTransportUsageStructure(this._points);
 
     const transportContextElement = this.getElement().querySelector(`.statistics__chart--transport`);
-    transportContextElement.height = BAR_HEIGHT * transportUsageMap.size;
+    transportContextElement.height = BAR_HEIGHT * transportUsageStructure.size;
 
     const transportChart = new Chart(transportContextElement, {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        labels: Array.from(transportUsageMap.keys()).map((name) => name.toUpperCase()),
+        labels: Array.from(transportUsageStructure.keys()).map((name) => name.toUpperCase()),
         datasets: [{
-          data: Array.from(transportUsageMap.values()),
+          data: Array.from(transportUsageStructure.values()),
           backgroundColor: `#ffffff`,
           hoverBackgroundColor: `#ffffff`,
           anchor: `start`
@@ -188,18 +188,18 @@ export default class Statistics extends AbstractView {
   }
 
   _renderTimeSpentChart() {
-    const timeSpentMap = getTimeSpentMap(this._points);
+    const timeSpentStructure = getTimeSpentStructure(this._points);
     const timeSpentContextElement = this.getElement().querySelector(`.statistics__chart--time`);
-    timeSpentContextElement.height = BAR_HEIGHT * timeSpentMap.size;
-    const tmpLabels = Array.from(timeSpentMap.keys()).map((name) => name.toUpperCase());
+    timeSpentContextElement.height = BAR_HEIGHT * timeSpentStructure.size;
+    const tempLabels = Array.from(timeSpentStructure.keys()).map((name) => name.toUpperCase());
 
     const timeSpentChart = new Chart(timeSpentContextElement, {
       plugins: [ChartDataLabels],
       type: `horizontalBar`,
       data: {
-        labels: tmpLabels,
+        labels: tempLabels,
         datasets: [{
-          data: Array.from(timeSpentMap.values()),
+          data: Array.from(timeSpentStructure.values()),
           backgroundColor: `#ffffff`,
           hoverBackgroundColor: `#ffffff`,
           anchor: `start`

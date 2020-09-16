@@ -27,14 +27,14 @@ export default class Provider {
       return this._api
         .getPoints()
         .then((points) => {
-          const pointsObject = createPointsStructure(points);
-          this._store.setPoints(pointsObject);
+          const pointsStructure = createPointsStructure(points);
+          this._store.setPoints(pointsStructure);
           return points;
         });
     }
 
-    const pointsObject = this._store.getPointsObject();
-    const tempPoints = Object.values(pointsObject);
+    const pointsStructure = this._store.getPointsStructure();
+    const tempPoints = Object.values(pointsStructure);
     return Promise.resolve(tempPoints);
   }
 
@@ -128,7 +128,7 @@ export default class Provider {
 
   synchronize() {
     if (this._isOnLine()) {
-      const storePoints = Object.values(this._store.getPointsObject());
+      const storePoints = Object.values(this._store.getPointsStructure());
 
       return this._api.synchronize(storePoints)
         .then((response) => {

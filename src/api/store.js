@@ -8,7 +8,7 @@ export default class Store {
     this._storage = storage;
   }
 
-  _getCachedObject() {
+  _getCachedStructure() {
     try {
       return JSON.parse(this._storage.getItem(this._storageKey)) || {};
     } catch (err) {
@@ -17,9 +17,9 @@ export default class Store {
   }
 
   _getStructure(key) {
-    const cachedObject = this._getCachedObject();
-    if (cachedObject.hasOwnProperty(key)) {
-      return cachedObject[key];
+    const cachedStructure = this._getCachedStructure();
+    if (cachedStructure.hasOwnProperty(key)) {
+      return cachedStructure[key];
     }
 
     return [];
@@ -33,47 +33,47 @@ export default class Store {
     return this._getStructure(CITIES_NAME);
   }
 
-  getPointsObject() {
-    const cachedObject = this._getCachedObject();
-    if (cachedObject.hasOwnProperty(POINTS_NAME)) {
-      return cachedObject[POINTS_NAME];
+  getPointsStructure() {
+    const cachedStructure = this._getCachedStructure();
+    if (cachedStructure.hasOwnProperty(POINTS_NAME)) {
+      return cachedStructure[POINTS_NAME];
     }
 
     return {};
   }
 
   setEventTypes(eventTypes) {
-    const cachedObject = this._getCachedObject();
-    cachedObject[EVENT_TYPES_NAME] = eventTypes;
+    const cachedStructure = this._getCachedStructure();
+    cachedStructure[EVENT_TYPES_NAME] = eventTypes;
 
     this._storage.setItem(
         this._storageKey,
-        JSON.stringify(cachedObject)
+        JSON.stringify(cachedStructure)
     );
   }
 
   setCities(cities) {
-    const cachedObject = this._getCachedObject();
-    cachedObject[CITIES_NAME] = cities;
+    const cachedStructure = this._getCachedStructure();
+    cachedStructure[CITIES_NAME] = cities;
 
     this._storage.setItem(
         this._storageKey,
-        JSON.stringify(cachedObject)
+        JSON.stringify(cachedStructure)
     );
   }
 
   setPoints(points) {
-    const cachedObject = this._getCachedObject();
-    cachedObject[POINTS_NAME] = points;
+    const cachedStructure = this._getCachedStructure();
+    cachedStructure[POINTS_NAME] = points;
 
     this._storage.setItem(
         this._storageKey,
-        JSON.stringify(cachedObject)
+        JSON.stringify(cachedStructure)
     );
   }
 
   setPoint(key, value) {
-    const points = this.getPointsObject();
+    const points = this.getPointsStructure();
     const tempPoints = Object.assign(
         {},
         points,
@@ -87,18 +87,18 @@ export default class Store {
 
   updateCreatedPoints(points) {
     // Точки в локальном хранилище
-    const pointsObject = this.getPointsObject();
+    const pointsStructure = this.getPointsStructure();
 
     // Раскидал созданные точки по временным id
     points.forEach((point) => {
-      pointsObject[point.tempId] = point;
+      pointsStructure[point.tempId] = point;
     });
 
-    let tempPointsObject = null;
-    const resultedPointsObject = Object.values(pointsObject)
+    let tempPointsStructure = null;
+    const resultedPointsStructure = Object.values(pointsStructure)
       .reduce((accumulator, currentPoint) => {
-        if (tempPointsObject === null) {
-          tempPointsObject = Object.assign(
+        if (tempPointsStructure === null) {
+          tempPointsStructure = Object.assign(
               {},
               {
                 [accumulator.id]: accumulator
@@ -108,7 +108,7 @@ export default class Store {
               }
           );
 
-          return tempPointsObject;
+          return tempPointsStructure;
         }
 
         return Object.assign(
@@ -120,11 +120,11 @@ export default class Store {
         );
       });
 
-    this.setPoints(resultedPointsObject);
+    this.setPoints(resultedPointsStructure);
   }
 
   removePoint(key) {
-    const points = this.getPointsObject();
+    const points = this.getPointsStructure();
 
     delete points[key];
     this.setPoints(points);

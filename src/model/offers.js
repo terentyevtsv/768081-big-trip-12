@@ -1,7 +1,7 @@
-import {getSnakeCaseString, getCapitalizedWord} from "../utils/common.js";
+import {getSnakeCaseText, getCapitalizedWord} from "../utils/common.js";
 import {PointGroup} from "../const.js";
 
-const pointGroups = {
+const pointGroupsDictionary = {
   [`taxi`]: PointGroup.MOVEMENT,
   [`bus`]: PointGroup.MOVEMENT,
   [`train`]: PointGroup.MOVEMENT,
@@ -39,7 +39,7 @@ export default class Offers {
         offer,
         {
           name: offer.title,
-          label: getSnakeCaseString(offer.title)
+          label: getSnakeCaseText(offer.title)
         }
     );
 
@@ -55,7 +55,7 @@ export default class Offers {
         {
           name: getCapitalizedWord(serverEventType.type),
           image: `img/icons/${serverEventType.type}.png`,
-          pointGroup: pointGroups[serverEventType.type],
+          pointGroup: pointGroupsDictionary[serverEventType.type],
           value: serverEventType.type
         }
     );

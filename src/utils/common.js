@@ -2,20 +2,20 @@ const isAlphabetsCharacter = (character) => {
   return typeof character === `string` && character.length === 1 && /[A-Za-z]/.test(character);
 };
 
-export const getSnakeCaseString = (inputString) => {
-  let alphabetString = ``;
-  for (let i = 0; i < inputString.length; ++i) {
-    if (isAlphabetsCharacter(inputString[i]) || inputString[i] === ` `) {
-      alphabetString += inputString[i];
+export const getSnakeCaseText = (inputText) => {
+  let alphabetText = ``;
+  for (let i = 0; i < inputText.length; ++i) {
+    if (isAlphabetsCharacter(inputText[i]) || inputText[i] === ` `) {
+      alphabetText += inputText[i];
     }
   }
 
-  const resultString = alphabetString
+  const resultText = alphabetText
     .split(` `)
     .map((part) => part.toLowerCase())
     .join(`-`);
 
-  return resultString;
+  return resultText;
 };
 
 export const getCapitalizedWord = (word) =>

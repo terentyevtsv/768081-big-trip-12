@@ -1,9 +1,9 @@
 import AbstractView from "./abstract.js";
 
-const createTripPriceTemplate = (planDatePointsMap) => {
+const createTripPriceTemplate = (datePointsPlan) => {
   let account = 0;
-  for (const pointsDate of planDatePointsMap.keys()) {
-    for (const point of planDatePointsMap.get(pointsDate)) {
+  for (const pointsDate of datePointsPlan.keys()) {
+    for (const point of datePointsPlan.get(pointsDate)) {
       point.offers
         .filter((offer) => offer.isAccepted)
         .forEach((offer) => {
@@ -21,12 +21,12 @@ const createTripPriceTemplate = (planDatePointsMap) => {
 };
 
 export default class TripPrice extends AbstractView {
-  constructor(planDatePointsMap) {
+  constructor(datePointsPlan) {
     super();
-    this._planDatePointsMap = planDatePointsMap;
+    this._datePointsPlan = datePointsPlan;
   }
 
   getTemplate() {
-    return createTripPriceTemplate(this._planDatePointsMap);
+    return createTripPriceTemplate(this._datePointsPlan);
   }
 }

@@ -94,7 +94,7 @@ export default class NewPoint {
         );
 
         this._changePoint(
-            UserAction.ADD_POINT,
+            UserAction.POINT_CREATION,
             Object.assign({id: response.id}, point)
         );
         this.destroy();
@@ -123,12 +123,12 @@ export default class NewPoint {
 
   // Значения по умолчанию для точки маршрута при создании
   _getDefaultPoint() {
-    const tmpCities = this._citiesModel.cities;
+    const tempCities = this._citiesModel.cities;
     const point = {
       eventType: this._offersModel.eventTypes[EMPTY_POINT_INDEX],
-      city: tmpCities[EMPTY_POINT_INDEX],
+      city: tempCities[EMPTY_POINT_INDEX],
       offers: [],
-      destination: this._citiesModel.getDestination(tmpCities[EMPTY_POINT_INDEX]),
+      destination: this._citiesModel.getDestination(tempCities[EMPTY_POINT_INDEX]),
       isFavorite: false,
       price: 0
     };

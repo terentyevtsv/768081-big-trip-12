@@ -1,5 +1,5 @@
 import {render, AddedComponentPosition, remove, replace} from "../utils/render.js";
-import NoPointsView from "../view/no-points.js";
+import NoPointsNotificationView from "../view/no-points-notification.js";
 import SortingView from "../view/sorting.js";
 import PointsPlanContainerView from "../view/points-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
@@ -45,7 +45,7 @@ export default class Trip {
     this._errorLoadingView = null;
 
     this._currentSortType = SortType.EVENT;
-    this._noPointsView = new NoPointsView();
+    this._noPointsNotificationView = new NoPointsNotificationView();
     this._sortingView = null;
     this._pointsPlanContainerView = new PointsPlanContainerView();
 
@@ -65,8 +65,8 @@ export default class Trip {
     this._newPointPresenter = null;
   }
 
-  get planDatePointsMap() {
-    return this._planDatePointsMap;
+  get datePointsPlan() {
+    return this._datePointsPlan;
   }
 
   set currentSortType(sortType) {
@@ -76,17 +76,17 @@ export default class Trip {
   createPoint() {
     this._filterModel.setFilter(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
-    this._planDatePointsMap = this._getMapDates();
+    this._datePointsPlan = this._getDatePointsStructure();
     this.renderPointsPlan(true);
   }
 
   _handleModelChange() {
-    this._planDatePointsMap = this._getMapDates();
+    this._datePointsPlan = this._getDatePointsStructure();
     this.renderPointsPlan(false);
   }
 
   _handleFilterChanged() {
-    remove(this._noPointsView);
+    remove(this._noPointsNotificationView);
     if (this._newPointPresenter !== null) {
       this._newPointPresenter.destroy();
     }
@@ -118,14 +118,14 @@ export default class Trip {
       );
     }
 
-    this._planDatePointsMap = this._getMapDates();
+    this._datePointsPlan = this._getDatePointsStructure();
     if (this._siteMenuModel.getMenuItem() === MenuItem.TABLE) {
       this.renderPointsPlan(false);
     }
   }
 
-  renderError(messageObject) {
-    const fullMessage = `Не загружены ${Object.values(messageObject).join(` и `)}`;
+  renderError(messageStructure) {
+    const fullMessage = `Не загружены ${Object.values(messageStructure).join(` и `)}`;
     this._errorLoadingView = new LoadingView(fullMessage);
     replace(this._errorLoadingView, this._loadingView);
 
@@ -154,7 +154,7 @@ export default class Trip {
       this._errorLoadingView = null;
     }
 
-    remove(this._noPointsView);
+    remove(this._noPointsNotificationView);
   }
 
   _getPoints(filterType) {
@@ -172,13 +172,13 @@ export default class Trip {
   // Обновление точки маршрута
   _handleViewAction(actionType, update) {
     switch (actionType) {
-      case UserAction.UPDATE_POINT:
+      case UserAction.POINT_UPDATE:
         this._pointsModel.updatePoint(update);
         break;
-      case UserAction.ADD_POINT:
+      case UserAction.POINT_CREATION:
         this._pointsModel.addPoint(update);
         break;
-      case UserAction.DELETE_POINT:
+      case UserAction.POINT_REMOVAL:
         this._pointsModel.deletePoint(update);
         break;
     }
@@ -189,46 +189,46 @@ export default class Trip {
       return;
     }
     this._currentSortType = sortType;
-    const mapDates = this._getMapDates();
-    this._renderPoints(mapDates);
+    const datePointsStructure = this._getDatePointsStructure();
+    this._renderPoints(datePointsStructure);
   }
 
   // Формирование структуры событий по датам
-  _getMapDates() {
-    const mapDates = new Map();
+  _getDatePointsStructure() {
+    const datePointsStructure = new Map();
     const points = this._getPoints(this._filterModel.getFilter());
 
     if (this._currentSortType === SortType.EVENT) {
       // Обычный порядок
-      const datesSet = new Set();
+      const distinctDates = new Set();
 
       // Формируем список дат, по которым будут группироваться события
       points.forEach((point) => {
         const date = new Date(point.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
-        datesSet.add(date.getTime());
+        distinctDates.add(date.getTime());
       });
 
       // Сортируем даты в порядке возрастания
-      const dates = Array.from(datesSet)
+      const dates = Array.from(distinctDates)
         .sort((a, b) => a - b);
 
       // Раскидываем события по датам
-      dates.forEach((date) => mapDates.set(date, []));
+      dates.forEach((date) => datePointsStructure.set(date, []));
 
       points.forEach((point) => {
         const date = new Date(point.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
-        mapDates.get(date.getTime()).push(point);
+        datePointsStructure.get(date.getTime()).push(point);
       });
 
-      Array.from(mapDates.keys()).forEach((mapDateKey) => mapDates.get(mapDateKey)
+      Array.from(datePointsStructure.keys()).forEach((dateKey) => datePointsStructure.get(dateKey)
         .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
                         b.timeInterval.leftLimitDate.getTime())
       );
-      return mapDates;
+      return datePointsStructure;
     }
 
     const tempDate = new Date();
@@ -237,16 +237,16 @@ export default class Trip {
       // Порядок с сортировкой по времени точки маршрута
       copyPoints.sort((point1, point2) => getTimeIntervalsDifference(point2.timeInterval) -
                                   getTimeIntervalsDifference(point1.timeInterval));
-      mapDates.set(tempDate, copyPoints);
+      datePointsStructure.set(tempDate, copyPoints);
 
-      return mapDates;
+      return datePointsStructure;
     }
 
     // Порядок с сортировкой по цене
     copyPoints.sort((point1, point2) => point2.price - point1.price);
-    mapDates.set(tempDate, copyPoints);
+    datePointsStructure.set(tempDate, copyPoints);
 
-    return mapDates;
+    return datePointsStructure;
   }
 
   _renderSort() {
@@ -293,7 +293,7 @@ export default class Trip {
     this._pointPresenter[point.id] = tripPointPresenter;
   }
 
-  _renderPoints(mapDates) {
+  _renderPoints(datePointsStructure) {
     Object.values(this._pointPresenter)
         .forEach((presenter) => presenter.destroy());
     this._dateContainers.forEach((d) => remove(d));
@@ -302,9 +302,9 @@ export default class Trip {
     this._dateContainers = [];
 
     let index = 0;
-    for (const mapDateKey of mapDates.keys()) {
+    for (const dateKey of datePointsStructure.keys()) {
       // Какая-то дата путешествия
-      const date = new Date(mapDateKey);
+      const date = new Date(dateKey);
 
       // Отрисовка очередной даты
       const tripDaysItemView = new TripDaysItemView(date, index, this._currentSortType);
@@ -324,7 +324,7 @@ export default class Trip {
       this._dateContainers[index++] = tripDaysItemView;
 
       // точки маршрута даты сортируем по дате начала
-      const tempPoints = mapDates.get(mapDateKey);
+      const tempPoints = datePointsStructure.get(dateKey);
       // Цикл по всем точкам маршрута данной даты
       for (let j = 0; j < tempPoints.length; ++j) {
         this._renderPoint(tempPoints[j], pointsListView);
@@ -332,7 +332,7 @@ export default class Trip {
     }
   }
 
-  _renderNoPoints() {
+  _renderNoPointsNotification() {
     if (this._sortingView !== null) {
       remove(this._sortingView);
       this._sortingView = null;
@@ -343,7 +343,7 @@ export default class Trip {
     // Метод для рендеринга заглушки
     render(
         this._tripPointsContainer,
-        this._noPointsView,
+        this._noPointsNotificationView,
         AddedComponentPosition.BEFORE_END
     );
   }
@@ -357,11 +357,11 @@ export default class Trip {
     const points = this._getPoints(this._filterModel.getFilter());
     if (points.length === 0) {
       if (renderNewPointFlag) {
-        remove(this._noPointsView);
+        remove(this._noPointsNotificationView);
         this._newPointPresenter.initialize();
         return;
       }
-      this._renderNoPoints();
+      this._renderNoPointsNotification();
       return;
     }
 
@@ -376,6 +376,6 @@ export default class Trip {
         this._pointsPlanContainerView,
         AddedComponentPosition.BEFORE_END
     );
-    this._renderPoints(this._planDatePointsMap);
+    this._renderPoints(this._datePointsPlan);
   }
 }

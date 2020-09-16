@@ -1,19 +1,19 @@
 export default class Cities {
   constructor() {
-    this._citiesMap = null;
+    this._citiesStructure = null;
   }
 
   get cities() {
-    return Array.from(this._citiesMap.keys());
+    return Array.from(this._citiesStructure.keys());
   }
 
   setCities(cities) {
-    this._citiesMap = cities;
+    this._citiesStructure = cities;
   }
 
   getDestination(city) {
-    return this._citiesMap.has(city)
-      ? this._citiesMap.get(city)
+    return this._citiesStructure.has(city)
+      ? this._citiesStructure.get(city)
       : null;
   }
 

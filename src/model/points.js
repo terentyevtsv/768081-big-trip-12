@@ -6,17 +6,17 @@ export default class Points extends Observer {
     this._points = [];
   }
 
-  getCitiesMap() {
-    return this._citiesMap;
+  getCitiesStructure() {
+    return this._citiesStructure;
   }
 
-  setСitiesMap(value) {
-    this._citiesMap = value;
+  setСitiesStructure(value) {
+    this._citiesStructure = value;
   }
 
   getDestinationsInformation(city) {
-    return this._citiesMap.has(city)
-      ? this._citiesMap.get(city)
+    return this._citiesStructure.has(city)
+      ? this._citiesStructure.get(city)
       : null;
   }
 
@@ -72,13 +72,13 @@ export default class Points extends Observer {
 
   static adaptToClient(point, eventType, maskOffers) {
     const offers = [];
-    const checkedOffersSet = new Set(point.offers.map((offer) => offer.title));
+    const checkedOffers = new Set(point.offers.map((offer) => offer.title));
     maskOffers.forEach((offer) => {
       offers.push({
         name: offer.name,
         price: offer.price,
         label: offer.label,
-        isAccepted: checkedOffersSet.has(offer.name)
+        isAccepted: checkedOffers.has(offer.name)
       });
     });
 
@@ -109,10 +109,10 @@ export default class Points extends Observer {
   }
 
   static adaptToServer(point, destinationsInformation) {
-    const tmpOffers = point.offers
+    const tempOffers = point.offers
       .filter((offer) => offer.isAccepted);
     const offers = [];
-    tmpOffers.forEach((offer) => offers.push({
+    tempOffers.forEach((offer) => offers.push({
       price: offer.price,
       title: offer.name
     }));

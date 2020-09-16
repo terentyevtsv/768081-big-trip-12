@@ -39,7 +39,7 @@ const mainPageBodyContainerElement = document
   .querySelector(`.page-body__page-main .page-body__container`);
 
 const typeOffers = new Map(); // Все возможные значения предложений для каждого типа события
-const eventTypesMap = new Map(); // Тип события по его названию
+const eventTypesDictionary = new Map(); // Тип события по его названию
 
 // Инициализация модели предложений
 const offersModel = new OffersModel();
@@ -53,7 +53,7 @@ const citiesModel = new CitiesModel();
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
-pointsModel.setСitiesMap(new Map()); // Города с общим описанием, фото и описанием фото
+pointsModel.setСitiesStructure(new Map()); // Города с общим описанием, фото и описанием фото
 
 // Инициализация модели фильтра
 const filterModel = new FilterModel();
@@ -79,23 +79,23 @@ const tripPresenter = new TripPresenter(
 
 tripPresenter.renderPointsPlan(false);
 
-const getPlanDatePointMap = () => tripPresenter.planDatePointsMap;
+const getDatePointsPlan = () => tripPresenter.datePointsPlan;
 const tripInformationPresenter = new TripInformationPresenter(tripMainElement,
-    filterModel, pointsModel, getPlanDatePointMap);
+    filterModel, pointsModel, getDatePointsPlan);
 
-const errorMessagesObject = {
+const errorMessage = {
   offersTaskMessage: `типы точек маршрута`,
   citiesTaskMessage: `города`
 };
 
-let errorValuesCount = Object.values(errorMessagesObject).length;
+let errorValuesCount = Object.values(errorMessage).length;
 
 const siteMenuView = new SiteMenuView(siteMenuModel);
 
 const renderPointsAfterLoading = (points) => {
   const tempPoints = [];
   points.forEach((point) => {
-    const eventType = eventTypesMap.get(point.type);
+    const eventType = eventTypesDictionary.get(point.type);
     const maskOffers = offersModel.getOffers(eventType);
 
     const tempPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
@@ -130,17 +130,17 @@ const renderPointsAfterLoading = (points) => {
 
 apiWithProvider.getEventTypesOffers()
   .then((eventTypesOffers) => {
-    delete errorMessagesObject.offersTaskMessage;
+    delete errorMessage.offersTaskMessage;
 
     typeOffers.clear();
-    eventTypesMap.clear();
+    eventTypesDictionary.clear();
 
     eventTypesOffers.forEach((eventTypesOffer) => {
       const eventType = OffersModel.adaptEventTypeToClient(eventTypesOffer);
 
       if (!typeOffers.has(eventType)) {
         typeOffers.set(eventType, []);
-        eventTypesMap.set(eventTypesOffer.type, eventType);
+        eventTypesDictionary.set(eventTypesOffer.type, eventType);
       }
 
       eventTypesOffer.offers.forEach((offer) => {
@@ -156,23 +156,23 @@ apiWithProvider.getEventTypesOffers()
     return apiWithProvider.getDestinations();
   })
   .then((destinations) => {
-    delete errorMessagesObject.citiesTaskMessage;
+    delete errorMessage.citiesTaskMessage;
 
-    pointsModel.getCitiesMap().clear();
+    pointsModel.getCitiesStructure().clear();
     destinations.forEach((destination) => {
       const currentDestination = CitiesModel.adaptDestinationToClient(destination);
-      pointsModel.getCitiesMap().set(destination.name, currentDestination);
+      pointsModel.getCitiesStructure().set(destination.name, currentDestination);
     });
-    citiesModel.setCities(pointsModel.getCitiesMap());
+    citiesModel.setCities(pointsModel.getCitiesStructure());
   })
   .catch(() => {
     // отображение ошибки загрузки доп. данных
-    tripPresenter.renderError(errorMessagesObject);
+    tripPresenter.renderError(errorMessage);
     filterModel.removeObserver(tripInformationPresenter.initialize);
     siteMenuView.removeMenuClickHandler();
   })
   .then(() => {
-    errorValuesCount = Object.values(errorMessagesObject).length;
+    errorValuesCount = Object.values(errorMessage).length;
     if (errorValuesCount > 0) {
       return [];
     }
