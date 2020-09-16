@@ -27,7 +27,7 @@ export default class PointsFiltration {
     const isFutureDisabled = this.getPoints(FilterType.FUTURE).length === NO_POINTS_LENGTH;
     const isPastDisabled = this.getPoints(FilterType.PAST).length === NO_POINTS_LENGTH;
 
-    filterModel.setFilterDisabledFlags(
+    filterModel.setDisabledFlags(
         isEverythingDisabled,
         isFutureDisabled,
         isPastDisabled

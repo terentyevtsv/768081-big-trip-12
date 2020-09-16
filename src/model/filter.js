@@ -11,16 +11,16 @@ export default class Filter extends Observer {
     this._isPastFilterDisabled = false;
   }
 
-  setFilter(filter) {
+  set(filter) {
     this._activeFilter = filter;
     this._notify(filter);
   }
 
-  getFilter() {
+  get() {
     return this._activeFilter;
   }
 
-  setFilterDisabledFlags(
+  setDisabledFlags(
       isEverythingDisabled,
       isFutureDisabled,
       isPastDisabled
@@ -30,7 +30,7 @@ export default class Filter extends Observer {
     this._isPastFilterDisabled = isPastDisabled;
   }
 
-  getFilterDisabledFlags() {
+  getDisabledFlags() {
     return {
       isEverythingDisabled: this._isEverythingFilterDisabled,
       isFutureDisabled: this._isFutureFilterDisabled,

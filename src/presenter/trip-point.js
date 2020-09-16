@@ -233,11 +233,11 @@ export default class TripPoint {
         this.initialize(this._point);
         this._replaceFormToPoint();
 
-        this._pointsModel.updatePoint(this._point);
+        this._pointsModel.update(this._point);
 
-        const pointsFiltration = new PointsFiltration(this._pointsModel.getPoints());
+        const pointsFiltration = new PointsFiltration(this._pointsModel.get());
         pointsFiltration.setFilterDisabledFlags(this._filterModel);
-        this._filterPresenter.updateFiltersAccessibilityStatus();
+        this._filterPresenter.updateAccessibilityStatus();
       })
       .catch(() => {
         this._pointEditComponent.shake(() => {
@@ -274,9 +274,9 @@ export default class TripPoint {
         );
         this._changePoint(UserAction.POINT_REMOVAL, point);
 
-        const pointsFiltration = new PointsFiltration(this._pointsModel.getPoints());
+        const pointsFiltration = new PointsFiltration(this._pointsModel.get());
         pointsFiltration.setFilterDisabledFlags(this._filterModel);
-        this._filterPresenter.updateFiltersAccessibilityStatus();
+        this._filterPresenter.updateAccessibilityStatus();
       })
       .catch(() => {
         this._pointEditComponent.shake(() => {

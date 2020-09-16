@@ -99,9 +99,9 @@ export default class NewPoint {
         );
         this.destroy();
 
-        const pointsFiltration = new PointsFiltration(this._pointsModel.getPoints());
+        const pointsFiltration = new PointsFiltration(this._pointsModel.get());
         pointsFiltration.setFilterDisabledFlags(this._filterModel);
-        this._filterPresenter.updateFiltersAccessibilityStatus();
+        this._filterPresenter.updateAccessibilityStatus();
       })
       .catch(() => {
         this._pointEditComponent.shake(() => {
@@ -123,7 +123,7 @@ export default class NewPoint {
 
   // Значения по умолчанию для точки маршрута при создании
   _getDefaultPoint() {
-    const tempCities = this._citiesModel.cities;
+    const tempCities = this._citiesModel.get();
     const point = {
       eventType: this._offersModel.eventTypes[EMPTY_POINT_INDEX],
       city: tempCities[EMPTY_POINT_INDEX],
@@ -141,7 +141,7 @@ export default class NewPoint {
       rightLimitDate: date
     };
 
-    const offers = this._offersModel.getOffers(point.eventType);
+    const offers = this._offersModel.get(point.eventType);
     for (let i = 0; i < offers.length; i++) {
       point.offers[i] = {
         name: offers[i].name,
@@ -162,7 +162,7 @@ export default class NewPoint {
       this._offers[i] = false;
     }
 
-    this._renderNewPoint(point);
+    this._render(point);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
 
@@ -181,7 +181,7 @@ export default class NewPoint {
     this._pointEditComponent.updateOffers(this._offers);
   }
 
-  _renderNewPoint(point) {
+  _render(point) {
     this._pointEditComponent = new BasePointView(
         point,
         true,
@@ -214,7 +214,7 @@ export default class NewPoint {
   }
 
   initialize() {
-    this._renderNewPoint(this._point);
+    this._render(this._point);
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);

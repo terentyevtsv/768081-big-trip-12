@@ -195,7 +195,7 @@ export default class BasePoint extends SmartView {
     this._offersModel = offersModel;
 
     this._citiesModel = citiesModel;
-    this._cityNames = new Set(this._citiesModel.cities);
+    this._cityNames = new Set(this._citiesModel.get());
 
     this._fromDatepicker = null;
     this._toDatepicker = null;
@@ -224,7 +224,7 @@ export default class BasePoint extends SmartView {
         this._data,
         this._isNewPoint,
         this._offersModel.eventTypes,
-        this._citiesModel.cities
+        this._citiesModel.get()
     );
   }
 
@@ -286,7 +286,7 @@ export default class BasePoint extends SmartView {
     evt.preventDefault();
     const tempEventType = this._offersModel.eventTypes
       .find((eventType) => eventType.value === evt.target.value);
-    const tempOffers = this._offersModel.getOffers(tempEventType);
+    const tempOffers = this._offersModel.get(tempEventType);
     this.updateData({
       eventType: tempEventType,
       offers: tempOffers

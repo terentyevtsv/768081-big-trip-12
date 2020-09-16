@@ -14,25 +14,25 @@ export default class NewPointButton extends SmartView {
     super();
 
     this._data.isEnabled = isEnabled;
-    this._clickNewPointButtonHandler = this._clickNewPointButtonHandler.bind(this);
+    this._clickNewPointButtonHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createNewPointButtonTemplate(this._data.isEnabled);
   }
 
-  _clickNewPointButtonHandler(evt) {
+  _clickHandler(evt) {
     this._callback.newPointClick(evt);
     this.updateData({isEnabled: !this._data.isEnabled}, false);
   }
 
   restoreHandlers() {
-    this.getElement().addEventListener(`click`, this._clickNewPointButtonHandler);
+    this.getElement().addEventListener(`click`, this._clickHandler);
   }
 
   setButtonClickHandler(callback) {
     this._callback.newPointClick = callback;
-    this.getElement().addEventListener(`click`, this._clickNewPointButtonHandler);
+    this.getElement().addEventListener(`click`, this._clickHandler);
   }
 
   inverseEnabled() {

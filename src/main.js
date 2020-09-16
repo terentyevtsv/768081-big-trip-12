@@ -96,13 +96,13 @@ const renderPointsAfterLoading = (points) => {
   const tempPoints = [];
   points.forEach((point) => {
     const eventType = eventTypesDictionary.get(point.type);
-    const maskOffers = offersModel.getOffers(eventType);
+    const maskOffers = offersModel.get(eventType);
 
     const tempPoint = PointsModel.adaptToClient(point, eventType, maskOffers);
     tempPoints.push(tempPoint);
   });
 
-  pointsModel.setPoints(tempPoints);
+  pointsModel.set(tempPoints);
 
   const pointsFiltration = new PointsFiltration(tempPoints);
   pointsFiltration.setFilterDisabledFlags(filterModel);
@@ -144,13 +144,13 @@ apiWithProvider.getEventTypesOffers()
       }
 
       eventTypesOffer.offers.forEach((offer) => {
-        const currentOffer = OffersModel.adaptOfferToClient(offer);
+        const currentOffer = OffersModel.adaptToClient(offer);
         typeOffers.get(eventType).push(currentOffer);
       });
 
     });
 
-    offersModel.setOffers(typeOffers);
+    offersModel.set(typeOffers);
   })
   .then(() => {
     return apiWithProvider.getDestinations();
@@ -163,7 +163,7 @@ apiWithProvider.getEventTypesOffers()
       const currentDestination = CitiesModel.adaptDestinationToClient(destination);
       pointsModel.getCitiesStructure().set(destination.name, currentDestination);
     });
-    citiesModel.setCities(pointsModel.getCitiesStructure());
+    citiesModel.set(pointsModel.getCitiesStructure());
   })
   .catch(() => {
     // отображение ошибки загрузки доп. данных
@@ -194,15 +194,15 @@ apiWithProvider.getEventTypesOffers()
 
     render(tripMainElement, newPointButtonView, AddedComponentPosition.BEFORE_END);
 
-    pointsModel.setPoints([]);
-    renderPointsAfterLoading(pointsModel.getPoints());
+    pointsModel.set([]);
+    renderPointsAfterLoading(pointsModel.get());
   });
 
 newPointButtonView.setButtonClickHandler((evt) => {
   evt.preventDefault();
 
   if (siteMenuModel.getMenuItem() !== MenuItem.TABLE) {
-    siteMenuView.updateSiteMenu(MenuItem.TABLE);
+    siteMenuView.update(MenuItem.TABLE);
     handleSiteMenuClick(MenuItem.TABLE);
   }
 
@@ -226,7 +226,7 @@ const handleSiteMenuClick = (menuItem) => {
       tripPresenter.destroy();
 
       // Показать статистику
-      statisticsView = new StatisticsView(pointsModel.getPoints());
+      statisticsView = new StatisticsView(pointsModel.get());
       render(mainPageBodyContainerElement, statisticsView, AddedComponentPosition.BEFORE_END);
       break;
   }

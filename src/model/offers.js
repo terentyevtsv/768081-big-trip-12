@@ -23,17 +23,17 @@ export default class Offers {
     return Array.from(this._typeOffers.keys());
   }
 
-  setOffers(typeOffers) {
+  set(typeOffers) {
     this._typeOffers = typeOffers;
   }
 
-  getOffers(eventType) {
+  get(eventType) {
     return this._typeOffers.has(eventType)
       ? this._typeOffers.get(eventType)
       : null;
   }
 
-  static adaptOfferToClient(offer) {
+  static adaptToClient(offer) {
     const adaptedOffer = Object.assign(
         {},
         offer,

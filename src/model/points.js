@@ -20,15 +20,15 @@ export default class Points extends Observer {
       : null;
   }
 
-  getPoints() {
+  get() {
     return this._points;
   }
 
-  setPoints(points) {
+  set(points) {
     this._points = points.slice();
   }
 
-  updatePoint(point) {
+  update(point) {
     const index = this._points.findIndex((item) => item.id === point.id);
 
     if (index === -1) {
@@ -46,7 +46,7 @@ export default class Points extends Observer {
     this._notify(point);
   }
 
-  addPoint(addedPoint) {
+  add(addedPoint) {
     this._points = [
       addedPoint,
       ...this._points
@@ -55,7 +55,7 @@ export default class Points extends Observer {
     this._notify(addedPoint);
   }
 
-  deletePoint(deletedPoint) {
+  delete(deletedPoint) {
     const index = this._points.findIndex((point) => point.id === deletedPoint.id);
 
     if (index === -1) {

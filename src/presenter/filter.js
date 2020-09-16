@@ -10,16 +10,16 @@ export default class Filter {
     this._filterHeaderView = new FilterHeaderView();
 
     const {isEverythingDisabled, isFutureDisabled, isPastDisabled} =
-      this._filterModel.getFilterDisabledFlags();
+      this._filterModel.getDisabledFlags();
     this._filterView = new FilterView(
         isEverythingDisabled,
         isFutureDisabled,
         isPastDisabled,
-        this._filterModel.getFilter()
+        this._filterModel.get()
     );
 
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
-    this._updateFiltersAccessibilityStatus = this.updateFiltersAccessibilityStatus.bind(this);
+    this._updateFiltersAccessibilityStatus = this.updateAccessibilityStatus.bind(this);
   }
 
   initialize() {
@@ -29,22 +29,22 @@ export default class Filter {
         AddedComponentPosition.BEFORE_END
     );
 
-    this.updateFiltersAccessibilityStatus();
+    this.updateAccessibilityStatus();
   }
 
-  updateFiltersAccessibilityStatus() {
+  updateAccessibilityStatus() {
     if (this._filterView !== null) {
       remove(this._filterView);
       this._filterView = null;
     }
 
     const {isEverythingDisabled, isFutureDisabled, isPastDisabled} =
-      this._filterModel.getFilterDisabledFlags();
+      this._filterModel.getDisabledFlags();
     this._filterView = new FilterView(
         isEverythingDisabled,
         isFutureDisabled,
         isPastDisabled,
-        this._filterModel.getFilter()
+        this._filterModel.get()
     );
 
     this._filterView.setFilterTypeChangeHandler(this._handleFilterTypeChange);
@@ -57,6 +57,6 @@ export default class Filter {
   }
 
   _handleFilterTypeChange(filterType) {
-    this._filterModel.setFilter(filterType);
+    this._filterModel.set(filterType);
   }
 }

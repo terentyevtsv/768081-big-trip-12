@@ -28,7 +28,7 @@ export default class SiteMenu extends SmartView {
     return createSiteMenuTemplate(this._siteMenuModel.getMenuItem());
   }
 
-  updateSiteMenu(menu) {
+  update(menu) {
     this._siteMenuModel.setMenuItem(menu);
     this._data = this._siteMenuModel.getMenuItem();
     this.updateData(this._data);
@@ -39,7 +39,7 @@ export default class SiteMenu extends SmartView {
     if (evt.target.tagName === Tag.REFERENCE) {
       const currentMenu = evt.target.dataset.menu;
       if (currentMenu !== this._siteMenuModel.getMenuItem()) {
-        this.updateSiteMenu(currentMenu);
+        this.update(currentMenu);
         this._callback.menuClick(currentMenu);
       }
     }

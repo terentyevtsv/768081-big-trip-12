@@ -74,7 +74,7 @@ export default class Trip {
   }
 
   createPoint() {
-    this._filterModel.setFilter(FilterType.EVERYTHING);
+    this._filterModel.set(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
     this._datePointsPlan = this._getDatePointsStructure();
     this.renderPointsPlan(true);
@@ -158,7 +158,7 @@ export default class Trip {
   }
 
   _getPoints(filterType) {
-    const pointsFiltration = new PointsFiltration(this._pointsModel.getPoints());
+    const pointsFiltration = new PointsFiltration(this._pointsModel.get());
     return pointsFiltration.getPoints(filterType);
   }
 
@@ -173,13 +173,13 @@ export default class Trip {
   _handleViewAction(actionType, update) {
     switch (actionType) {
       case UserAction.POINT_UPDATE:
-        this._pointsModel.updatePoint(update);
+        this._pointsModel.update(update);
         break;
       case UserAction.POINT_CREATION:
-        this._pointsModel.addPoint(update);
+        this._pointsModel.add(update);
         break;
       case UserAction.POINT_REMOVAL:
-        this._pointsModel.deletePoint(update);
+        this._pointsModel.delete(update);
         break;
     }
   }
@@ -196,7 +196,7 @@ export default class Trip {
   // Формирование структуры событий по датам
   _getDatePointsStructure() {
     const datePointsStructure = new Map();
-    const points = this._getPoints(this._filterModel.getFilter());
+    const points = this._getPoints(this._filterModel.get());
 
     if (this._currentSortType === SortType.EVENT) {
       // Обычный порядок
@@ -354,7 +354,7 @@ export default class Trip {
       return;
     }
 
-    const points = this._getPoints(this._filterModel.getFilter());
+    const points = this._getPoints(this._filterModel.get());
     if (points.length === 0) {
       if (renderNewPointFlag) {
         remove(this._noPointsNotificationView);

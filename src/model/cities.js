@@ -3,11 +3,11 @@ export default class Cities {
     this._citiesStructure = null;
   }
 
-  get cities() {
+  get() {
     return Array.from(this._citiesStructure.keys());
   }
 
-  setCities(cities) {
+  set(cities) {
     this._citiesStructure = cities;
   }
 
