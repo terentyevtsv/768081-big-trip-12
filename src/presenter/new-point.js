@@ -38,7 +38,7 @@ export default class NewPoint {
     this._handleCancelClick = this._handleCancelClick.bind(this);
     this._escapeKeyDownHandler = this._escapeKeyDownHandler.bind(this);
     this._initializeBasePoint = this._initializeBasePoint.bind(this);
-    this._offersListChangeHandler = this._offersListChangeHandler.bind(this);
+    this._handleOffersListChange = this._handleOffersListChange.bind(this);
     this._point = this._getDefaultPoint();
 
     this._offers = [];
@@ -60,11 +60,96 @@ export default class NewPoint {
     document.removeEventListener(`keydown`, this._escapeKeyDownHandler);
   }
 
-  _escapeKeyDownHandler(evt) {
-    if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
-      evt.preventDefault();
-      this.destroy();
+  // Значения по умолчанию для точки маршрута при создании
+  _getDefaultPoint() {
+    const tempCities = this._citiesModel.get();
+    const point = {
+      eventType: this._offersModel.eventTypes[EMPTY_POINT_INDEX],
+      city: tempCities[EMPTY_POINT_INDEX],
+      offers: [],
+      destination: this._citiesModel.getDestination(tempCities[EMPTY_POINT_INDEX]),
+      isFavorite: false,
+      price: 0
+    };
+
+    const date = new Date();
+    date.setHours(0, 0, 0);
+
+    point.timeInterval = {
+      leftLimitDate: date,
+      rightLimitDate: date
+    };
+
+    const offers = this._offersModel.get(point.eventType);
+    for (let i = 0; i < offers.length; i++) {
+      point.offers[i] = {
+        name: offers[i].name,
+        price: offers[i].price,
+        label: offers[i].label,
+        isAccepted: false
+      };
     }
+
+    return point;
+  }
+
+  _initializeBasePoint(point) {
+    const previousPointEditComponent = this._pointEditComponent;
+
+    this._offers = [];
+    for (let i = 0; i < point.offers.length; i++) {
+      this._offers[i] = false;
+    }
+
+    this._render(point);
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
+
+    document.addEventListener(`keydown`, this._escapeKeyDownHandler);
+
+    replace(this._pointEditComponent, previousPointEditComponent);
+    remove(previousPointEditComponent);
+  }
+
+  _render(point) {
+    this._pointEditComponent = new BasePointView(
+        point,
+        true,
+        this._offersModel,
+        this._citiesModel,
+        this._initializeBasePoint,
+        () => render(
+            this._pointEditComponent,
+            this._pointDetailsView,
+            AddedComponentPosition.BEFORE_END
+        )
+    );
+
+    this._pointDetailsView = new PointDetailsView();
+    this._offersContainerView = renderPointsOptions(
+        this._pointDetailsView,
+        this._pointEditComponent,
+        point,
+        this._citiesModel
+    );
+    if (this._offersContainerView !== null) {
+      this._offersContainerView.setOffersCheckHandler(this._handleOffersListChange);
+    }
+
+    render(
+        this._pointListContainer,
+        this._pointEditComponent,
+        AddedComponentPosition.BEFORE_END
+    );
+  }
+
+  initialize() {
+    this._render(this._point);
+
+    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
+
+    document.addEventListener(`keydown`, this._escapeKeyDownHandler);
   }
 
   _handleFormSubmit(point) {
@@ -121,58 +206,7 @@ export default class NewPoint {
     this.destroy();
   }
 
-  // Значения по умолчанию для точки маршрута при создании
-  _getDefaultPoint() {
-    const tempCities = this._citiesModel.get();
-    const point = {
-      eventType: this._offersModel.eventTypes[EMPTY_POINT_INDEX],
-      city: tempCities[EMPTY_POINT_INDEX],
-      offers: [],
-      destination: this._citiesModel.getDestination(tempCities[EMPTY_POINT_INDEX]),
-      isFavorite: false,
-      price: 0
-    };
-
-    const date = new Date();
-    date.setHours(0, 0, 0);
-
-    point.timeInterval = {
-      leftLimitDate: date,
-      rightLimitDate: date
-    };
-
-    const offers = this._offersModel.get(point.eventType);
-    for (let i = 0; i < offers.length; i++) {
-      point.offers[i] = {
-        name: offers[i].name,
-        price: offers[i].price,
-        label: offers[i].label,
-        isAccepted: false
-      };
-    }
-
-    return point;
-  }
-
-  _initializeBasePoint(point) {
-    const previousPointEditComponent = this._pointEditComponent;
-
-    this._offers = [];
-    for (let i = 0; i < point.offers.length; i++) {
-      this._offers[i] = false;
-    }
-
-    this._render(point);
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
-
-    document.addEventListener(`keydown`, this._escapeKeyDownHandler);
-
-    replace(this._pointEditComponent, previousPointEditComponent);
-    remove(previousPointEditComponent);
-  }
-
-  _offersListChangeHandler() {
+  _handleOffersListChange() {
     const offerElements = this._pointEditComponent.getElement()
       .querySelectorAll(`.event__offer-checkbox`);
     for (let i = 0; i < offerElements.length; ++i) {
@@ -181,44 +215,10 @@ export default class NewPoint {
     this._pointEditComponent.updateOffers(this._offers);
   }
 
-  _render(point) {
-    this._pointEditComponent = new BasePointView(
-        point,
-        true,
-        this._offersModel,
-        this._citiesModel,
-        this._initializeBasePoint,
-        () => render(
-            this._pointEditComponent,
-            this._pointDetailsView,
-            AddedComponentPosition.BEFORE_END
-        )
-    );
-
-    this._pointDetailsView = new PointDetailsView();
-    this._offersContainerView = renderPointsOptions(
-        this._pointDetailsView,
-        this._pointEditComponent,
-        point,
-        this._citiesModel
-    );
-    if (this._offersContainerView !== null) {
-      this._offersContainerView.setOffersCheckHandler(this._offersListChangeHandler);
+  _escapeKeyDownHandler(evt) {
+    if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
+      evt.preventDefault();
+      this.destroy();
     }
-
-    render(
-        this._pointListContainer,
-        this._pointEditComponent,
-        AddedComponentPosition.BEFORE_END
-    );
-  }
-
-  initialize() {
-    this._render(this._point);
-
-    this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
-    this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
-
-    document.addEventListener(`keydown`, this._escapeKeyDownHandler);
   }
 }

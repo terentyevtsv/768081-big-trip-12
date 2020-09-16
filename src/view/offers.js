@@ -38,13 +38,6 @@ export default class OffersContainer extends SmartView {
     return createOffersTemplate(this._offers, this._data.isDisabled);
   }
 
-  _offersCheckHandler(evt) {
-    evt.preventDefault();
-    if (evt.target.tagName === Tag.INPUT) {
-      this._callback.checkOffers();
-    }
-  }
-
   setOffersCheckHandler(callback) {
     this._callback.checkOffers = callback;
     this.getElement().addEventListener(`change`, this._offersCheckHandler);
@@ -52,6 +45,13 @@ export default class OffersContainer extends SmartView {
 
   restoreHandlers() {
     this.getElement().addEventListener(`change`, this._offersCheckHandler);
+  }
+
+  _offersCheckHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === Tag.INPUT) {
+      this._callback.checkOffers();
+    }
   }
 
   static parseOffersToData() {

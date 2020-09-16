@@ -228,37 +228,15 @@ export default class BasePoint extends SmartView {
     );
   }
 
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-    this._callback.formSubmit(this._data);
-  }
-
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
-  }
-
-  _formDeleteClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.deleteClick(this._data);
   }
 
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     this.getElement().querySelector(`.event__reset-btn`)
       .addEventListener(`click`, this._formDeleteClickHandler);
-  }
-
-  // обработчик клика для звёздочки.
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
-
-    this.updateData({
-      isFavorite: !this._data.isFavorite
-    }, true);
-
-    this._initialize(this._data);
-    this._callback.favoriteClick();
   }
 
   updateOffers(offers) {
@@ -280,6 +258,106 @@ export default class BasePoint extends SmartView {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.event__favorite-btn`)
       .addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  // метод для установки обработчика клика для звёздочки.
+  _setPriceChangeHandler() {
+    this.getElement().querySelector(`#event-price-1`)
+      .addEventListener(`change`, this._priceChangeHandler);
+  }
+
+  reset(point) {
+    if (point !== null) {
+      this.updateData(
+          BasePoint.parsePointToData(point)
+      );
+    }
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._eventTypeChangeHandler);
+    this.getElement()
+      .querySelector(`#event-destination-1`)
+      .addEventListener(`input`, this._cityChangeHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setFromDatepicker();
+    this._setToDatepicker();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+    this._setPriceChangeHandler();
+  }
+
+  _setFromDatepicker() {
+    if (this._fromDatepicker) {
+      // В случае обновления компонента удаляем вспомогательные DOM-элементы,
+      // которые создает flatpickr при инициализации
+      this._fromDatepicker.destroy();
+      this._fromDatepicker = null;
+    }
+
+    // flatpickr есть смысл инициализировать только в случае,
+    // если поле выбора даты доступно для заполнения
+    this._fromDatepicker = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          allowInput: false,
+          dateFormat: `d/m/Y H:i`,
+          onChange: this._leftDateTimeChangeHandler
+        }
+    );
+  }
+
+  _setToDatepicker() {
+    if (this._toDatepicker) {
+      // В случае обновления компонента удаляем вспомогательные DOM-элементы,
+      // которые создает flatpickr при инициализации
+      this._toDatepicker.destroy();
+      this._toDatepicker = null;
+    }
+
+    // flatpickr есть смысл инициализировать только в случае,
+    // если поле выбора даты доступно для заполнения
+    this._toDatepicker = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          enableTime: true,
+          // eslint-disable-next-line camelcase
+          time_24hr: true,
+          allowInput: false,
+          dateFormat: `d/m/Y H:i`,
+          onChange: this._rightDateTimeChangeHandler
+        }
+    );
+  }
+
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit(this._data);
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(this._data);
+  }
+
+  // обработчик клика для звёздочки.
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+
+    this.updateData({
+      isFavorite: !this._data.isFavorite
+    }, true);
+
+    this._initialize(this._data);
+    this._callback.favoriteClick();
   }
 
   _eventTypeChangeHandler(evt) {
@@ -319,38 +397,6 @@ export default class BasePoint extends SmartView {
       price: parseInt(evt.target.value, RADIX)
     },
     true);
-  }
-
-  // метод для установки обработчика клика для звёздочки.
-  _setPriceChangeHandler() {
-    this.getElement().querySelector(`#event-price-1`)
-      .addEventListener(`change`, this._priceChangeHandler);
-  }
-
-  reset(point) {
-    if (point !== null) {
-      this.updateData(
-          BasePoint.parsePointToData(point)
-      );
-    }
-  }
-
-  _setInnerHandlers() {
-    this.getElement()
-      .querySelector(`.event__type-list`)
-      .addEventListener(`change`, this._eventTypeChangeHandler);
-    this.getElement()
-      .querySelector(`#event-destination-1`)
-      .addEventListener(`input`, this._cityChangeHandler);
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this._setFromDatepicker();
-    this._setToDatepicker();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-    this._setPriceChangeHandler();
   }
 
   _leftDateTimeChangeHandler(selectedDates) {
@@ -423,52 +469,6 @@ export default class BasePoint extends SmartView {
       timeInterval: tempTimeInterval
     }, false);
     this._renderPointDetails();
-  }
-
-  _setFromDatepicker() {
-    if (this._fromDatepicker) {
-      // В случае обновления компонента удаляем вспомогательные DOM-элементы,
-      // которые создает flatpickr при инициализации
-      this._fromDatepicker.destroy();
-      this._fromDatepicker = null;
-    }
-
-    // flatpickr есть смысл инициализировать только в случае,
-    // если поле выбора даты доступно для заполнения
-    this._fromDatepicker = flatpickr(
-        this.getElement().querySelector(`#event-start-time-1`),
-        {
-          enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
-          allowInput: false,
-          dateFormat: `d/m/Y H:i`,
-          onChange: this._leftDateTimeChangeHandler
-        }
-    );
-  }
-
-  _setToDatepicker() {
-    if (this._toDatepicker) {
-      // В случае обновления компонента удаляем вспомогательные DOM-элементы,
-      // которые создает flatpickr при инициализации
-      this._toDatepicker.destroy();
-      this._toDatepicker = null;
-    }
-
-    // flatpickr есть смысл инициализировать только в случае,
-    // если поле выбора даты доступно для заполнения
-    this._toDatepicker = flatpickr(
-        this.getElement().querySelector(`#event-end-time-1`),
-        {
-          enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
-          allowInput: false,
-          dateFormat: `d/m/Y H:i`,
-          onChange: this._rightDateTimeChangeHandler
-        }
-    );
   }
 
   static parsePointToData(point) {

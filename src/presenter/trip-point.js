@@ -51,7 +51,7 @@ export default class TripPoint {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escapeKeyDownHandler = this._escapeKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-    this._changeOffersListHandler = this._offersListChangeHandler.bind(this);
+    this._handleOffersListChange = this._handleOffersListChange.bind(this);
     this.initialize = this.initialize.bind(this);
   }
 
@@ -149,17 +149,6 @@ export default class TripPoint {
     );
   }
 
-  _offersListChangeHandler() {
-    const offerElements = this._pointEditComponent.getElement()
-      .querySelectorAll(`.event__offer-checkbox`);
-    const offers = [];
-    for (let i = 0; i < offerElements.length; ++i) {
-      offers[i] = offerElements[i].checked;
-    }
-
-    this._pointEditComponent.updateOffers(offers);
-  }
-
   _renderEditablePoint(point) {
     this._pointEditComponent = new BasePointView(
         point,
@@ -182,7 +171,7 @@ export default class TripPoint {
         this._citiesModel
     );
     if (this._offersContainerView !== null) {
-      this._offersContainerView.setOffersCheckHandler(this._offersListChangeHandler);
+      this._offersContainerView.setOffersCheckHandler(this._handleOffersListChange);
     }
   }
 
@@ -201,6 +190,17 @@ export default class TripPoint {
     document.removeEventListener(`keydown`, this._escapeKeyDownHandler);
 
     this._mode = Mode.DEFAULT;
+  }
+
+  _handleOffersListChange() {
+    const offerElements = this._pointEditComponent.getElement()
+      .querySelectorAll(`.event__offer-checkbox`);
+    const offers = [];
+    for (let i = 0; i < offerElements.length; ++i) {
+      offers[i] = offerElements[i].checked;
+    }
+
+    this._pointEditComponent.updateOffers(offers);
   }
 
   _handleEditClick() {
@@ -292,15 +292,15 @@ export default class TripPoint {
       });
   }
 
+  _handleFavoriteClick() {
+    this._point.isFavorite = !this._point.isFavorite;
+  }
+
   _escapeKeyDownHandler(evt) {
     if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
       evt.preventDefault();
       this.initialize(this._point);
       this._replaceFormToPoint();
     }
-  }
-
-  _handleFavoriteClick() {
-    this._point.isFavorite = !this._point.isFavorite;
   }
 }

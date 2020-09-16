@@ -34,17 +34,6 @@ export default class SiteMenu extends SmartView {
     this.updateData(this._data);
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    if (evt.target.tagName === Tag.REFERENCE) {
-      const currentMenu = evt.target.dataset.menu;
-      if (currentMenu !== this._siteMenuModel.getMenuItem()) {
-        this.update(currentMenu);
-        this._callback.menuClick(currentMenu);
-      }
-    }
-  }
-
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().addEventListener(`click`, this._menuClickHandler);
@@ -56,5 +45,16 @@ export default class SiteMenu extends SmartView {
 
   restoreHandlers() {
     this.getElement().addEventListener(`click`, this._menuClickHandler);
+  }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === Tag.REFERENCE) {
+      const currentMenu = evt.target.dataset.menu;
+      if (currentMenu !== this._siteMenuModel.getMenuItem()) {
+        this.update(currentMenu);
+        this._callback.menuClick(currentMenu);
+      }
+    }
   }
 }

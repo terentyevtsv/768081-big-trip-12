@@ -80,21 +80,6 @@ export default class Trip {
     this.renderPointsPlan(true);
   }
 
-  _handleModelChange() {
-    this._datePointsPlan = this._getDatePointsStructure();
-    this.renderPointsPlan(false);
-  }
-
-  _handleFilterChanged() {
-    remove(this._noPointsNotificationView);
-    if (this._newPointPresenter !== null) {
-      this._newPointPresenter.destroy();
-    }
-
-    this._currentSortType = SortType.EVENT;
-    this.initialize(false);
-  }
-
   _renderLoading() {
     render(this._tripPointsContainer, this._loadingView, AddedComponentPosition.BEFORE_END);
   }
@@ -160,37 +145,6 @@ export default class Trip {
   _getPoints(filterType) {
     const pointsFiltration = new PointsFiltration(this._pointsModel.get());
     return pointsFiltration.getPoints(filterType);
-  }
-
-  _handleModeChange() {
-    this._newPointPresenter.destroy();
-    Object
-      .values(this._pointPresenter)
-      .forEach((presenter) => presenter.resetView());
-  }
-
-  // Обновление точки маршрута
-  _handleViewAction(actionType, update) {
-    switch (actionType) {
-      case UserAction.POINT_UPDATE:
-        this._pointsModel.update(update);
-        break;
-      case UserAction.POINT_CREATION:
-        this._pointsModel.add(update);
-        break;
-      case UserAction.POINT_REMOVAL:
-        this._pointsModel.delete(update);
-        break;
-    }
-  }
-
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-    this._currentSortType = sortType;
-    const datePointsStructure = this._getDatePointsStructure();
-    this._renderPoints(datePointsStructure);
   }
 
   // Формирование структуры событий по датам
@@ -377,5 +331,51 @@ export default class Trip {
         AddedComponentPosition.BEFORE_END
     );
     this._renderPoints(this._datePointsPlan);
+  }
+
+  _handleModelChange() {
+    this._datePointsPlan = this._getDatePointsStructure();
+    this.renderPointsPlan(false);
+  }
+
+  _handleFilterChanged() {
+    remove(this._noPointsNotificationView);
+    if (this._newPointPresenter !== null) {
+      this._newPointPresenter.destroy();
+    }
+
+    this._currentSortType = SortType.EVENT;
+    this.initialize(false);
+  }
+
+  _handleModeChange() {
+    this._newPointPresenter.destroy();
+    Object
+      .values(this._pointPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  // Обновление точки маршрута
+  _handleViewAction(actionType, update) {
+    switch (actionType) {
+      case UserAction.POINT_UPDATE:
+        this._pointsModel.update(update);
+        break;
+      case UserAction.POINT_CREATION:
+        this._pointsModel.add(update);
+        break;
+      case UserAction.POINT_REMOVAL:
+        this._pointsModel.delete(update);
+        break;
+    }
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._currentSortType = sortType;
+    const datePointsStructure = this._getDatePointsStructure();
+    this._renderPoints(datePointsStructure);
   }
 }
