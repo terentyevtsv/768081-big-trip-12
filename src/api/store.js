@@ -1,6 +1,8 @@
-const EVENT_TYPES_NAME = `eventTypes`;
-const CITIES_NAME = `cities`;
-const POINTS_NAME = `points`;
+const StoreSubStructure = {
+  EVENT_TYPES: `eventTypes`,
+  CITIES: `cities`,
+  POINTS: `points`
+};
 
 export default class Store {
   constructor(key, storage) {
@@ -26,17 +28,17 @@ export default class Store {
   }
 
   getEventTypesOffers() {
-    return this._getStructure(EVENT_TYPES_NAME);
+    return this._getStructure(StoreSubStructure.EVENT_TYPES);
   }
 
   getCities() {
-    return this._getStructure(CITIES_NAME);
+    return this._getStructure(StoreSubStructure.CITIES);
   }
 
   getPointsStructure() {
     const cachedStructure = this._getCachedStructure();
-    if (cachedStructure.hasOwnProperty(POINTS_NAME)) {
-      return cachedStructure[POINTS_NAME];
+    if (cachedStructure.hasOwnProperty(StoreSubStructure.POINTS)) {
+      return cachedStructure[StoreSubStructure.POINTS];
     }
 
     return {};
@@ -44,7 +46,7 @@ export default class Store {
 
   setEventTypes(eventTypes) {
     const cachedStructure = this._getCachedStructure();
-    cachedStructure[EVENT_TYPES_NAME] = eventTypes;
+    cachedStructure[StoreSubStructure.EVENT_TYPES] = eventTypes;
 
     this._storage.setItem(
         this._storageKey,
@@ -54,7 +56,7 @@ export default class Store {
 
   setCities(cities) {
     const cachedStructure = this._getCachedStructure();
-    cachedStructure[CITIES_NAME] = cities;
+    cachedStructure[StoreSubStructure.CITIES] = cities;
 
     this._storage.setItem(
         this._storageKey,
@@ -64,7 +66,7 @@ export default class Store {
 
   setPoints(points) {
     const cachedStructure = this._getCachedStructure();
-    cachedStructure[POINTS_NAME] = points;
+    cachedStructure[StoreSubStructure.POINTS] = points;
 
     this._storage.setItem(
         this._storageKey,
