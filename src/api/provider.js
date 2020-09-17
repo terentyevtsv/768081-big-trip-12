@@ -1,12 +1,13 @@
 import {nanoid} from "nanoid";
+import {NO_POINTS_LENGTH} from "../const.js";
 
 const createPointsStructure = (points) => {
-  return points.reduce((acc, current) => {
-    delete current.isDeleting;
-    delete current.isSaving;
-    delete current.isDisabled;
-    return Object.assign({}, acc, {
-      [current.id]: current,
+  return points.reduce((accumulator, currentPoint) => {
+    delete currentPoint.isDeleting;
+    delete currentPoint.isSaving;
+    delete currentPoint.isDisabled;
+    return Object.assign({}, accumulator, {
+      [currentPoint.id]: currentPoint,
     });
   }, {});
 };
@@ -27,15 +28,15 @@ export default class Provider {
       return this._api
         .getPoints()
         .then((points) => {
-          const pointsObject = createPointsStructure(points);
-          this._store.setPoints(pointsObject);
+          const pointsStructure = createPointsStructure(points);
+          this._store.setPoints(pointsStructure);
           return points;
         });
     }
 
-    const pointsObject = this._store.getPointsObject();
-    const tmpPoints = Object.values(pointsObject);
-    return Promise.resolve(tmpPoints);
+    const pointsStructure = this._store.getPointsStructure();
+    const tempPoints = Object.values(pointsStructure);
+    return Promise.resolve(tempPoints);
   }
 
   getEventTypesOffers() {
@@ -85,9 +86,9 @@ export default class Provider {
     if (this._isOnLine()) {
       return this._api
         .createPoint(point)
-        .then((response) => {
-          this._store.setPoint(response.id, response);
-          return response;
+        .then((responsePoint) => {
+          this._store.setPoint(responsePoint.id, responsePoint);
+          return responsePoint;
         });
     }
 
@@ -126,13 +127,13 @@ export default class Provider {
     return Promise.resolve();
   }
 
-  sync() {
+  synchronize() {
     if (this._isOnLine()) {
-      const storePoints = Object.values(this._store.getPointsObject());
+      const storePoints = Object.values(this._store.getPointsStructure());
 
-      return this._api.sync(storePoints)
+      return this._api.synchronize(storePoints)
         .then((response) => {
-          if (response.created.length > 0) {
+          if (response.created.length > NO_POINTS_LENGTH) {
             this._store.updateCreatedPoints(response.created);
           }
 

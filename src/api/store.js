@@ -1,6 +1,8 @@
-const EVENT_TYPES_NAME = `eventTypes`;
-const CITIES_NAME = `cities`;
-const POINTS_NAME = `points`;
+const StoreSubStructure = {
+  EVENT_TYPES: `eventTypes`,
+  CITIES: `cities`,
+  POINTS: `points`
+};
 
 export default class Store {
   constructor(key, storage) {
@@ -8,7 +10,7 @@ export default class Store {
     this._storage = storage;
   }
 
-  _getCachedObject() {
+  _getCachedStructure() {
     try {
       return JSON.parse(this._storage.getItem(this._storageKey)) || {};
     } catch (err) {
@@ -16,65 +18,65 @@ export default class Store {
     }
   }
 
-  _getStruct(key) {
-    const cachedObject = this._getCachedObject();
-    if (cachedObject.hasOwnProperty(key)) {
-      return cachedObject[key];
+  _getStructure(key) {
+    const cachedStructure = this._getCachedStructure();
+    if (cachedStructure.hasOwnProperty(key)) {
+      return cachedStructure[key];
     }
 
     return [];
   }
 
   getEventTypesOffers() {
-    return this._getStruct(EVENT_TYPES_NAME);
+    return this._getStructure(StoreSubStructure.EVENT_TYPES);
   }
 
   getCities() {
-    return this._getStruct(CITIES_NAME);
+    return this._getStructure(StoreSubStructure.CITIES);
   }
 
-  getPointsObject() {
-    const cachedObject = this._getCachedObject();
-    if (cachedObject.hasOwnProperty(POINTS_NAME)) {
-      return cachedObject[POINTS_NAME];
+  getPointsStructure() {
+    const cachedStructure = this._getCachedStructure();
+    if (cachedStructure.hasOwnProperty(StoreSubStructure.POINTS)) {
+      return cachedStructure[StoreSubStructure.POINTS];
     }
 
     return {};
   }
 
   setEventTypes(eventTypes) {
-    const cachedObject = this._getCachedObject();
-    cachedObject[EVENT_TYPES_NAME] = eventTypes;
+    const cachedStructure = this._getCachedStructure();
+    cachedStructure[StoreSubStructure.EVENT_TYPES] = eventTypes;
 
     this._storage.setItem(
         this._storageKey,
-        JSON.stringify(cachedObject)
+        JSON.stringify(cachedStructure)
     );
   }
 
   setCities(cities) {
-    const cachedObject = this._getCachedObject();
-    cachedObject[CITIES_NAME] = cities;
+    const cachedStructure = this._getCachedStructure();
+    cachedStructure[StoreSubStructure.CITIES] = cities;
 
     this._storage.setItem(
         this._storageKey,
-        JSON.stringify(cachedObject)
+        JSON.stringify(cachedStructure)
     );
   }
 
   setPoints(points) {
-    const cachedObject = this._getCachedObject();
-    cachedObject[POINTS_NAME] = points;
+    const cachedStructure = this._getCachedStructure();
+    cachedStructure[StoreSubStructure.POINTS] = points;
 
     this._storage.setItem(
         this._storageKey,
-        JSON.stringify(cachedObject)
+        JSON.stringify(cachedStructure)
     );
   }
 
   setPoint(key, value) {
-    const points = this.getPointsObject();
-    const tmpPoints = Object.assign(
+    const points = this.getPointsStructure();
+    const tempPoints = Object.assign(
         {},
         points,
         {
@@ -82,49 +84,49 @@ export default class Store {
         }
     );
 
-    this.setPoints(tmpPoints);
+    this.setPoints(tempPoints);
   }
 
   updateCreatedPoints(points) {
     // Точки в локальном хранилище
-    const pointsObject = this.getPointsObject();
+    const pointsStructure = this.getPointsStructure();
 
     // Раскидал созданные точки по временным id
     points.forEach((point) => {
-      pointsObject[point.tempId] = point;
+      pointsStructure[point.tempId] = point;
     });
 
-    let initPointsObject = null;
-    const resultedPointsObject = Object.values(pointsObject)
-      .reduce((acc, current) => {
-        if (initPointsObject === null) {
-          initPointsObject = Object.assign(
+    let tempPointsStructure = null;
+    const resultedPointsStructure = Object.values(pointsStructure)
+      .reduce((accumulator, currentPoint) => {
+        if (tempPointsStructure === null) {
+          tempPointsStructure = Object.assign(
               {},
               {
-                [acc.id]: acc
+                [accumulator.id]: accumulator
               },
               {
-                [current.id]: current
+                [currentPoint.id]: currentPoint
               }
           );
 
-          return initPointsObject;
+          return tempPointsStructure;
         }
 
         return Object.assign(
             {},
-            acc,
+            accumulator,
             {
-              [current.id]: current
+              [currentPoint.id]: currentPoint
             }
         );
       });
 
-    this.setPoints(resultedPointsObject);
+    this.setPoints(resultedPointsStructure);
   }
 
   removePoint(key) {
-    const points = this.getPointsObject();
+    const points = this.getPointsStructure();
 
     delete points[key];
     this.setPoints(points);

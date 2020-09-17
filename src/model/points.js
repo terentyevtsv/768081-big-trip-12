@@ -6,29 +6,29 @@ export default class Points extends Observer {
     this._points = [];
   }
 
-  getCitiesMap() {
-    return this._citiesMap;
+  getCitiesStructure() {
+    return this._citiesStructure;
   }
 
-  setСitiesMap(value) {
-    this._citiesMap = value;
+  setСitiesStructure(value) {
+    this._citiesStructure = value;
   }
 
-  getDestinationInfo(city) {
-    return this._citiesMap.has(city)
-      ? this._citiesMap.get(city)
+  getDestinationsInformation(city) {
+    return this._citiesStructure.has(city)
+      ? this._citiesStructure.get(city)
       : null;
   }
 
-  getPoints() {
+  get() {
     return this._points;
   }
 
-  setPoints(points) {
+  set(points) {
     this._points = points.slice();
   }
 
-  updatePoint(point) {
+  update(point) {
     const index = this._points.findIndex((item) => item.id === point.id);
 
     if (index === -1) {
@@ -46,17 +46,17 @@ export default class Points extends Observer {
     this._notify(point);
   }
 
-  addPoint(update) {
+  add(addedPoint) {
     this._points = [
-      update,
+      addedPoint,
       ...this._points
     ];
 
-    this._notify(update);
+    this._notify(addedPoint);
   }
 
-  deletePoint(update) {
-    const index = this._points.findIndex((point) => point.id === update.id);
+  delete(deletedPoint) {
+    const index = this._points.findIndex((point) => point.id === deletedPoint.id);
 
     if (index === -1) {
       throw new Error(`Can't delete unexisting task`);
@@ -67,18 +67,18 @@ export default class Points extends Observer {
       ...this._points.slice(index + 1)
     ];
 
-    this._notify(update);
+    this._notify(deletedPoint);
   }
 
   static adaptToClient(point, eventType, maskOffers) {
     const offers = [];
-    const checkedOffersSet = new Set(point.offers.map((offer) => offer.title));
+    const checkedOffers = new Set(point.offers.map((offer) => offer.title));
     maskOffers.forEach((offer) => {
       offers.push({
         name: offer.name,
         price: offer.price,
         label: offer.label,
-        isAccepted: checkedOffersSet.has(offer.name)
+        isAccepted: checkedOffers.has(offer.name)
       });
     });
 
@@ -108,22 +108,22 @@ export default class Points extends Observer {
     return adaptedPoint;
   }
 
-  static adaptToServer(point, destinationInfo) {
-    const tmpOffers = point.offers
+  static adaptToServer(point, destinationsInformation) {
+    const tempOffers = point.offers
       .filter((offer) => offer.isAccepted);
     const offers = [];
-    tmpOffers.forEach((offer) => offers.push({
+    tempOffers.forEach((offer) => offers.push({
       price: offer.price,
       title: offer.name
     }));
 
     const destination = {
-      description: destinationInfo.description,
+      description: destinationsInformation.description,
       name: point.city,
       pictures: []
     };
 
-    destinationInfo.photos.forEach((photo) => destination.pictures.push({
+    destinationsInformation.photos.forEach((photo) => destination.pictures.push({
       src: photo.source,
       description: photo.description
     }));

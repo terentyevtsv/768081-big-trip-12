@@ -1,52 +1,52 @@
-import {EventGroup} from "../const.js";
+import {PointGroup} from "../const.js";
 
-export const getEventTypeMoneyMap = (points) => {
-  const resultMap = new Map();
+export const getEventTypeMoneyStructure = (points) => {
+  const resultStructure = new Map();
 
   for (const point of points) {
-    if (!resultMap.has(point.eventType.name)) {
-      resultMap.set(point.eventType.name, 0);
+    if (!resultStructure.has(point.eventType.name)) {
+      resultStructure.set(point.eventType.name, 0);
     }
 
-    const price = resultMap.get(point.eventType.name) + point.price;
-    resultMap.set(point.eventType.name, price);
+    const price = resultStructure.get(point.eventType.name) + point.price;
+    resultStructure.set(point.eventType.name, price);
   }
 
-  return resultMap;
+  return resultStructure;
 };
 
-export const getTransportUsageMap = (points) => {
-  const resultMap = new Map();
+export const getTransportUsageStructure = (points) => {
+  const resultStructure = new Map();
 
   for (const point of points) {
-    if (point.eventType.eventGroup !== EventGroup.MOVEMENT) {
+    if (point.eventType.pointGroup !== PointGroup.MOVEMENT) {
       continue;
     }
 
-    if (!resultMap.has(point.eventType.name)) {
-      resultMap.set(point.eventType.name, 0);
+    if (!resultStructure.has(point.eventType.name)) {
+      resultStructure.set(point.eventType.name, 0);
     }
 
-    const count = resultMap.get(point.eventType.name) + 1;
-    resultMap.set(point.eventType.name, count);
+    const count = resultStructure.get(point.eventType.name) + 1;
+    resultStructure.set(point.eventType.name, count);
   }
 
-  return resultMap;
+  return resultStructure;
 };
 
-export const getTimeSpentMap = (points) => {
-  const tmpTimeSpentMap = new Map();
+export const getTimeSpentStructure = (points) => {
+  const tempTimeSpentStructure = new Map();
 
   // Подсчет количества времени для каждого типа точки маршрута
   for (const point of points) {
-    if (!tmpTimeSpentMap.has(point.eventType.name)) {
-      tmpTimeSpentMap.set(point.eventType.name, 0);
+    if (!tempTimeSpentStructure.has(point.eventType.name)) {
+      tempTimeSpentStructure.set(point.eventType.name, 0);
     }
 
-    const value = tmpTimeSpentMap.get(point.eventType.name);
-    const difValue = point.timeInterval.rightLimitDate - point.timeInterval.leftLimitDate;
-    tmpTimeSpentMap.set(point.eventType.name, value + difValue);
+    const value = tempTimeSpentStructure.get(point.eventType.name);
+    const differenceValue = point.timeInterval.rightLimitDate - point.timeInterval.leftLimitDate;
+    tempTimeSpentStructure.set(point.eventType.name, value + differenceValue);
   }
 
-  return tmpTimeSpentMap;
+  return tempTimeSpentStructure;
 };

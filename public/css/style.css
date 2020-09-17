@@ -767,7 +767,7 @@ main {
     .event__input--destination::-webkit-calendar-picker-indicator {
       display: none; }
   .event__input--time {
-    width: 130px;
+    width: 149px;
     text-align: center; }
   .event__input--price {
     width: 66px; }

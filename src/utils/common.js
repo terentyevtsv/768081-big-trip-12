@@ -1,22 +1,29 @@
-const isAlpha = (ch) => {
-  return typeof ch === `string` && ch.length === 1 && /[A-Za-z]/.test(ch);
+const ONE_CHARACTER_LENGTH = 1;
+const UPPERCASE_CHARACTER_INDEX = 0;
+const LOWERCASE_FIRST_CHARACTER_INDEX = 1;
+
+const isAlphabetsCharacter = (text) => {
+  return (
+    text.length === ONE_CHARACTER_LENGTH &&
+    /[A-Za-z]/.test(text)
+  );
 };
 
-export const getSnakeCaseString = (str) => {
-  let alphaString = ``;
-  for (let i = 0; i < str.length; ++i) {
-    if (isAlpha(str[i]) || str[i] === ` `) {
-      alphaString += str[i];
+export const getSnakeCaseText = (inputText) => {
+  let alphabetText = ``;
+  for (let i = 0; i < inputText.length; ++i) {
+    if (isAlphabetsCharacter(inputText[i]) || inputText[i] === ` `) {
+      alphabetText += inputText[i];
     }
   }
 
-  const resultString = alphaString
+  const resultText = alphabetText
     .split(` `)
     .map((part) => part.toLowerCase())
     .join(`-`);
 
-  return resultString;
+  return resultText;
 };
 
 export const getCapitalizedWord = (word) =>
-  `${word[0].toUpperCase()}${word.slice(1)}`;
+  `${word[UPPERCASE_CHARACTER_INDEX].toUpperCase()}${word.slice(LOWERCASE_FIRST_CHARACTER_INDEX)}`;

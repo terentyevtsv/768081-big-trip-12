@@ -3,27 +3,30 @@ import TripPriceView from "./trip-price.js";
 import {getDateForInterval} from "../utils/formats.js";
 import AbstractView from "./abstract.js";
 
-const MAX_CITIES_COUNT = 3;
-const FIRST_CITY_INDEX = 0;
-const SECOND_CITY_INDEX = 1;
-const LAST_CITY_INDEX = 2;
+const MAXIMUM_CITIES_COUNT = 3;
+
+const RouteIndex = {
+  FIRST_CITY: 0,
+  SECOND_CITY: 1,
+  LAST_CITY: 2,
+};
 
 const getRoute = (cities) => {
   let route = ``;
-  for (let i = 0; i < MAX_CITIES_COUNT; ++i) {
+  for (let i = 0; i < MAXIMUM_CITIES_COUNT; ++i) {
     if (i >= cities.length) {
       break;
     }
     switch (i) {
-      case FIRST_CITY_INDEX:
+      case RouteIndex.FIRST_CITY:
         route = `${cities[i]}`;
         break;
 
-      case SECOND_CITY_INDEX:
-        route = `${route} &mdash; ${cities.length > MAX_CITIES_COUNT ? `...` : cities[i]}`;
+      case RouteIndex.SECOND_CITY:
+        route = `${route} &mdash; ${cities.length > MAXIMUM_CITIES_COUNT ? `...` : cities[i]}`;
         break;
 
-      case LAST_CITY_INDEX:
+      case RouteIndex.LAST_CITY:
         route = `${route} &mdash; ${cities[cities.length - 1]}`;
         break;
     }
@@ -32,30 +35,30 @@ const getRoute = (cities) => {
   return route;
 };
 
-const createTripInformationContainerTemplate = (planDateEventsMap) => {
-  const msDates = Array.from(planDateEventsMap.keys());
-  if (msDates.length === 0) {
+const createTripInformationContainerTemplate = (datePointsPlan) => {
+  const dates = Array.from(datePointsPlan.keys());
+  if (dates.length === 0) {
     return `<section class="trip-main__trip-info  trip-info"></section>`;
   }
 
   // Берем дату начала первого события в первой дате
-  const leftLimitDate = planDateEventsMap.get(msDates[0])[0].timeInterval.leftLimitDate;
+  const leftLimitDate = datePointsPlan.get(dates[0])[0].timeInterval.leftLimitDate;
 
-  const lastDateEvents = planDateEventsMap.get(msDates[msDates.length - 1]);
-  const rightLimitDate = lastDateEvents[lastDateEvents.length - 1].timeInterval.rightLimitDate;
+  const lastDatePoints = datePointsPlan.get(dates[dates.length - 1]);
+  const rightLimitDate = lastDatePoints[lastDatePoints.length - 1].timeInterval.rightLimitDate;
 
   const cities = [];
   let index = 0;
   let lastCity = ``;
-  for (const msDate of msDates) {
-    for (const evt of planDateEventsMap.get(msDate)) {
+  for (const date of dates) {
+    for (const point of datePointsPlan.get(date)) {
       if (cities.length === 0) {
-        lastCity = evt.city;
-        cities[index] = evt.city;
+        lastCity = point.city;
+        cities[index] = point.city;
         continue;
       }
-      if (lastCity !== evt.city) {
-        cities[++index] = evt.city;
+      if (lastCity !== point.city) {
+        cities[++index] = point.city;
         lastCity = cities[index];
       }
     }
@@ -73,19 +76,19 @@ const createTripInformationContainerTemplate = (planDateEventsMap) => {
 };
 
 export default class TripInformationContainer extends AbstractView {
-  constructor(planDateEventsMap) {
+  constructor(datePointsPlan) {
     super();
-    this._planDateEventsMap = planDateEventsMap;
+    this._datePointsPlan = datePointsPlan;
   }
 
   getTemplate() {
-    return createTripInformationContainerTemplate(this._planDateEventsMap);
+    return createTripInformationContainerTemplate(this._datePointsPlan);
   }
 
   fillPrice() {
     render(
         this,
-        new TripPriceView(this._planDateEventsMap),
+        new TripPriceView(this._datePointsPlan),
         AddedComponentPosition.BEFORE_END
     );
   }

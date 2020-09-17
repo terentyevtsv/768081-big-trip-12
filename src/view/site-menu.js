@@ -1,5 +1,5 @@
 import SmartView from "./smart.js";
-import {MenuItem} from "../const.js";
+import {MenuItem, Tag} from "../const.js";
 
 const createSiteMenuTemplate = (activeMenuItem) =>
   `<nav class="trip-controls__trip-tabs  trip-tabs">
@@ -28,21 +28,10 @@ export default class SiteMenu extends SmartView {
     return createSiteMenuTemplate(this._siteMenuModel.getMenuItem());
   }
 
-  updateSiteMenu(menu) {
+  update(menu) {
     this._siteMenuModel.setMenuItem(menu);
     this._data = this._siteMenuModel.getMenuItem();
     this.updateData(this._data);
-  }
-
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    if (evt.target.tagName === `A`) {
-      const currentMenu = evt.target.dataset.menu;
-      if (currentMenu !== this._siteMenuModel.getMenuItem()) {
-        this.updateSiteMenu(currentMenu);
-        this._callback.menuClick(currentMenu);
-      }
-    }
   }
 
   setMenuClickHandler(callback) {
@@ -56,5 +45,16 @@ export default class SiteMenu extends SmartView {
 
   restoreHandlers() {
     this.getElement().addEventListener(`click`, this._menuClickHandler);
+  }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName === Tag.REFERENCE) {
+      const currentMenu = evt.target.dataset.menu;
+      if (currentMenu !== this._siteMenuModel.getMenuItem()) {
+        this.update(currentMenu);
+        this._callback.menuClick(currentMenu);
+      }
+    }
   }
 }

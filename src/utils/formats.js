@@ -24,8 +24,8 @@ export const monthDayToString = (date) => {
 };
 
 export const timeToString = (date) => {
-  let hours = zeroBasedFormat(date.getHours());
-  let minutes = zeroBasedFormat(date.getMinutes());
+  const hours = zeroBasedFormat(date.getHours());
+  const minutes = zeroBasedFormat(date.getMinutes());
 
   return `${hours}:${minutes}`;
 };
@@ -41,38 +41,21 @@ export const shortYearDateToString = (date) => {
   // для формы редактирования
   const day = zeroBasedFormat(date.getDate());
   const month = zeroBasedFormat(date.getMonth() + 1);
-  const year = zeroBasedFormat(date.getFullYear() % 100);
+  const year = zeroBasedFormat(date.getFullYear());
   const hours = zeroBasedFormat(date.getHours());
   const minutes = zeroBasedFormat(date.getMinutes());
 
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
 
-export const getDeltaDateObject = (date1, date2) => {
-  let a = moment([
-    date1.getFullYear(), date1.getMonth(), date1.getDate(),
-    date1.getHours(), date1.getMinutes(), date1.getSeconds()
-  ]);
-  const b = moment([
-    date2.getFullYear(), date2.getMonth(), date2.getDate(),
-    date2.getHours(), date2.getMinutes(), date2.getSeconds()
-  ]);
-
-  let duration = moment.duration(b.diff(a));
-  const days = Math.floor(duration.asDays());
-  a = a.add(days, `days`);
-
-  duration = moment.duration(b.diff(a));
-  const hours = Math.floor(duration.asHours());
-
-  a = a.add(hours, `hours`);
-  duration = moment.duration(b.diff(a));
-  const minutes = Math.floor(duration.asMinutes());
+export const getDeltaDateInformation = (date1, date2) => {
+  const dateDifference = date2 - date1;
+  const duration = moment.duration(dateDifference);
 
   return {
-    days,
-    hours,
-    minutes
+    days: duration.days(),
+    hours: duration.hours(),
+    minutes: duration.minutes()
   };
 };
 
@@ -87,9 +70,7 @@ export const getDeltaTimeFormat = (days, hours, minutes) => {
     delta += `${zeroBasedFormat(hours)}H `;
   }
 
-  if (minutes > 0) {
-    delta += `${zeroBasedFormat(minutes)}M`;
-  }
+  delta += `${zeroBasedFormat(minutes)}M`;
 
   delta = delta.trimRight();
 
@@ -97,10 +78,10 @@ export const getDeltaTimeFormat = (days, hours, minutes) => {
 };
 
 export const getDatesDelta = (date1, date2) => {
-  const {days, hours, minutes} = getDeltaDateObject(date1, date2);
+  const {days, hours, minutes} = getDeltaDateInformation(date1, date2);
 
   // 01D 02H 30M
-  let delta = getDeltaTimeFormat(days, hours, minutes);
+  const delta = getDeltaTimeFormat(days, hours, minutes);
 
   return delta;
 };

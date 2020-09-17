@@ -3,31 +3,31 @@ import TripInformationContainer from "../view/trip-information.js";
 import TripPriceView from "../view/trip-price.js";
 
 export default class TripInformation {
-  constructor(tripMainElement, filterModel, pointsModel, getPlanDateEventMap) {
+  constructor(tripMainElement, filterModel, pointsModel, getDatePointsPlan) {
     this._tripMainElement = tripMainElement;
     this._filterModel = filterModel;
     this._pointsModel = pointsModel;
-    this._getPlanDateEventMap = getPlanDateEventMap;
+    this._getDatePointsPlan = getDatePointsPlan;
 
     this._tripInformationContainer = null;
 
-    this.init = this.init.bind(this);
+    this.initialize = this.initialize.bind(this);
 
-    this._pointsModel.addObserver(this.init);
-    this._filterModel.addObserver(this.init);
+    this._pointsModel.addObserver(this.initialize);
+    this._filterModel.addObserver(this.initialize);
   }
 
-  init() {
+  initialize() {
     if (this._tripInformationContainer !== null) {
       remove(this._tripInformationContainer);
     }
 
-    const planDateEventsMap = this._getPlanDateEventMap();
+    const datePointsPlan = this._getDatePointsPlan();
 
-    this._tripInformationContainer = new TripInformationContainer(planDateEventsMap);
+    this._tripInformationContainer = new TripInformationContainer(datePointsPlan);
     render(
         this._tripInformationContainer,
-        new TripPriceView(planDateEventsMap),
+        new TripPriceView(datePointsPlan),
         AddedComponentPosition.BEFORE_END
     );
 

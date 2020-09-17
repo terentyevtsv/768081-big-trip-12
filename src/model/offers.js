@@ -1,17 +1,17 @@
-import {getSnakeCaseString, getCapitalizedWord} from "../utils/common.js";
-import {EventGroup} from "../const.js";
+import {getSnakeCaseText, getCapitalizedWord} from "../utils/common.js";
+import {PointGroup} from "../const.js";
 
-const eventGroups = {
-  [`taxi`]: EventGroup.MOVEMENT,
-  [`bus`]: EventGroup.MOVEMENT,
-  [`train`]: EventGroup.MOVEMENT,
-  [`ship`]: EventGroup.MOVEMENT,
-  [`transport`]: EventGroup.MOVEMENT,
-  [`drive`]: EventGroup.MOVEMENT,
-  [`flight`]: EventGroup.MOVEMENT,
-  [`check-in`]: EventGroup.PLACE,
-  [`sightseeing`]: EventGroup.PLACE,
-  [`restaurant`]: EventGroup.PLACE,
+const pointGroupsDictionary = {
+  [`taxi`]: PointGroup.MOVEMENT,
+  [`bus`]: PointGroup.MOVEMENT,
+  [`train`]: PointGroup.MOVEMENT,
+  [`ship`]: PointGroup.MOVEMENT,
+  [`transport`]: PointGroup.MOVEMENT,
+  [`drive`]: PointGroup.MOVEMENT,
+  [`flight`]: PointGroup.MOVEMENT,
+  [`check-in`]: PointGroup.PLACE,
+  [`sightseeing`]: PointGroup.PLACE,
+  [`restaurant`]: PointGroup.PLACE,
 };
 
 export default class Offers {
@@ -23,23 +23,23 @@ export default class Offers {
     return Array.from(this._typeOffers.keys());
   }
 
-  setOffers(typeOffers) {
+  set(typeOffers) {
     this._typeOffers = typeOffers;
   }
 
-  getOffers(eventType) {
+  get(eventType) {
     return this._typeOffers.has(eventType)
       ? this._typeOffers.get(eventType)
       : null;
   }
 
-  static adaptOfferToClient(offer) {
+  static adaptToClient(offer) {
     const adaptedOffer = Object.assign(
         {},
         offer,
         {
           name: offer.title,
-          label: getSnakeCaseString(offer.title)
+          label: getSnakeCaseText(offer.title)
         }
     );
 
@@ -55,7 +55,7 @@ export default class Offers {
         {
           name: getCapitalizedWord(serverEventType.type),
           image: `img/icons/${serverEventType.type}.png`,
-          eventGroup: eventGroups[serverEventType.type],
+          pointGroup: pointGroupsDictionary[serverEventType.type],
           value: serverEventType.type
         }
     );

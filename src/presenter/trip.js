@@ -1,17 +1,17 @@
 import {render, AddedComponentPosition, remove, replace} from "../utils/render.js";
-import NoEventView from "../view/no-event.js";
+import NoPointsNotificationView from "../view/no-points-notification.js";
 import SortingView from "../view/sorting.js";
-import EventsPlanContainerView from "../view/events-plan-container.js";
+import PointsPlanContainerView from "../view/points-plan-container.js";
 import TripDaysItemView from "../view/trip-days-item.js";
-import EventsListView from "../view/events-list.js";
-import TripEventsItemView from "../view/trip-events-item.js";
+import PointsListView from "../view/points-list.js";
+import TripPointsItemView from "../view/trip-points-item.js";
 import {SortType, FilterType, UserAction, MenuItem} from "../const.js";
-import TripEventPresenter from "./trip-event.js";
-import EventsFiltration from "../utils/filter.js";
-import EventNewPresenter from "./event-new.js";
+import TripPointPresenter from "./trip-point.js";
+import PointsFiltration from "../utils/filter.js";
+import NewPointPresenter from "./new-point.js";
 import LoadingView from "../view/loading.js";
 
-const getDifference = function (timeInterval) {
+const getTimeIntervalsDifference = (timeInterval) => {
   return (
     timeInterval.rightLimitDate.getTime() -
     timeInterval.leftLimitDate.getTime()
@@ -21,23 +21,23 @@ const getDifference = function (timeInterval) {
 export default class Trip {
   constructor(
       filterPresenter,
-      tripEventsContainer,
+      tripPointsContainer,
       pointsModel,
       offersModel,
       filterModel,
       siteMenuModel,
       citiesModel,
-      newEventButtonView,
+      newPointButtonView,
       api
   ) {
     this._filterPresenter = filterPresenter;
-    this._tripEventsContainer = tripEventsContainer;
+    this._tripPointsContainer = tripPointsContainer;
     this._pointsModel = pointsModel;
     this._offersModel = offersModel;
     this._filterModel = filterModel;
     this._siteMenuModel = siteMenuModel;
     this._citiesModel = citiesModel;
-    this._newEventButtonView = newEventButtonView;
+    this._newPointButtonView = newPointButtonView;
     this._api = api;
 
     this._isLoading = true;
@@ -45,11 +45,11 @@ export default class Trip {
     this._errorLoadingView = null;
 
     this._currentSortType = SortType.EVENT;
-    this._noEventView = new NoEventView();
+    this._noPointsNotificationView = new NoPointsNotificationView();
     this._sortingView = null;
-    this._eventsPlanContainerView = new EventsPlanContainerView();
+    this._pointsPlanContainerView = new PointsPlanContainerView();
 
-    this._eventPresenter = {};
+    this._pointPresenter = {};
     this._dateContainers = [];
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -62,70 +62,55 @@ export default class Trip {
     this._filterModel.addObserver(this._handleFilterChanged);
     this._pointsModel.addObserver(this._handleModelChange);
     this._siteMenuModel.addObserver(this._renderSort);
-    this._eventNewPresenter = null;
+    this._newPointPresenter = null;
   }
 
-  get planDateEventsMap() {
-    return this._planDateEventsMap;
+  get datePointsPlan() {
+    return this._datePointsPlan;
   }
 
   set currentSortType(sortType) {
     this._currentSortType = sortType;
   }
 
-  createEvent() {
-    this._filterModel.setFilter(FilterType.EVERYTHING);
+  createPoint() {
+    this._filterModel.set(FilterType.EVERYTHING);
     this._currentSortType = SortType.EVENT;
-    this._planDateEventsMap = this._getMapDates();
-    this.renderEventsPlan(true);
-  }
-
-  _handleModelChange() {
-    this._planDateEventsMap = this._getMapDates();
-    this.renderEventsPlan(false);
-  }
-
-  _handleFilterChanged() {
-    remove(this._noEventView);
-    if (this._eventNewPresenter !== null) {
-      this._eventNewPresenter.destroy();
-    }
-
-    this._currentSortType = SortType.EVENT;
-    this.init(false);
+    this._datePointsPlan = this._getDatePointsStructure();
+    this.renderPointsPlan(true);
   }
 
   _renderLoading() {
-    render(this._tripEventsContainer, this._loadingView, AddedComponentPosition.BEFORE_END);
+    render(this._tripPointsContainer, this._loadingView, AddedComponentPosition.BEFORE_END);
   }
 
-  init(isFirstLoading) {
+  initialize(isFirstLoading) {
     if (isFirstLoading) {
       this._isLoading = false;
       remove(this._loadingView);
 
-      this._eventNewPresenter = new EventNewPresenter(
+      this._newPointPresenter = new NewPointPresenter(
           this._filterPresenter,
-          this._tripEventsContainer,
+          this._tripPointsContainer,
           this._offersModel,
           this._citiesModel,
           this._pointsModel,
           this._filterModel,
-          this._newEventButtonView,
+          this._newPointButtonView,
           this._handleViewAction,
           this._handleModeChange,
           this._api
       );
     }
 
-    this._planDateEventsMap = this._getMapDates();
+    this._datePointsPlan = this._getDatePointsStructure();
     if (this._siteMenuModel.getMenuItem() === MenuItem.TABLE) {
-      this.renderEventsPlan(false);
+      this.renderPointsPlan(false);
     }
   }
 
-  renderError(messageObject) {
-    const fullMessage = `Не загружены ${Object.values(messageObject).join(` и `)}`;
+  renderError(messageStructure) {
+    const fullMessage = `Не загружены ${Object.values(messageStructure).join(` и `)}`;
     this._errorLoadingView = new LoadingView(fullMessage);
     replace(this._errorLoadingView, this._loadingView);
 
@@ -135,118 +120,87 @@ export default class Trip {
 
   reload() {
     this._siteMenuModel.addObserver(this._renderSort);
-    this.init(false);
+    this.initialize(false);
   }
 
   destroy() {
     this._isLoading = false;
-    if (this._eventNewPresenter !== null) {
-      this._eventNewPresenter.destroy();
+    if (this._newPointPresenter !== null) {
+      this._newPointPresenter.destroy();
     }
 
     if (this._sortingView !== null) {
       remove(this._sortingView);
     }
 
-    remove(this._eventsPlanContainerView);
+    remove(this._pointsPlanContainerView);
     if (this._errorLoadingView !== null) {
       remove(this._errorLoadingView);
       this._errorLoadingView = null;
     }
 
-    remove(this._noEventView);
+    remove(this._noPointsNotificationView);
   }
 
   _getPoints(filterType) {
-    const eventsFiltration = new EventsFiltration(this._pointsModel.getPoints());
-    return eventsFiltration.getEvents(filterType);
-  }
-
-  _handleModeChange() {
-    this._eventNewPresenter.destroy();
-    Object
-      .values(this._eventPresenter)
-      .forEach((presenter) => presenter.resetView());
-  }
-
-  // Обновление мока и отрисовка согласно обновлению точки марщрута
-  _handleViewAction(actionType, update) {
-    switch (actionType) {
-      case UserAction.UPDATE_EVENT:
-        this._pointsModel.updatePoint(update);
-        break;
-      case UserAction.ADD_EVENT:
-        this._pointsModel.addPoint(update);
-        break;
-      case UserAction.DELETE_EVENT:
-        this._pointsModel.deletePoint(update);
-        break;
-    }
-  }
-
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-    this._currentSortType = sortType;
-    const mapDates = this._getMapDates();
-    this._renderEvents(mapDates);
+    const pointsFiltration = new PointsFiltration(this._pointsModel.get());
+    return pointsFiltration.getPoints(filterType);
   }
 
   // Формирование структуры событий по датам
-  _getMapDates() {
-    const mapDates = new Map();
-    const points = this._getPoints(this._filterModel.getFilter());
+  _getDatePointsStructure() {
+    const datePointsStructure = new Map();
+    const points = this._getPoints(this._filterModel.get());
 
     if (this._currentSortType === SortType.EVENT) {
       // Обычный порядок
-      const datesSet = new Set();
+      const distinctDates = new Set();
 
       // Формируем список дат, по которым будут группироваться события
-      points.forEach((evt) => {
-        const date = new Date(evt.timeInterval.leftLimitDate);
+      points.forEach((point) => {
+        const date = new Date(point.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
-        datesSet.add(date.getTime());
+        distinctDates.add(date.getTime());
       });
 
       // Сортируем даты в порядке возрастания
-      const dates = Array.from(datesSet)
+      const dates = Array.from(distinctDates)
         .sort((a, b) => a - b);
 
       // Раскидываем события по датам
-      dates.forEach((date) => mapDates.set(date, []));
+      dates.forEach((date) => datePointsStructure.set(date, []));
 
-      points.forEach((evt) => {
-        const date = new Date(evt.timeInterval.leftLimitDate);
+      points.forEach((point) => {
+        const date = new Date(point.timeInterval.leftLimitDate);
         date.setHours(0, 0, 0, 0);
 
-        mapDates.get(date.getTime()).push(evt);
+        datePointsStructure.get(date.getTime()).push(point);
       });
 
-      Array.from(mapDates.keys()).forEach((mapDateKey) => mapDates.get(mapDateKey)
+      Array.from(datePointsStructure.keys()).forEach((dateKey) => datePointsStructure.get(dateKey)
         .sort((a, b) => a.timeInterval.leftLimitDate.getTime() -
                         b.timeInterval.leftLimitDate.getTime())
       );
-      return mapDates;
+      return datePointsStructure;
     }
 
-    const tmpDate = new Date();
-    const events = points.slice();
+    const tempDate = new Date();
+    const copyPoints = points.slice();
     if (this._currentSortType === SortType.TIME) {
-      // Порядок с сортировкой по времени события
-      events.sort((evt1, evt2) => getDifference(evt2.timeInterval) -
-                                  getDifference(evt1.timeInterval));
-      mapDates.set(tmpDate, events);
+      // Порядок с сортировкой по времени точки маршрута
+      copyPoints.sort((point1, point2) => getTimeIntervalsDifference(point2.timeInterval) -
+                                  getTimeIntervalsDifference(point1.timeInterval));
+      datePointsStructure.set(tempDate, copyPoints);
 
-      return mapDates;
+      return datePointsStructure;
     }
 
     // Порядок с сортировкой по цене
-    events.sort((evt1, evt2) => evt2.price - evt1.price);
-    mapDates.set(tmpDate, events);
+    copyPoints.sort((point1, point2) => point2.price - point1.price);
+    datePointsStructure.set(tempDate, copyPoints);
 
-    return mapDates;
+    return datePointsStructure;
   }
 
   _renderSort() {
@@ -260,7 +214,7 @@ export default class Trip {
     // Метод для рендеринга сортировки
     // Сортировка
     render(
-        this._tripEventsContainer,
+        this._tripPointsContainer,
         this._sortingView,
         AddedComponentPosition.BEFORE_END
     );
@@ -268,19 +222,19 @@ export default class Trip {
     this._sortingView.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
-  _renderEvent(evt, eventsListView) {
+  _renderPoint(point, pointsListView) {
     // Контейнер события
-    const tripEventsItemView = new TripEventsItemView();
+    const tripPointsItemView = new TripPointsItemView();
     render(
-        eventsListView,
-        tripEventsItemView,
+        pointsListView,
+        tripPointsItemView,
         AddedComponentPosition.BEFORE_END
     );
 
-    const tripEventPresenter = new TripEventPresenter(
-        evt,
+    const tripPointPresenter = new TripPointPresenter(
+        point,
         this._filterPresenter,
-        tripEventsItemView,
+        tripPointsItemView,
         this._pointsModel,
         this._offersModel,
         this._citiesModel,
@@ -289,93 +243,139 @@ export default class Trip {
         this._handleModeChange,
         this._api
     );
-    tripEventPresenter.init(evt);
-    this._eventPresenter[evt.id] = tripEventPresenter;
+    tripPointPresenter.initialize(point);
+    this._pointPresenter[point.id] = tripPointPresenter;
   }
 
-  _renderEvents(mapDates) {
-    Object.values(this._eventPresenter)
+  _renderPoints(datePointsStructure) {
+    Object.values(this._pointPresenter)
         .forEach((presenter) => presenter.destroy());
     this._dateContainers.forEach((d) => remove(d));
 
-    this._eventPresenter = {};
+    this._pointPresenter = {};
     this._dateContainers = [];
 
     let index = 0;
-    for (const mapDateKey of mapDates.keys()) {
+    for (const dateKey of datePointsStructure.keys()) {
       // Какая-то дата путешествия
-      const date = new Date(mapDateKey);
+      const date = new Date(dateKey);
 
       // Отрисовка очередной даты
       const tripDaysItemView = new TripDaysItemView(date, index, this._currentSortType);
       render(
-          this._eventsPlanContainerView,
+          this._pointsPlanContainerView,
           tripDaysItemView,
           AddedComponentPosition.BEFORE_END
       );
 
-      const eventsListView = new EventsListView();
+      const pointsListView = new PointsListView();
       render(
           tripDaysItemView,
-          eventsListView,
+          pointsListView,
           AddedComponentPosition.BEFORE_END
       );
 
       this._dateContainers[index++] = tripDaysItemView;
 
-      // события даты сортируем по дате начала
-      const tmpEvents = mapDates.get(mapDateKey);
-      // Цикл по всем событиям данной даты
-      for (let j = 0; j < tmpEvents.length; ++j) {
-        this._renderEvent(tmpEvents[j], eventsListView);
+      // точки маршрута даты сортируем по дате начала
+      const tempPoints = datePointsStructure.get(dateKey);
+      // Цикл по всем точкам маршрута данной даты
+      for (const tempPoint of tempPoints) {
+        this._renderPoint(tempPoint, pointsListView);
       }
     }
   }
 
-  _renderNoEvents() {
+  _renderNoPointsNotification() {
     if (this._sortingView !== null) {
       remove(this._sortingView);
       this._sortingView = null;
     }
 
-    remove(this._eventsPlanContainerView);
+    remove(this._pointsPlanContainerView);
 
     // Метод для рендеринга заглушки
     render(
-        this._tripEventsContainer,
-        this._noEventView,
+        this._tripPointsContainer,
+        this._noPointsNotificationView,
         AddedComponentPosition.BEFORE_END
     );
   }
 
-  renderEventsPlan(renderNewEventFlag) {
+  renderPointsPlan(renderNewPointFlag) {
     if (this._isLoading) {
       this._renderLoading();
       return;
     }
 
-    const points = this._getPoints(this._filterModel.getFilter());
+    const points = this._getPoints(this._filterModel.get());
     if (points.length === 0) {
-      if (renderNewEventFlag) {
-        remove(this._noEventView);
-        this._eventNewPresenter.init();
+      if (renderNewPointFlag) {
+        remove(this._noPointsNotificationView);
+        this._newPointPresenter.initialize();
         return;
       }
-      this._renderNoEvents();
+      this._renderNoPointsNotification();
       return;
     }
 
     this._renderSort();
 
-    if (renderNewEventFlag) {
-      this._eventNewPresenter.init();
+    if (renderNewPointFlag) {
+      this._newPointPresenter.initialize();
     }
 
     render(
-        this._tripEventsContainer,
-        this._eventsPlanContainerView,
+        this._tripPointsContainer,
+        this._pointsPlanContainerView,
         AddedComponentPosition.BEFORE_END
     );
-    this._renderEvents(this._planDateEventsMap);
+    this._renderPoints(this._datePointsPlan);
+  }
+
+  _handleModelChange() {
+    this._datePointsPlan = this._getDatePointsStructure();
+    this.renderPointsPlan(false);
+  }
+
+  _handleFilterChanged() {
+    remove(this._noPointsNotificationView);
+    if (this._newPointPresenter !== null) {
+      this._newPointPresenter.destroy();
+    }
+
+    this._currentSortType = SortType.EVENT;
+    this.initialize(false);
+  }
+
+  _handleModeChange() {
+    this._newPointPresenter.destroy();
+    Object
+      .values(this._pointPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  // Обновление точки маршрута
+  _handleViewAction(actionType, update) {
+    switch (actionType) {
+      case UserAction.POINT_UPDATE:
+        this._pointsModel.update(update);
+        break;
+      case UserAction.POINT_CREATION:
+        this._pointsModel.add(update);
+        break;
+      case UserAction.POINT_REMOVAL:
+        this._pointsModel.delete(update);
+        break;
+    }
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._currentSortType = sortType;
+    const datePointsStructure = this._getDatePointsStructure();
+    this._renderPoints(datePointsStructure);
   }
 }
