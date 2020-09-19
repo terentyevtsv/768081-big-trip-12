@@ -14,7 +14,7 @@ export default class NewPointButton extends SmartView {
     super();
 
     this._data.isEnabled = isEnabled;
-    this._clickNewPointButtonHandler = this._clickHandler.bind(this);
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {

@@ -62,14 +62,13 @@ export default class NewPoint {
 
   // Значения по умолчанию для точки маршрута при создании
   _getDefaultPoint() {
-    const tempCities = this._citiesModel.get();
     const point = {
       eventType: this._offersModel.eventTypes[EMPTY_POINT_INDEX],
-      city: tempCities[EMPTY_POINT_INDEX],
+      city: null,
       offers: [],
-      destination: this._citiesModel.getDestination(tempCities[EMPTY_POINT_INDEX]),
+      destination: this._citiesModel.getDestination(null),
       isFavorite: false,
-      price: 0
+      price: null
     };
 
     const date = new Date();
@@ -104,6 +103,7 @@ export default class NewPoint {
     this._render(point);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCancelClick);
 
     document.addEventListener(`keydown`, this._escapeKeyDownHandler);
 
@@ -148,6 +148,11 @@ export default class NewPoint {
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCancelClick);
+
+    this._pointEditComponent.getElement()
+      .querySelector(`#event-destination-1`)
+      .selectedIndex = -1;
 
     document.addEventListener(`keydown`, this._escapeKeyDownHandler);
   }

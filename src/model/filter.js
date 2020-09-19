@@ -11,9 +11,11 @@ export default class Filter extends Observer {
     this._isPastFilterDisabled = false;
   }
 
-  set(filter) {
+  set(filter, notifyFlag) {
     this._activeFilter = filter;
-    this._notify(filter);
+    if (notifyFlag) {
+      this._notify(filter);
+    }
   }
 
   get() {

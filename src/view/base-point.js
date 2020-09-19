@@ -85,18 +85,22 @@ const createEmptyPointTemplate = (
         <label class="event__label  event__type-output" for="event-destination-1">
           ${`${point.eventType.name} ${point.eventType.pointGroup}`}
         </label>
-        <input
+        <select
           class="event__input  event__input--destination"
           id="event-destination-1"
-          type="text"
-          name="event-destination"
-          value="${point.city}"
-          list="destination-list-1"
           ${point.isDisabled ? `disabled` : ``}
+          required
         >
-        <datalist id="destination-list-1">
-          ${cities.map((city) => `<option value="${city}"></option>`).join(``)}
-        </datalist>
+          ${cities
+            .map((city) =>
+              `<option
+                value="${city}"
+                ${point.city === city ? `selected` : ``}
+              >
+                ${city}
+              </option>`)
+            .join(``)}
+        </select>
       </div>
 
       <div class="event__field-group  event__field-group--time">
@@ -135,7 +139,8 @@ const createEmptyPointTemplate = (
           id="event-price-1"
           type="number"
           name="event-price"
-          value="${point.price}"
+          min="0"
+          ${point.price !== null ? `value="${point.price}"` : ``}
           ${point.isDisabled ? `disabled` : ``}
           required
         >
@@ -161,7 +166,7 @@ const createEmptyPointTemplate = (
         ${point.isDisabled ? `disabled` : ``}
       >
         ${point.isDeleting ? `Deleting` : `Delete`}
-      </button>
+      </button>`}
 
       <input
         id="event-favorite-1"
@@ -184,7 +189,7 @@ const createEmptyPointTemplate = (
         ${point.isDisabled ? `disabled` : ``}
       >
         <span class="visually-hidden">Open event</span>
-      </button>`}
+      </button>
     </header>
   </form>`;
 
@@ -211,6 +216,7 @@ export default class BasePoint extends SmartView {
     this._leftDateTimeChangeHandler = this._leftDateTimeChangeHandler.bind(this);
     this._rightDateTimeChangeHandler = this._rightDateTimeChangeHandler.bind(this);
     this._priceChangeHandler = this._priceChangeHandler.bind(this);
+    this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
     this._initialize = initialize;
 
     this._setInnerHandlers();
@@ -237,6 +243,13 @@ export default class BasePoint extends SmartView {
     this._callback.deleteClick = callback;
     this.getElement().querySelector(`.event__reset-btn`)
       .addEventListener(`click`, this._formDeleteClickHandler);
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._formCloseClickHandler);
   }
 
   updateOffers(offers) {
@@ -280,7 +293,7 @@ export default class BasePoint extends SmartView {
       .addEventListener(`change`, this._eventTypeChangeHandler);
     this.getElement()
       .querySelector(`#event-destination-1`)
-      .addEventListener(`input`, this._cityChangeHandler);
+      .addEventListener(`change`, this._cityChangeHandler);
   }
 
   restoreHandlers() {
@@ -289,6 +302,7 @@ export default class BasePoint extends SmartView {
     this._setToDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setCloseClickHandler(this._callback.closeClick);
     this._setPriceChangeHandler();
   }
 
@@ -358,6 +372,11 @@ export default class BasePoint extends SmartView {
 
     this._initialize(this._data);
     this._callback.favoriteClick();
+  }
+
+  _formCloseClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
   }
 
   _eventTypeChangeHandler(evt) {
