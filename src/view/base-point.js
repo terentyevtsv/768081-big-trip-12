@@ -136,7 +136,8 @@ const createEmptyPointTemplate = (
           id="event-price-1"
           type="number"
           name="event-price"
-          value="${point.price}"
+          min="0"
+          ${point.price !== null ? `value="${point.price}"` : ``}
           ${point.isDisabled ? `disabled` : ``}
           required
         >

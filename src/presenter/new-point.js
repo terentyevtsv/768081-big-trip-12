@@ -68,7 +68,7 @@ export default class NewPoint {
       offers: [],
       destination: this._citiesModel.getDestination(null),
       isFavorite: false,
-      price: 0
+      price: null
     };
 
     const date = new Date();
