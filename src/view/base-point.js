@@ -85,19 +85,22 @@ const createEmptyPointTemplate = (
         <label class="event__label  event__type-output" for="event-destination-1">
           ${`${point.eventType.name} ${point.eventType.pointGroup}`}
         </label>
-        <input
+        <select
           class="event__input  event__input--destination"
           id="event-destination-1"
-          type="text"
-          name="event-destination"
-          ${point.city !== null ? `value="${point.city}"` : ``}
-          list="destination-list-1"
           ${point.isDisabled ? `disabled` : ``}
           required
         >
-        <datalist id="destination-list-1">
-          ${cities.map((city) => `<option value="${city}"></option>`).join(``)}
-        </datalist>
+          ${cities
+            .map((city) =>
+              `<option
+                value="${city}"
+                ${point.city === city ? `selected` : ``}
+              >
+                ${city}
+              </option>`)
+            .join(``)}
+        </select>
       </div>
 
       <div class="event__field-group  event__field-group--time">
@@ -290,7 +293,7 @@ export default class BasePoint extends SmartView {
       .addEventListener(`change`, this._eventTypeChangeHandler);
     this.getElement()
       .querySelector(`#event-destination-1`)
-      .addEventListener(`input`, this._cityChangeHandler);
+      .addEventListener(`change`, this._cityChangeHandler);
   }
 
   restoreHandlers() {
