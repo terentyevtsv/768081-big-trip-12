@@ -100,6 +100,12 @@ export default class NewPoint {
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
     this._pointEditComponent.setCloseClickHandler(this._handleCancelClick);
 
+    if (point.city === null) {
+      this._pointEditComponent.getElement()
+      .querySelector(`#event-destination-1`)
+      .selectedIndex = -1;
+    }
+
     document.addEventListener(`keydown`, this._escapeKeyDownHandler);
 
     replace(this._pointEditComponent, previousPointEditComponent);
@@ -168,9 +174,6 @@ export default class NewPoint {
           isDisabled: true,
           isSaving: true
         });
-    for (let i = 0; i < this._offers.length; ++i) {
-      point.offers[i].isAccepted = this._offers[i];
-    }
 
     const destinationsInformation = this._pointsModel.getDestinationsInformation(point.city);
     const tempPoint = PointsModel.adaptToServer(point, destinationsInformation);
