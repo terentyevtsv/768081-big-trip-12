@@ -95,11 +95,6 @@ export default class NewPoint {
   _initializeBasePoint(point) {
     const previousPointEditComponent = this._pointEditComponent;
 
-    this._offers = [];
-    for (let i = 0; i < point.offers.length; i++) {
-      this._offers[i] = false;
-    }
-
     this._render(point);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
@@ -118,11 +113,19 @@ export default class NewPoint {
         this._offersModel,
         this._citiesModel,
         this._initializeBasePoint,
-        () => render(
-            this._pointEditComponent,
-            this._pointDetailsView,
-            AddedComponentPosition.BEFORE_END
-        )
+        () => {
+          if (point.city === null) {
+            this._pointEditComponent.getElement()
+            .querySelector(`#event-destination-1`)
+            .selectedIndex = -1;
+          }
+
+          render(
+              this._pointEditComponent,
+              this._pointDetailsView,
+              AddedComponentPosition.BEFORE_END
+          );
+        }
     );
 
     this._pointDetailsView = new PointDetailsView();

@@ -308,10 +308,11 @@ export default class Trip {
       return;
     }
 
+    remove(this._noPointsNotificationView);
+
     const points = this._getPoints(this._filterModel.get());
     if (points.length === 0) {
       if (renderNewPointFlag) {
-        remove(this._noPointsNotificationView);
         this._newPointPresenter.initialize();
         return;
       }
