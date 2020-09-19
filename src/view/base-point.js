@@ -90,9 +90,10 @@ const createEmptyPointTemplate = (
           id="event-destination-1"
           type="text"
           name="event-destination"
-          value="${point.city}"
+          ${point.city !== null ? `value="${point.city}"` : ``}
           list="destination-list-1"
           ${point.isDisabled ? `disabled` : ``}
+          required
         >
         <datalist id="destination-list-1">
           ${cities.map((city) => `<option value="${city}"></option>`).join(``)}

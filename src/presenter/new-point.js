@@ -62,12 +62,11 @@ export default class NewPoint {
 
   // Значения по умолчанию для точки маршрута при создании
   _getDefaultPoint() {
-    const tempCities = this._citiesModel.get();
     const point = {
       eventType: this._offersModel.eventTypes[EMPTY_POINT_INDEX],
-      city: tempCities[EMPTY_POINT_INDEX],
+      city: null,
       offers: [],
-      destination: this._citiesModel.getDestination(tempCities[EMPTY_POINT_INDEX]),
+      destination: this._citiesModel.getDestination(null),
       isFavorite: false,
       price: 0
     };
