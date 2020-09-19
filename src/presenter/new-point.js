@@ -103,6 +103,7 @@ export default class NewPoint {
     this._render(point);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCancelClick);
 
     document.addEventListener(`keydown`, this._escapeKeyDownHandler);
 
@@ -147,6 +148,7 @@ export default class NewPoint {
 
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCancelClick);
 
     document.addEventListener(`keydown`, this._escapeKeyDownHandler);
   }

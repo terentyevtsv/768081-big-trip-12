@@ -163,7 +163,7 @@ const createEmptyPointTemplate = (
         ${point.isDisabled ? `disabled` : ``}
       >
         ${point.isDeleting ? `Deleting` : `Delete`}
-      </button>
+      </button>`}
 
       <input
         id="event-favorite-1"
@@ -186,7 +186,7 @@ const createEmptyPointTemplate = (
         ${point.isDisabled ? `disabled` : ``}
       >
         <span class="visually-hidden">Open event</span>
-      </button>`}
+      </button>
     </header>
   </form>`;
 
@@ -213,6 +213,7 @@ export default class BasePoint extends SmartView {
     this._leftDateTimeChangeHandler = this._leftDateTimeChangeHandler.bind(this);
     this._rightDateTimeChangeHandler = this._rightDateTimeChangeHandler.bind(this);
     this._priceChangeHandler = this._priceChangeHandler.bind(this);
+    this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
     this._initialize = initialize;
 
     this._setInnerHandlers();
@@ -239,6 +240,13 @@ export default class BasePoint extends SmartView {
     this._callback.deleteClick = callback;
     this.getElement().querySelector(`.event__reset-btn`)
       .addEventListener(`click`, this._formDeleteClickHandler);
+  }
+
+  setCloseClickHandler(callback) {
+    this._callback.closeClick = callback;
+
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, this._formCloseClickHandler);
   }
 
   updateOffers(offers) {
@@ -291,6 +299,7 @@ export default class BasePoint extends SmartView {
     this._setToDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setCloseClickHandler(this._callback.closeClick);
     this._setPriceChangeHandler();
   }
 
@@ -360,6 +369,11 @@ export default class BasePoint extends SmartView {
 
     this._initialize(this._data);
     this._callback.favoriteClick();
+  }
+
+  _formCloseClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.closeClick();
   }
 
   _eventTypeChangeHandler(evt) {

@@ -49,6 +49,7 @@ export default class TripPoint {
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleCloseClick = this._handleCloseClick.bind(this);
     this._escapeKeyDownHandler = this._escapeKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleOffersListChange = this._handleOffersListChange.bind(this);
@@ -68,6 +69,7 @@ export default class TripPoint {
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointEditComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
+    this._pointEditComponent.setCloseClickHandler(this._handleCloseClick);
     this._pointEditComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     if (previousPointComponent === null ||
@@ -296,11 +298,15 @@ export default class TripPoint {
     this._point.isFavorite = !this._point.isFavorite;
   }
 
+  _handleCloseClick() {
+    this.initialize(this._point);
+    this._replaceFormToPoint();
+  }
+
   _escapeKeyDownHandler(evt) {
     if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
       evt.preventDefault();
-      this.initialize(this._point);
-      this._replaceFormToPoint();
+      this._handleCloseClick();
     }
   }
 }
