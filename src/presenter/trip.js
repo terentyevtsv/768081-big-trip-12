@@ -74,7 +74,7 @@ export default class Trip {
   }
 
   createPoint() {
-    this._filterModel.set(FilterType.EVERYTHING);
+    this._filterModel.set(FilterType.EVERYTHING, false);
     this._currentSortType = SortType.EVENT;
     this._datePointsPlan = this._getDatePointsStructure();
     this.renderPointsPlan(true);

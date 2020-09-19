@@ -57,6 +57,6 @@ export default class Filter {
   }
 
   _handleFilterTypeChange(filterType) {
-    this._filterModel.set(filterType);
+    this._filterModel.set(filterType, true);
   }
 }

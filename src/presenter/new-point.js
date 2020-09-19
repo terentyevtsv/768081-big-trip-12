@@ -150,6 +150,10 @@ export default class NewPoint {
     this._pointEditComponent.setDeleteClickHandler(this._handleCancelClick);
     this._pointEditComponent.setCloseClickHandler(this._handleCancelClick);
 
+    this._pointEditComponent.getElement()
+      .querySelector(`#event-destination-1`)
+      .selectedIndex = -1;
+
     document.addEventListener(`keydown`, this._escapeKeyDownHandler);
   }
 
