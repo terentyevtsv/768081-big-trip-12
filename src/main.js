@@ -22,7 +22,7 @@ const STORE_VERSION = `v12`;
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VERSION}`;
 
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
-const AUTHORIZATION = `Basic mokrajbalka1`;
+const AUTHORIZATION = `Basic mokrajbalka2`;
 
 const pageBodyElement = document.querySelector(`.page-body`);
 
@@ -208,6 +208,7 @@ newPointButtonView.setButtonClickHandler((evt) => {
 
   tripPresenter.createPoint();
   filterPresenter.initialize();
+  tripInformationPresenter.initialize();
 });
 
 let statisticsView = null;

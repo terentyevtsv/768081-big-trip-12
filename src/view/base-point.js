@@ -405,8 +405,6 @@ export default class BasePoint extends SmartView {
 
       return;
     }
-
-    evt.target.setCustomValidity(`Не найден город!`);
   }
 
   // обработчик изменения цены.
