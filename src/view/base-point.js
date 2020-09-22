@@ -424,15 +424,14 @@ export default class BasePoint extends SmartView {
       return;
     }
 
-    tempTimeInterval = selectedDate > this._data.timeInterval.rightLimitDate
-      ? {
-        leftLimitDate: selectedDate,
-        rightLimitDate: selectedDate
-      }
-      : {
-        leftLimitDate: selectedDate,
-        rightLimitDate: this._data.timeInterval.rightLimitDate
-      };
+    const rightLimitDate = selectedDate > this._data.timeInterval.rightLimitDate
+      ? selectedDate
+      : this._data.timeInterval.rightLimitDate;
+
+    tempTimeInterval = {
+      leftLimitDate: selectedDate,
+      rightLimitDate
+    };
 
     this.updateData({
       timeInterval: tempTimeInterval
@@ -458,15 +457,14 @@ export default class BasePoint extends SmartView {
       return;
     }
 
-    tempTimeInterval = selectedDate < this._data.timeInterval.leftLimitDate
-      ? {
-        leftLimitDate: selectedDate,
-        rightLimitDate: selectedDate
-      }
-      : {
-        leftLimitDate: this._data.timeInterval.leftLimitDate,
-        rightLimitDate: selectedDate
-      };
+    const leftLimitDate = selectedDate < this._data.timeInterval.leftLimitDate
+      ? selectedDate
+      : this._data.timeInterval.leftLimitDate;
+
+    tempTimeInterval = {
+      leftLimitDate,
+      rightLimitDate: selectedDate
+    };
 
     this.updateData({
       timeInterval: tempTimeInterval
