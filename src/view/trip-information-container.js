@@ -1,5 +1,3 @@
-import {AddedComponentPosition, render} from "../utils/render.js";
-import TripPriceView from "./trip-price.js";
 import {getDateForInterval} from "../utils/formats.js";
 import AbstractView from "./abstract.js";
 
