@@ -10,7 +10,7 @@ export default class Points extends Observer {
     return this._citiesStructure;
   }
 
-  setСitiesStructure(value) {
+  setCitiesStructure(value) {
     this._citiesStructure = value;
   }
 

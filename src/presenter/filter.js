@@ -19,7 +19,6 @@ export default class Filter {
     );
 
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
-    this._updateFiltersAccessibilityStatus = this.updateAccessibilityStatus.bind(this);
   }
 
   initialize() {

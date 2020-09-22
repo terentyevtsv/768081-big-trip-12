@@ -84,12 +84,4 @@ export default class TripInformationContainer extends AbstractView {
   getTemplate() {
     return createTripInformationContainerTemplate(this._datePointsPlan);
   }
-
-  fillPrice() {
-    render(
-        this,
-        new TripPriceView(this._datePointsPlan),
-        AddedComponentPosition.BEFORE_END
-    );
-  }
 }

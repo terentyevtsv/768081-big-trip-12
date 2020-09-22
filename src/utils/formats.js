@@ -5,7 +5,7 @@ const MONTH_NAMES = [
   `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`
 ];
 
-const zeroBasedFormat = (value) => {
+const convertToZeroBasedFormat = (value) => {
   return value >= 10 ? `${value}` : `0${value}`;
 };
 
@@ -13,19 +13,19 @@ export const dateToString = (date) => {
   const month = date.getMonth() + 1;
   const day = date.getDate();
   const newDate =
-    `${date.getFullYear()}.${zeroBasedFormat(month)}.${zeroBasedFormat(day)}`;
+    `${date.getFullYear()}.${convertToZeroBasedFormat(month)}.${convertToZeroBasedFormat(day)}`;
   return newDate;
 };
 
 export const monthDayToString = (date) => {
   const day = date.getDate();
 
-  return `${MONTH_NAMES[date.getMonth()]} ${zeroBasedFormat(day)}`;
+  return `${MONTH_NAMES[date.getMonth()]} ${convertToZeroBasedFormat(day)}`;
 };
 
 export const timeToString = (date) => {
-  const hours = zeroBasedFormat(date.getHours());
-  const minutes = zeroBasedFormat(date.getMinutes());
+  const hours = convertToZeroBasedFormat(date.getHours());
+  const minutes = convertToZeroBasedFormat(date.getMinutes());
 
   return `${hours}:${minutes}`;
 };
@@ -34,16 +34,16 @@ export const fullDateToString = (date) => {
   // 2019-03-18T11:00
   const month = date.getMonth() + 1;
 
-  return `${date.getFullYear()}-${zeroBasedFormat(month)}-${zeroBasedFormat(date.getDate())}T${timeToString(date)}`;
+  return `${date.getFullYear()}-${convertToZeroBasedFormat(month)}-${convertToZeroBasedFormat(date.getDate())}T${timeToString(date)}`;
 };
 
 export const shortYearDateToString = (date) => {
   // для формы редактирования
-  const day = zeroBasedFormat(date.getDate());
-  const month = zeroBasedFormat(date.getMonth() + 1);
-  const year = zeroBasedFormat(date.getFullYear());
-  const hours = zeroBasedFormat(date.getHours());
-  const minutes = zeroBasedFormat(date.getMinutes());
+  const day = convertToZeroBasedFormat(date.getDate());
+  const month = convertToZeroBasedFormat(date.getMonth() + 1);
+  const year = convertToZeroBasedFormat(date.getFullYear());
+  const hours = convertToZeroBasedFormat(date.getHours());
+  const minutes = convertToZeroBasedFormat(date.getMinutes());
 
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
@@ -63,14 +63,14 @@ export const getDeltaTimeFormat = (days, hours, minutes) => {
   // 01D 02H 30M
   let delta = ``;
   if (days > 0) {
-    delta += `${zeroBasedFormat(days)}D `;
+    delta += `${convertToZeroBasedFormat(days)}D `;
   }
 
   if (hours > 0) {
-    delta += `${zeroBasedFormat(hours)}H `;
+    delta += `${convertToZeroBasedFormat(hours)}H `;
   }
 
-  delta += `${zeroBasedFormat(minutes)}M`;
+  delta += `${convertToZeroBasedFormat(minutes)}M`;
 
   delta = delta.trimRight();
 
@@ -87,4 +87,4 @@ export const getDatesDelta = (date1, date2) => {
 };
 
 export const getDateForInterval = (date1) =>
-  `${zeroBasedFormat(date1.getDate())} ${MONTH_NAMES[date1.getMonth()].toUpperCase()}`;
+  `${convertToZeroBasedFormat(date1.getDate())} ${MONTH_NAMES[date1.getMonth()].toUpperCase()}`;

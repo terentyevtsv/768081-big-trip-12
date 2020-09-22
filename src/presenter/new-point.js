@@ -18,13 +18,11 @@ export default class NewPoint {
       filterModel,
       newPointButtonView,
       changePoint,
-      changePointsMode,
       api
   ) {
     this._filterPresenter = filterPresenter;
     this._pointListContainer = pointListContainer;
     this._changePoint = changePoint;
-    this._changePointsMode = changePointsMode;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
     this._pointsModel = pointsModel;

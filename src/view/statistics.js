@@ -30,9 +30,9 @@ export default class Statistics extends AbstractView {
 
     this._points = points;
 
-    this._moneyChart = this._renderMoneyChart();
-    this._transportChart = this._renderTransportChart();
-    this._timeSpentChart = this._renderTimeSpentChart();
+    this._renderMoneyChart();
+    this._renderTransportChart();
+    this._renderTimeSpentChart();
   }
 
   getTemplate() {

@@ -98,7 +98,6 @@ export default class Trip {
           this._filterModel,
           this._newPointButtonView,
           this._handleViewAction,
-          this._handleModeChange,
           this._api
       );
     }

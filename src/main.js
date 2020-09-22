@@ -53,7 +53,7 @@ const citiesModel = new CitiesModel();
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
-pointsModel.setСitiesStructure(new Map()); // Города с общим описанием, фото и описанием фото
+pointsModel.setCitiesStructure(new Map()); // Города с общим описанием, фото и описанием фото
 
 // Инициализация модели фильтра
 const filterModel = new FilterModel();

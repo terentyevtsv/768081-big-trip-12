@@ -279,14 +279,6 @@ export default class BasePoint extends SmartView {
       .addEventListener(`change`, this._priceChangeHandler);
   }
 
-  reset(point) {
-    if (point !== null) {
-      this.updateData(
-          BasePoint.parsePointToData(point)
-      );
-    }
-  }
-
   _setInnerHandlers() {
     this.getElement()
       .querySelector(`.event__type-list`)
@@ -434,17 +426,15 @@ export default class BasePoint extends SmartView {
       return;
     }
 
-    if (selectedDate > this._data.timeInterval.rightLimitDate) {
-      tempTimeInterval = {
+    tempTimeInterval = selectedDate > this._data.timeInterval.rightLimitDate
+      ? {
         leftLimitDate: selectedDate,
         rightLimitDate: selectedDate
-      };
-    } else {
-      tempTimeInterval = {
+      }
+      : {
         leftLimitDate: selectedDate,
         rightLimitDate: this._data.timeInterval.rightLimitDate
       };
-    }
 
     this.updateData({
       timeInterval: tempTimeInterval
@@ -470,17 +460,15 @@ export default class BasePoint extends SmartView {
       return;
     }
 
-    if (selectedDate < this._data.timeInterval.leftLimitDate) {
-      tempTimeInterval = {
+    tempTimeInterval = selectedDate < this._data.timeInterval.leftLimitDate
+      ? {
         leftLimitDate: selectedDate,
         rightLimitDate: selectedDate
-      };
-    } else {
-      tempTimeInterval = {
+      }
+      : {
         leftLimitDate: this._data.timeInterval.leftLimitDate,
         rightLimitDate: selectedDate
       };
-    }
 
     this.updateData({
       timeInterval: tempTimeInterval
