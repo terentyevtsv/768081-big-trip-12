@@ -236,12 +236,9 @@ siteMenuView.setMenuClickHandler(handleSiteMenuClick);
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      // Действие, в случае успешной регистрации ServiceWorker
-      console.log(`ServiceWorker available`); // eslint-disable-line
-    }).catch(() => {
+    .catch((error) => {
       // Действие, в случае ошибки при регистрации ServiceWorker
-      console.error(`ServiceWorker isn't available`); // eslint-disable-line
+      throw new Error(`ServiceWorker isn't available: ${error.message}`);
     });
 });
 

@@ -312,8 +312,7 @@ export default class BasePoint extends SmartView {
         this.getElement().querySelector(`#event-start-time-1`),
         {
           enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
+          [`time_24hr`]: true,
           allowInput: false,
           dateFormat: `d/m/Y H:i`,
           onChange: this._leftDateTimeChangeHandler
@@ -335,8 +334,7 @@ export default class BasePoint extends SmartView {
         this.getElement().querySelector(`#event-end-time-1`),
         {
           enableTime: true,
-          // eslint-disable-next-line camelcase
-          time_24hr: true,
+          [`time_24hr`]: true,
           allowInput: false,
           dateFormat: `d/m/Y H:i`,
           onChange: this._rightDateTimeChangeHandler
