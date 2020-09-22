@@ -8,7 +8,7 @@ import OpenPointButtonView from "../view/open-point-button.js";
 import {Key, UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import PointDetailsView from "../view/point-details.js";
-import PointsFiltration from "../utils/filter.js";
+import PointsFiltration from "../utils/points-filtration.js";
 
 const MAXIMUM_OFFERS_COUNT = 3;
 

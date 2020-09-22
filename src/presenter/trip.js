@@ -7,7 +7,7 @@ import PointsListView from "../view/points-list.js";
 import TripPointsItemView from "../view/trip-points-item.js";
 import {SortType, FilterType, UserAction, MenuItem} from "../const.js";
 import TripPointPresenter from "./trip-point.js";
-import PointsFiltration from "../utils/filter.js";
+import PointsFiltration from "../utils/points-filtration.js";
 import NewPointPresenter from "./new-point.js";
 import LoadingView from "../view/loading.js";
 

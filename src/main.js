@@ -15,7 +15,7 @@ import CitiesModel from "./model/cities.js";
 import NewPointButtonView from "./view/new-point-button.js";
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
-import PointsFiltration from "./utils/filter.js";
+import PointsFiltration from "./utils/points-filtration.js";
 
 const STORE_PREFIX = `bigtrip-localstorage`;
 const STORE_VERSION = `v12`;

@@ -4,7 +4,7 @@ import {render, AddedComponentPosition, replace, remove} from "../utils/render.j
 import {Key, UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import PointDetailsView from "../view/point-details.js";
-import PointsFiltration from "../utils/filter.js";
+import PointsFiltration from "../utils/points-filtration.js";
 
 const EMPTY_POINT_INDEX = 0;
 
