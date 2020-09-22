@@ -1,5 +1,3 @@
-import {AddedComponentPosition, render} from "../utils/render.js";
-import TripPriceView from "./trip-price.js";
 import {getDateForInterval} from "../utils/formats.js";
 import AbstractView from "./abstract.js";
 
@@ -83,13 +81,5 @@ export default class TripInformationContainer extends AbstractView {
 
   getTemplate() {
     return createTripInformationContainerTemplate(this._datePointsPlan);
-  }
-
-  fillPrice() {
-    render(
-        this,
-        new TripPriceView(this._datePointsPlan),
-        AddedComponentPosition.BEFORE_END
-    );
   }
 }

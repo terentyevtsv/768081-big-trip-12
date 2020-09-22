@@ -1,4 +1,4 @@
-import OffersContainerView from "../view/offers.js";
+import OffersContainerView from "../view/offers-container.js";
 import DestinationView from "../view/destination.js";
 import {AddedComponentPosition, render, remove} from "./render.js";
 

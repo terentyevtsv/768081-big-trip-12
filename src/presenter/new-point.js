@@ -4,7 +4,7 @@ import {render, AddedComponentPosition, replace, remove} from "../utils/render.j
 import {Key, UserAction} from "../const.js";
 import PointsModel from "../model/points.js";
 import PointDetailsView from "../view/point-details.js";
-import PointsFiltration from "../utils/filter.js";
+import PointsFiltration from "../utils/points-filtration.js";
 
 const EMPTY_POINT_INDEX = 0;
 
@@ -18,13 +18,11 @@ export default class NewPoint {
       filterModel,
       newPointButtonView,
       changePoint,
-      changePointsMode,
       api
   ) {
     this._filterPresenter = filterPresenter;
     this._pointListContainer = pointListContainer;
     this._changePoint = changePoint;
-    this._changePointsMode = changePointsMode;
     this._offersModel = offersModel;
     this._citiesModel = citiesModel;
     this._pointsModel = pointsModel;

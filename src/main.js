@@ -15,7 +15,7 @@ import CitiesModel from "./model/cities.js";
 import NewPointButtonView from "./view/new-point-button.js";
 import Store from "./api/store.js";
 import Provider from "./api/provider.js";
-import PointsFiltration from "./utils/filter.js";
+import PointsFiltration from "./utils/points-filtration.js";
 
 const STORE_PREFIX = `bigtrip-localstorage`;
 const STORE_VERSION = `v12`;
@@ -53,7 +53,7 @@ const citiesModel = new CitiesModel();
 
 // Инициализация модели точек маршрута
 const pointsModel = new PointsModel();
-pointsModel.setСitiesStructure(new Map()); // Города с общим описанием, фото и описанием фото
+pointsModel.setCitiesStructure(new Map()); // Города с общим описанием, фото и описанием фото
 
 // Инициализация модели фильтра
 const filterModel = new FilterModel();

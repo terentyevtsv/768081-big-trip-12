@@ -1,5 +1,5 @@
 import {remove, render, AddedComponentPosition} from "../utils/render.js";
-import TripInformationContainer from "../view/trip-information.js";
+import TripInformationContainer from "../view/trip-information-container.js";
 import TripPriceView from "../view/trip-price.js";
 
 export default class TripInformation {
